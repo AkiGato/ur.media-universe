@@ -1,0 +1,28 @@
+name: CI
+
+# Typecheck, design audits and build on every push. The design rules in
+# docs/design/ were previously enforced by remembering them; the two static
+# audits in scripts/audits/static/ run inside `lint`.
+on:
+  push:
+    branches: ['**']
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+
+      - run: npm ci
+
+      - name: Typecheck and design audits
+        run: npm run lint
+
+      - name: Build
+        run: npm run build

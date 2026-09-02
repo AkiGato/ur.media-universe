@@ -1,0 +1,1131 @@
+@import "tailwindcss";
+
+/* SELF-HOSTED TYPEFACE — the single family (TY-01, One Voice, and It Is Light).
+   Served from /fonts so first paint needs no third-party connection, the reader
+   is not announced to a font CDN, and offline reading keeps its typography. */
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  font-style: normal;
+  font-weight: 200 800;
+  font-display: swap;
+  src: url('/fonts/plus-jakarta-sans-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  font-style: normal;
+  font-weight: 200 800;
+  font-display: swap;
+  src: url('/fonts/plus-jakarta-sans-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  font-style: italic;
+  font-weight: 200 800;
+  font-display: swap;
+  src: url('/fonts/plus-jakarta-sans-latin-italic.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  font-style: italic;
+  font-weight: 200 800;
+  font-display: swap;
+  src: url('/fonts/plus-jakarta-sans-latin-ext-italic.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+/* GLOBAL STRICT DESIGN RULES — sharp geometry, no focus outlines, no rings */
+*, *::before, *::after,
+*:focus, *:focus-visible, *:focus-within, *:active, *:hover,
+button, a, input, select, textarea, div, span, label, svg {
+  border-radius: 0px !important;
+  outline: none !important;
+  outline-style: none !important;
+  outline-width: 0px !important;
+  outline-color: transparent !important;
+  outline-offset: 0px !important;
+  -webkit-tap-highlight-color: transparent !important;
+  -webkit-focus-ring-color: transparent !important;
+  --tw-ring-color: transparent !important;
+  --tw-ring-shadow: none !important;
+  --tw-ring-offset-shadow: none !important;
+  --tw-ring-offset-width: 0px !important;
+  --tw-ring-width: 0px !important;
+}
+
+body, button, input, select, textarea, div, p, span, h1, h2, h3, h4, h5, h6,
+text, tspan {
+  font-family: 'Plus Jakarta Sans', ui-sans-serif, system-ui, -apple-system, sans-serif !important;
+}
+
+/* THE HOUSE VOICE IS LIGHT.
+
+   The map settled this: a name is typography, not signage. Contrast comes from
+   size, letter-spacing, opacity and light — never from weight, which is the one
+   register that makes an interface shout. Anything that never says a weight
+   inherited 400 and quietly sat a step heavier than everything around it, so
+   the default is the voice rather than the exception. Buttons and inputs carry
+   their own UA weight and have to be named explicitly. */
+body, button, input, select, textarea {
+  font-weight: 300;
+}
+
+/* LIQUID GLASS HAIRLINES — every border in the app becomes a translucent
+   hairline instead of a hard 1px outline. Neurologically low-arousal. */
+.theme-dark *, .theme-dark *::before, .theme-dark *::after {
+  border-color: rgba(255, 255, 255, 0.12) !important;
+}
+.theme-light *, .theme-light *::before, .theme-light *::after {
+  border-color: rgba(0, 0, 0, 0.10) !important;
+}
+
+/* PLAIN SURFACES — the glass system is retired (see PLAIN GROUND at the end
+   of this file). The classes survive in markup as layout hooks only; none of
+   them draws anything of its own any more. */
+
+/* ══════════════════════════════════════════ ORGANIC GLASS — the reader body
+   The reader borrows the map's grammar. On the map nothing is a box: a soma
+   is defined by the density of the light inside it, never by a drawn rim, and
+   a connection is a filament, never a rule. The reader works the same way.
+
+   A surface is a LIGHT-WELL — a glass field lit from one side whose edges
+   dissolve into the page before they can become an edge. The field lives on a
+   masked ::before, never on the element itself, so the feather softens the
+   glass without ever fading the text sitting on top of it. Flat translucent
+   fills are what read as grey slabs; a gradient reads as light.             */
+
+/* THE ONE CURVE.
+
+   Every easing in the app is this curve, because the map is this curve. It was
+   an ease-out quint (.22, 1, .36, 1), which covers most of its
+   distance in the first fifth of the duration. The eye registers rate, not
+   amount, so that fast leading edge read as aggressive no matter how small the
+   movement was made; the map replaced it and everything else kept the old one,
+   which is why the reader always felt a touch snappier than the organism it
+   came out of. A curve that starts slowly cannot feel like a flash.
+
+   --ease-exit is its deliberate inverse, for motion that is leaving: slow to
+   commit, then gone. Nothing arrives on it. */
+:root {
+  --ease-organic: cubic-bezier(0.45, 0.05, 0.3, 1);
+  --ease-exit: cubic-bezier(0.55, 0, 0.85, 0.5);
+}
+
+/*
+   THE SHELL IS THE VISIBLE VIEWPORT, NOT THE THEORETICAL ONE.
+
+   `100vh` on a phone is the viewport with the browser's own chrome retracted —
+   taller than what is actually on screen while the address bar is showing. In
+   an app that forbids page scrolling (No Page Scrolling), the difference is not
+   cosmetic: the footer and its page controls sit below the fold with no way to
+   reach them, because the one gesture that would bring them up is the gesture
+   this app disables. `100dvh` is the height that is actually there. The `vh`
+   line stays first as the fallback for engines that do not know `dvh`.        */
+.app-shell {
+  height: 100vh;
+  height: 100dvh;
+}
+
+/*
+   THE OPENER YIELDS TO THE PROSE.
+
+   A chapter's cell is a moment of scale, and a moment of scale is worth having
+   only where there is room to have one. Measured on a 320×568 sheet: the opener
+   block took 248px of a 426px column and the citations another 123, which left
+   the chapter's actual text fourteen pixels — the chapter announced itself and
+   then had nowhere to speak.
+
+   So the figure is bound to the height of the viewport, not only its width. A
+   short sheet — a small phone, a phone held sideways, a laptop with a shallow
+   window — keeps the chapter's title and drops the drawing. Nothing is lost
+   that the page cannot say in words.                                          */
+.opener-figure { max-height: 38vh; }
+
+@media (max-height: 900px) { .opener-figure { max-height: 26vh; } }
+@media (max-height: 760px) { .opener-figure { max-height: 18vh; } }
+@media (max-height: 640px) { .opener-figure { display: none; } }
+/* a phone on its side has height to spare nowhere and width to spare here */
+@media (orientation: landscape) and (max-height: 520px) { .opener-figure { display: none; } }
+
+/*
+   CHROME AND MARGIN YIELD TOO.
+
+   Measured on a phone held sideways (844×390): the header and footer took 110
+   pixels and the sheet's own margins another 64 — 45% of the screen spent
+   before a word of the chapter was set, leaving the prose 32px. Reading margin
+   is generous because generosity is legible, but generosity measured against a
+   390px screen is just a wall.
+
+   Both are bound to viewport height rather than width: it is the short axis
+   that runs out, and a laptop with a shallow window is in exactly the same
+   position as a phone on its side.                                            */
+.reader-bar { height: 3.5rem; }
+.reader-bar--foot { height: 3rem; }
+
+@media (max-height: 760px) {
+  .reader-bar { height: 3rem; }
+  .reader-bar--foot { height: 2.75rem; }
+  .sheet-pad { padding-top: 0.75rem !important; padding-bottom: 0.75rem !important; }
+}
+@media (max-height: 620px) {
+  .reader-bar { height: 2.6rem; }
+  .reader-bar--foot { height: 2.5rem; }
+  .sheet-pad { padding-top: 0.4rem !important; padding-bottom: 0.4rem !important; }
+  /* the subtitle is the first line a shallow page can do without */
+  .sheet-subtitle { display: none; }
+}
+
+.membrane, .membrane-faint, .membrane-lit,
+.bud, .bud-lit, .veil {
+  position: relative;
+  isolation: isolate;
+}
+
+.membrane::before, .membrane-faint::before, .membrane-lit::before,
+.bud::before, .bud-lit::before, .veil::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* The feather. The mask ellipse reaches zero opacity at the rim — like the
+   wander envelope on a strand, a floored value would leave a visible edge. */
+.membrane::before, .membrane-faint::before, .membrane-lit::before {
+  inset: -7px -11px;
+  -webkit-mask-image: radial-gradient(ellipse 94% 100% at 50% 46%, #000 28%, rgba(0, 0, 0, 0.62) 68%, transparent 100%);
+  mask-image: radial-gradient(ellipse 94% 100% at 50% 46%, #000 28%, rgba(0, 0, 0, 0.62) 68%, transparent 100%);
+  animation: membrane-tide 19.7s ease-in-out infinite;
+}
+
+.membrane::before {
+  background:
+    radial-gradient(ellipse 82% 130% at 50% -12%, rgba(255, 255, 255, 0.10), transparent 70%),
+    radial-gradient(ellipse 130% 95% at 16% 112%, rgba(255, 255, 255, 0.05), transparent 74%);
+  backdrop-filter: blur(14px) saturate(122%);
+  -webkit-backdrop-filter: blur(14px) saturate(122%);
+}
+/* a pane laid on paper: lit along its upper edge, shading away underneath */
+.theme-light .membrane::before {
+  background:
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.85), transparent 22%),
+    radial-gradient(ellipse 86% 130% at 50% 108%, rgba(0, 0, 0, 0.075), transparent 72%),
+    radial-gradient(ellipse 120% 100% at 50% 50%, rgba(0, 0, 0, 0.035), rgba(0, 0, 0, 0.055) 100%);
+}
+
+/* Nested tissue — no second blur pass, it already sits on blurred glass */
+.membrane-faint::before {
+  background: radial-gradient(ellipse 92% 150% at 42% -20%, rgba(255, 255, 255, 0.055), transparent 76%);
+}
+.theme-light .membrane-faint::before {
+  background:
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.6), transparent 26%),
+    radial-gradient(ellipse 110% 130% at 50% 100%, rgba(0, 0, 0, 0.045), transparent 78%);
+}
+
+/* Excited tissue — selection and active states brighten from within rather
+   than inverting to a solid slab */
+.membrane-lit::before {
+  background:
+    radial-gradient(ellipse 88% 150% at 50% -18%, rgba(var(--lume-rgb), 0.20), transparent 72%),
+    radial-gradient(ellipse 120% 100% at 50% 120%, rgba(var(--lume-rgb), 0.08), transparent 74%);
+  backdrop-filter: blur(16px) saturate(130%);
+  -webkit-backdrop-filter: blur(16px) saturate(130%);
+}
+/* excited, not merely darker: the core lifts clear of the page while the rim
+   presses further into it — a state change reads as presence, not as ink */
+.theme-light .membrane-lit::before {
+  background:
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.95), transparent 30%),
+    radial-gradient(ellipse 92% 140% at 50% 112%, rgba(0, 0, 0, 0.12), transparent 74%),
+    radial-gradient(ellipse 118% 100% at 50% 46%, rgba(255, 255, 255, 0.55) 34%, rgba(0, 0, 0, 0.05) 84%, rgba(0, 0, 0, 0.1) 100%);
+}
+
+/* Desynchronised surfaces — surfaces breathing in lockstep read as machinery */
+.membrane:nth-child(2n)::before, .membrane-faint:nth-child(2n)::before { animation-delay: -6.4s; }
+.membrane:nth-child(3n)::before, .membrane-faint:nth-child(3n)::before { animation-delay: -13.1s; }
+.membrane:nth-child(5n)::before, .membrane-faint:nth-child(5n)::before { animation-delay: -3.7s; }
+
+/* The reader's surfaces ride the same tide as the map's strands, on the same
+   19.7s period and the same asymmetric contour — so moving between the two
+   never feels like moving between two systems with different metabolisms. */
+@keyframes membrane-tide {
+  0%   { opacity: 0.82; }
+  17%  { opacity: 0.90; }
+  31%  { opacity: 0.87; }
+  46%  { opacity: 1; }
+  68%  { opacity: 0.92; }
+  100% { opacity: 0.82; }
+}
+
+/* A control is bare type. The bud used to draw a swelling of light under every
+   glyph — a soft field with a backdrop blur — and however gently it was graded
+   it read as a background slab behind the words: a piece of chrome lying on the
+   sheet. It is gone everywhere at once. What remains is the calmest state
+   change there is: the control sits dimmed, and attention brightens it. Active
+   state (.bud-lit) is simply full presence. */
+.bud::before, .bud-lit::before {
+  content: none;
+}
+.bud {
+  opacity: 0.68;
+  transition: opacity 0.6s var(--ease-organic);
+}
+.bud:hover, .bud:focus-visible { opacity: 1; }
+.bud-lit { opacity: 1; }
+.bud:disabled { opacity: 0.22; }
+
+/* A bud is a target as well as a mark. With a fine pointer its size is set by
+   the glyph; with a coarse one it has to be reachable by a thumb, and an icon
+   button drawn at 28px is not. The swell itself does not grow — only the area
+   that answers to touch. */
+@media (pointer: coarse) {
+  .bud, button.glass-hover { min-height: 44px; min-width: 44px; }
+}
+
+/* Chrome bands dissolve into the page instead of sitting on it behind a rule */
+.veil::before {
+  inset: 0;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.22) 62%, transparent 100%);
+  backdrop-filter: blur(26px) saturate(125%);
+  -webkit-backdrop-filter: blur(26px) saturate(125%);
+  -webkit-mask-image: linear-gradient(to bottom, #000 46%, rgba(0, 0, 0, 0.55) 78%, transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 46%, rgba(0, 0, 0, 0.55) 78%, transparent 100%);
+}
+/* chrome on paper needs the shade at its trailing edge or it is not there */
+.theme-light .veil::before {
+  background:
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.92) 40%, rgba(255, 255, 255, 0.55) 74%, transparent 100%),
+    linear-gradient(to bottom, transparent 62%, rgba(0, 0, 0, 0.045) 100%);
+}
+.veil-up::before {
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.22) 62%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to top, #000 46%, rgba(0, 0, 0, 0.55) 78%, transparent 100%);
+  mask-image: linear-gradient(to top, #000 46%, rgba(0, 0, 0, 0.55) 78%, transparent 100%);
+}
+.theme-light .veil-up::before {
+  background:
+    linear-gradient(to top, rgba(255, 255, 255, 0.92) 40%, rgba(255, 255, 255, 0.55) 74%, transparent 100%),
+    linear-gradient(to top, transparent 62%, rgba(0, 0, 0, 0.045) 100%);
+}
+
+/* Drawers are columns of glass whose inner edge dissolves into the page —
+   never a panel with a rule down one side */
+.veil-right::before {
+  background: linear-gradient(to right, rgba(0, 0, 0, 0.72), rgba(0, 0, 0, 0.6) 74%, rgba(0, 0, 0, 0.2) 100%);
+  -webkit-mask-image: linear-gradient(to right, #000 84%, rgba(0, 0, 0, 0.7) 94%, transparent 100%);
+  mask-image: linear-gradient(to right, #000 84%, rgba(0, 0, 0, 0.7) 94%, transparent 100%);
+}
+.theme-light .veil-right::before {
+  background:
+    linear-gradient(to right, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.86) 74%, rgba(255, 255, 255, 0.3) 100%),
+    linear-gradient(to right, transparent 70%, rgba(0, 0, 0, 0.07) 100%);
+}
+.veil-left::before {
+  background: linear-gradient(to left, rgba(0, 0, 0, 0.72), rgba(0, 0, 0, 0.6) 74%, rgba(0, 0, 0, 0.2) 100%);
+  -webkit-mask-image: linear-gradient(to left, #000 84%, rgba(0, 0, 0, 0.7) 94%, transparent 100%);
+  mask-image: linear-gradient(to left, #000 84%, rgba(0, 0, 0, 0.7) 94%, transparent 100%);
+}
+.theme-light .veil-left::before {
+  background:
+    linear-gradient(to left, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.86) 74%, rgba(255, 255, 255, 0.3) 100%),
+    linear-gradient(to left, transparent 70%, rgba(0, 0, 0, 0.07) 100%);
+}
+
+/* A floating well — the search modal. Bright in the middle, gone at the rim. */
+.well {
+  position: relative;
+  isolation: isolate;
+}
+.well::before {
+  content: '';
+  position: absolute;
+  inset: -14px -18px;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 90% 70% at 50% 0%, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.62) 55%, rgba(0, 0, 0, 0.3) 100%);
+  backdrop-filter: blur(26px) saturate(128%);
+  -webkit-backdrop-filter: blur(26px) saturate(128%);
+  -webkit-mask-image: radial-gradient(ellipse 96% 98% at 50% 46%, #000 52%, rgba(0, 0, 0, 0.72) 82%, transparent 100%);
+  mask-image: radial-gradient(ellipse 96% 98% at 50% 46%, #000 52%, rgba(0, 0, 0, 0.72) 82%, transparent 100%);
+}
+.theme-light .well::before {
+  background:
+    radial-gradient(ellipse 90% 70% at 50% 0%, rgba(255, 255, 255, 0.97), rgba(255, 255, 255, 0.9) 55%, rgba(255, 255, 255, 0.55) 100%),
+    radial-gradient(ellipse 100% 100% at 50% 50%, transparent 58%, rgba(0, 0, 0, 0.09) 100%);
+}
+
+/* Overlays dim through a light-well, never a flat grey wash */
+.scrim {
+  background:
+    radial-gradient(ellipse 70% 60% at 50% 45%, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.74) 100%);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+/* A white wash behind a white panel hides the panel. In light the scrim shades
+   instead — the overlay still recedes, and what floats above it can be seen. */
+.theme-light .scrim {
+  background:
+    radial-gradient(ellipse 70% 60% at 50% 45%, rgba(0, 0, 0, 0.14), rgba(0, 0, 0, 0.26) 100%);
+}
+
+/* Dividers are filaments, and a filament breathes. Gentler amplitude than the
+   map's strands — a rule that pulses hard next to text reads as a flicker. */
+@keyframes vein-breathe {
+  0%   { opacity: 0.62; }
+  17%  { opacity: 0.79; }
+  30%  { opacity: 0.74; }
+  46%  { opacity: 1; }
+  67%  { opacity: 0.85; }
+  100% { opacity: 0.62; }
+}
+.vein-breathe { animation: vein-breathe 19.7s ease-in-out infinite; }
+
+/* A drift of light across a surface as it settles into place */
+@keyframes surface-settle {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.settle { animation: surface-settle 0.28s var(--ease-organic) both; }
+
+/* Soft hover for interactive glass — no harsh inversion flips */
+/* THE LIGHT COMES FROM THE TEXT, NEVER FROM THE BOX BEHIND IT.
+
+   This used to raise a translucent rectangle behind whatever was hovered —
+   12% white over the whole padded area — so touching a control lit up a BOX,
+   and a box is the one thing LY-06 says a control may never become: "a swell
+   of light under the glyph, never a bordered pill and never a black-white fill
+   flip". A rectangle appearing under a name is also a filled area, which DG-02
+   refuses at any opacity, and it is the same grey slab the glass came out for.
+
+   So the light is carried by the element's own ink instead. Everything inside
+   the control — its name, its soma, whatever texture it holds — comes up
+   together, which is exactly what .bud does, and the two now behave alike
+   because they were always meant to be one idea. Nothing is painted, nothing
+   has an edge, and the shape of the control stays invisible until it is
+   pressed. */
+.glass-hover {
+  opacity: 0.72;
+  transition: opacity 0.6s var(--ease-organic);
+}
+.glass-hover:hover, .glass-hover:focus-visible { opacity: 1; }
+
+/* SOFT SCROLL — content scrolls, and no scroller is ever drawn.
+   Even a 3px thumb is a piece of mechanism lying on the sheet. Wheel, drag and
+   keys all still work and nothing is clipped; overflow announces itself by text
+   meeting the edge, not by a bar. overflow-x is shut on the same columns so a
+   wide child can never summon the horizontal one. */
+.soft-scroll,
+.overflow-y-auto {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  overflow-x: hidden;
+}
+.soft-scroll::-webkit-scrollbar,
+.overflow-y-auto::-webkit-scrollbar {
+  display: none;
+}
+
+/* HORIZONTAL FLOW — the page never scrolls down; content that outgrows the
+   sheet continues in a column beside itself, reached by the same horizontal
+   gesture that turns pages. One column = the holder's full width (100cqw), so
+   each column reads as its own sheet. No column-rule: a rule is a straight
+   line, and the gap is enough. */
+.hflow-hold { container-type: inline-size; }
+.hflow {
+  height: 100%;
+  column-width: 100cqw;
+  column-gap: 5rem;
+  column-fill: auto;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+}
+
+.hflow::-webkit-scrollbar { display: none; }
+
+/* AMBIENT MOTION — slow enough to register as stillness (soft fascination).
+
+   ON THE TIDE, AND NOT ITS OWN CLOCK.
+
+   This ran at 18s inside a 19.7s app. Every other cycle here — `.strand-breathe`,
+   `.membrane-tide`, `.vein-breathe`, and `TIDE` in Orrery.tsx — is 19.7s, and
+   this one reached the reader and the figures, so the two periods beat against
+   each other with a cycle of their own: a drift of 1.7s per breath that comes
+   back into step only every few minutes. That is exactly the second clock LC-03
+   was written to remove ("Never give the reader its own cycle again"), and
+   LC-05 fixes the number outright — "the 19.7s tide period is fixed... change
+   the number and the wave falls apart".
+
+   THE CONTOUR WAS ALSO A METRONOME.
+
+   It was two stops, 0%/100% against 50% — symmetric rise and fall, which is
+   the shape LC-05 names as the thing to avoid: "the eye finds the beat within
+   a cycle and the motion stops holding attention". The contour now matches the
+   tide it shares a period with — filling faster than it empties, cresting off
+   centre at 43%, carrying a small counter-swell on the way up so one cycle
+   offers two events, and holding at the trough so the next breath has a start.
+   LC-05 permits exactly this: reshape the contour freely, never the number.
+
+   The scale stays. PF-03 bans transforms on big groups because they
+   re-rasterise every descendant per frame; all three users of this class are
+   small and bounded — a 132px loading splash, one pinned cell, the cover
+   flower — which is the case that rule explicitly leaves open. */
+@keyframes ambient-breathe {
+  0%   { opacity: 0.50; transform: scale(1); }
+  14%  { opacity: 0.72; transform: scale(1.017); }
+  27%  { opacity: 0.66; transform: scale(1.012); }  /* the counter-swell */
+  43%  { opacity: 1;    transform: scale(1.04); }   /* crest, early */
+  62%  { opacity: 0.83; transform: scale(1.030); }
+  78%  { opacity: 0.61; transform: scale(1.018); }
+  92%  { opacity: 0.51; transform: scale(1.003); }
+  100% { opacity: 0.50; transform: scale(1); }      /* a held trough */
+}
+.ambient-breathe { animation: ambient-breathe 19.7s ease-in-out infinite; }
+
+/* Vortex spin — the swirl inside a liquid-glass sphere */
+@keyframes vortex-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+.vortex-spin {
+  transform-box: view-box;
+  animation: vortex-spin 120s linear infinite;
+}
+.vortex-spin-rev {
+  transform-box: view-box;
+  animation: vortex-spin 170s linear infinite reverse;
+}
+
+/* Light flows continuously through the tissue — never a burst with a hard start
+   and stop. Many strands carry a slow wave at their own duration and phase, so
+   something is always moving somewhere and nothing ever pulses in lockstep.
+   Paths carry pathLength="1" so the dash maths is resolution-independent. */
+@keyframes flow {
+  0%   { stroke-dashoffset: 1; opacity: 0; }
+  14%  { opacity: 1; }
+  86%  { opacity: 1; }
+  100% { stroke-dashoffset: 0; opacity: 0; }
+}
+.flow {
+  stroke-dasharray: 0.16 0.84;
+  animation: flow 26s linear infinite;
+}
+
+/* Every strand breathes. Opacity animation is compositor-cheap, unlike
+   stroke-dashoffset, so the whole organism can pulse while only a handful of
+   strands carry an actual travelling wave. */
+/* The luminance tide. Every strand shares one period, but its phase is set by
+   its distance from the core, so the breathing becomes a wave of brightness
+   propagating outward through the whole mesh — light that travels with no
+   moving object and no ends to read as a capsule. */
+/*
+   A two-stop sine is a metronome.
+
+   Symmetric rise and fall over a fixed period is exactly what a machine does,
+   and the eye finds the beat within a cycle or two — after which the motion has
+   nothing left to give and stops holding attention. Breath is not symmetric: it
+   fills faster than it empties, crests slightly off centre, and pauses at the
+   bottom before the next one starts. This contour does that, and carries a
+   smaller secondary swell inside the long one, so a single 19.7s cycle offers
+   two events instead of one and never resolves into a countable beat.
+
+   The PERIOD must stay 19.7s: it is the luminance tide, shared by every strand
+   in the organism and matched by TIDE in Orrery.tsx. Change the shape here as
+   much as you like; change the number and the wave falls apart.
+*/
+@keyframes strand-breathe {
+  0%   { opacity: 0.50; }
+  14%  { opacity: 0.72; }
+  27%  { opacity: 0.66; }   /* the small counter-swell on the way up */
+  43%  { opacity: 1; }      /* crest, early — filling is faster than emptying */
+  62%  { opacity: 0.83; }
+  78%  { opacity: 0.61; }
+  92%  { opacity: 0.51; }
+  100% { opacity: 0.50; }   /* a held trough, so the next breath has a start */
+}
+.strand-breathe {
+  animation: strand-breathe 19.7s ease-in-out infinite;
+}
+
+/* Saltatory conduction.
+
+   Between the wraps of myelin the axon membrane is bare, and the spike does not
+   slide down the fibre — it regenerates from scratch at each of those nodes in
+   turn. So every node on one axon shares a period and takes its delay from its
+   position along the fibre, and the flash appears to leap distally.
+
+   This is the one honest way to send light along a strand under the no-
+   travelling-dash rule: nothing moves and nothing has ends, each node simply
+   fires slightly later than the one behind it, which is what the real thing
+   does. The rise is near-instant and the fall is quick — a spike that eases in
+   and out is a swell, and swells belong to the tide, not to firing. */
+@keyframes ranvier-fire {
+  0%   { opacity: 0.14; }
+  3%   { opacity: 1; }
+  11%  { opacity: 0.3; }
+  100% { opacity: 0.14; }
+}
+.ranvier {
+  animation: ranvier-fire 7.4s ease-out infinite;
+}
+
+/* Depth planes — applied only to the backdrop, never to the organism. A
+   transform animation re-rasterises every descendant each frame, so these must
+   wrap few elements. Parallax between backdrop and tissue gives the depth. */
+@keyframes plane-turn {
+  0%, 100% { transform: rotate(-0.55deg); }
+  50%      { transform: rotate(0.55deg); }
+}
+.plane-mid  { transform-box: view-box; animation: plane-turn 71.3s ease-in-out infinite reverse; }
+
+/* A planet emitting on its own — a halo swelling outward and fading, always on,
+   never waiting for a cursor. Each planet runs its own period and phase. */
+
+/* A soma glowing as light passes through it — slow, soft, out of step.
+   The tide arrives at a cell body, floods it, and drains more slowly than it
+   came: the same asymmetry the strands carry, so the wave passes *through* the
+   soma instead of the soma blinking on its own schedule. */
+
+/* Living tissue: everything breathes and sways, each at its own phase.
+   Synchronised motion reads as machinery — desynchronised reads as alive.
+   Callers vary animation-duration and pass a negative delay to offset phase.
+
+   Breathing is scale *and* a little drift. A cell that only inflates reads as a
+   balloon on a pump; one that also wanders a fraction of a unit reads as
+   suspended in something. The drift is deliberately not in phase with the
+   swell — the crest of the breath falls between the extremes of the wander, so
+   the two never resolve into a single motion. */
+@keyframes alive-breathe {
+  0%   { transform: scale(1) translate(0, 0); }
+  27%  { transform: scale(1.016) translate(0.35px, -0.5px); }
+  50%  { transform: scale(1.028) translate(0.1px, -0.8px); }
+  73%  { transform: scale(1.014) translate(-0.4px, -0.35px); }
+  100% { transform: scale(1) translate(0, 0); }
+}
+/* transform-box: view-box, never fill-box. fill-box makes the browser measure
+   the group's bounding box every frame — with large dendrite groups that alone
+   collapsed the map to 1fps. view-box needs no measurement, so callers pass an
+   explicit transform-origin in user units instead. */
+.alive {
+  transform-box: view-box;
+  animation: alive-breathe 9s ease-in-out infinite;
+}
+
+/* Sway is a float, not a pendulum.
+
+   A single rotate axis swings between two stops and the eye finds the pivot
+   immediately — it reads as something hinged. Adding a small out-of-phase
+   translation makes the path an open loop rather than an arc, which is what
+   something suspended in fluid actually does: it never returns along the line
+   it left by. Sub-pixel amplitudes; the reading is of drift, not of movement. */
+@keyframes tissue-sway {
+  0%   { transform: rotate(-1.1deg) translate(0, 0); }
+  22%  { transform: rotate(-0.5deg) translate(0.6px, 0.35px); }
+  47%  { transform: rotate(0.85deg) translate(0.35px, 0.7px); }
+  68%  { transform: rotate(1.1deg) translate(-0.3px, 0.25px); }
+  86%  { transform: rotate(0.15deg) translate(-0.55px, -0.3px); }
+  100% { transform: rotate(-1.1deg) translate(0, 0); }
+}
+.sway {
+  transform-box: view-box;
+  animation: tissue-sway 24s ease-in-out infinite;
+}
+
+/* Excitation spreading outward from whatever you touched — fires once per
+   touch, propagating through the tissue by graph distance, not by geometry. */
+/* The excitation keyframe is gone. Touch response is a CSS transition on an
+   always-mounted layer instead — see the excitation paths in Orrery.tsx. A
+   keyframe on a conditionally-rendered element cannot reverse when the cursor
+   leaves; it is simply cut, which is the opposite of fluid. */
+
+/* Core pulse — the emitter itself.
+
+   Six seconds was fast enough to read as a heartbeat, and a heartbeat is an
+   arousal signal: the one rhythm a nervous system is built to synchronise to.
+   At 11.3s, with an asymmetric fill and a long drain, it reads as respiration
+   instead — the source breathing, not beating.
+
+   transform-box: view-box, never fill-box (PF-02). fill-box re-measures the
+   group's bounding box every frame; the origin is passed in user units by the
+   caller instead. */
+@keyframes core-pulse {
+  0%   { opacity: 0.85; transform: scale(1); }
+  16%  { opacity: 0.93; transform: scale(1.028); }
+  29%  { opacity: 0.90; transform: scale(1.021); }
+  45%  { opacity: 1;    transform: scale(1.062); }
+  70%  { opacity: 0.93; transform: scale(1.034); }
+  100% { opacity: 0.85; transform: scale(1); }
+}
+.core-pulse {
+  transform-box: view-box;
+  animation: core-pulse 11.3s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ambient-breathe,
+  .vortex-spin, .vortex-spin-rev,
+  .flow, .core-pulse, .alive, .sway, .strand-breathe,
+  .ranvier,
+  .plane-mid,
+  .settle, .vein-breathe, .surface { animation: none; }
+  .surface { opacity: 1; transform: none; filter: none; }
+  .ranvier { opacity: 0.55; }
+  .membrane::before, .membrane-faint::before, .membrane-lit::before { animation: none; opacity: 0.92; }
+  .bud::before, .bud-lit::before { transition: none; }
+  .flow { stroke-dasharray: none; opacity: 0.2; }
+}
+
+/* SURFACING — the far end of the dive.
+   The camera fell into a cell; the page it lands on must appear to come up
+   through that light rather than cut in. It starts fractionally overscaled and
+   settles back, which reads as the last of the forward motion bleeding off. */
+@keyframes surface {
+  from { opacity: 0; transform: scale(1.035); filter: blur(6px); }
+  60%  { opacity: 1; }
+  to   { opacity: 1; transform: scale(1); filter: blur(0); }
+}
+.surface {
+  animation: surface 1.05s var(--ease-organic) both;
+  transform-origin: center;
+}
+
+/* The one control zen mode keeps. It has to be quiet enough not to be chrome
+   and present enough to be found — so it rests at the threshold of visible and
+   comes up fully the moment it is touched or focused. */
+.zen-exit {
+  opacity: 0.16;
+  transition: opacity 0.3s var(--ease-organic);
+}
+.zen-exit:hover, .zen-exit:focus-visible { opacity: 0.95; }
+
+/* SUBMERGING — the return leg.
+   A dive that has no way back is half a journey: leaving the reader used to
+   cut to the map in one frame, which undid the continuity the descent had
+   just established. The page sinks back through the same light it came up
+   through, and the map opens centred on the cell it sank into. Shorter than
+   the dive — going back to something you have already seen should not take as
+   long as arriving at it. */
+@keyframes submerge {
+  from { opacity: 1; transform: scale(1); filter: blur(0); }
+  to   { opacity: 0; transform: scale(1.05); filter: blur(7px); }
+}
+.submerge {
+  animation: submerge 0.18s var(--ease-exit) both;
+  transform-origin: center;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .surface, .submerge { animation: none; }
+}
+
+/* EVERY FIBRE ANSWERS TO TOUCH
+   Excitation only ever fired when the pointer found a node, so most of the
+   organism was inert: you could run the cursor straight through the tissue and
+   nothing happened. Now each filament responds on its own — it swells and
+   lights as the pointer crosses it, and subsides slowly afterwards.
+
+   Deliberately NOT a light that follows the cursor (removed twice, for good
+   reason). Nothing here is attached to the pointer: each fibre reacts only when
+   it is actually touched, so what moves is the tissue, not a marker riding over
+   it. Because the pointer crosses many filaments as it travels, the aggregate
+   reads as tissue squirming under a finger.
+
+   Pure CSS: no React re-render, no rAF, no per-frame JS. The asymmetric timing
+   is the whole effect — 0.14s to answer, 1.6s to let go. */
+.tissue-live path,
+.tissue-live circle {
+  transition:
+    opacity 1.6s var(--ease-organic),
+    stroke-width 1.6s var(--ease-organic),
+    r 1.6s var(--ease-organic);
+}
+.tissue-live path:not(.halo):hover {
+  opacity: 1;
+  stroke-width: 1.15;
+  transition:
+    opacity 0.14s var(--ease-organic),
+    stroke-width 0.14s var(--ease-organic);
+}
+.tissue-live circle:hover {
+  opacity: 1;
+  r: 1.6;
+  transition:
+    opacity 0.14s var(--ease-organic),
+    r 0.14s var(--ease-organic);
+}
+@media (prefers-reduced-motion: reduce) {
+  .tissue-live path, .tissue-live circle,
+  .tissue-live path:hover, .tissue-live circle:hover { transition: none; }
+}
+
+/* FOCUS IS A BUD, NOT A RING
+   The global reset above kills every outline and ring, which left keyboard
+   readers with no way to see where they are. A hard outline is forbidden
+   (No Hard Outlines), so focus is what a control's hover already is: a swell
+   of light under the glyph — here soft-edged, so it never reads as a border. */
+:focus-visible {
+  box-shadow:
+    0 0 0 3px rgba(255, 255, 255, 0.07),
+    0 0 16px 3px rgba(255, 255, 255, 0.26) !important;
+  transition: box-shadow 0.35s var(--ease-organic);
+}
+.theme-light :focus-visible {
+  box-shadow:
+    0 0 0 3px rgba(0, 0, 0, 0.06),
+    0 0 16px 3px rgba(0, 0, 0, 0.20) !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  :focus-visible { transition: none; }
+}
+
+/* SKIP LINK — off-screen until focused, then a light-well at the top edge.
+   Without it, a keyboard reader must tab through the entire organism. */
+.skip-link {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translate(-50%, -140%);
+  z-index: 100;
+  padding: 0.65rem 1.4rem;
+  font-size: 9px;
+  /* the single voice — light and wide-tracked, never signage weight */
+  font-weight: 300;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  background: #000000;
+    color: inherit;
+  transition: transform 0.5s var(--ease-organic);
+}
+.skip-link:focus {
+  transform: translate(-50%, 0);
+}
+.theme-light .skip-link {
+  background: #ffffff;
+}
+
+/* Strict high-contrast text selection */
+::selection {
+  background: #000000;
+  color: #ffffff;
+}
+
+/* A saved note, drawn back onto the sentence it was taken from.
+
+   A note used to be a quotation in a drawer with a control that turned to the
+   right sheet and left the reader to find the words again by eye. The mark is
+   type, not a field behind type: GR-02 leaves nothing on the ground but type
+   and tissue, so this is the same 0.5px underline the sources link already
+   uses, plus the full opacity that carries state everywhere else in the app
+   (TY-01 — contrast never comes from weight). */
+.marked {
+  opacity: 1;
+  text-decoration: underline;
+  text-decoration-thickness: 0.5px;
+  text-underline-offset: 4px;
+  text-decoration-color: rgb(var(--lume-rgb, 255 255 255) / 0.55);
+}
+.theme-light .marked {
+  text-decoration-color: rgb(0 0 0 / 0.45);
+}
+
+.theme-dark ::selection {
+  background: #ffffff;
+  color: #000000;
+}
+
+/* ═══════════════════════════════════════════════ PLAIN GROUND — GLASS RETIRED
+   Every glassmorphic surface — the graded gradient fields, the backdrop blurs,
+   the feathered light-wells — is switched off here, at the end of the sheet so
+   these rules win over everything above. The page is plain: black is black,
+   white is white, and the only things on the ground are type and tissue.
+
+   Surfaces that genuinely sit OVER other content (drawers, the search well,
+   the highlight popover, the chrome bands) become solid theme ground instead —
+   plain, not translucent, so what is beneath them can never bleed through the
+   words they carry. Everything that merely decorated the page gets nothing. */
+
+.glass-panel,
+.membrane::before, .membrane-faint::before,
+.well::before {
+  background: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  box-shadow: none !important;
+  -webkit-mask-image: none !important;
+  mask-image: none !important;
+  animation: none !important;
+}
+
+/* overlays: solid, plain, opaque */
+.veil::before, .well, .membrane-lit::before {
+  background: #000000 !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  box-shadow: none !important;
+  -webkit-mask-image: none !important;
+  mask-image: none !important;
+  animation: none !important;
+}
+.theme-light .veil::before, .theme-light .well, .theme-light .membrane-lit::before {
+  background: #ffffff !important;
+}
+
+/* ═══════════════════════════════════════════════ THE GROUND UNDER A NAME
+   A name set over the organism is a name competing with it: the tissue is fine
+   white line at the same weight as the type, so wherever a filament crosses a
+   letter the letter loses, and the map's own caption was unreadable exactly
+   when it mattered — with a cell touched and the arbor lit under it.
+
+   GR-04 answers this once — "Legibility Comes From the Ground, Not From
+   Thicker Strands: when the tissue is hard to read, empty the background
+   before touching the drawing" — and the inverse holds for type laid over
+   tissue. Nothing about the letterforms changes. The ground beneath them is
+   emptied instead, which is also why this is not a licence to thicken, bold
+   or box a label: those were the moves this replaces.
+
+   It is the one feathered surface left after PLAIN GROUND retired the glass,
+   and it is permitted for the reason the others were not: it darkens toward
+   the theme's OWN ground rather than lifting it. A soft mass behind filaments
+   lifts black to grey and takes the drawing's contrast with it ("A Cell That
+   Emits No Light Takes No Temperature"); this one is in front of the drawing
+   and can only ever move a pixel toward the ground it already sits on. Verify
+   the same way that rule is verified — measure, never judge: the ground must
+   not lift, so black stays black wherever the vignette is transparent.
+
+   And it carries a PLATEAU, not merely a falloff. Where the words are it is
+   effectively opaque ground, which is what "overlays are solid theme ground,
+   never translucent, so what is beneath can never bleed through the words
+   they carry" asks for; the feather begins only once the type has ended. The
+   name's box is sized to that plateau in Orrery.tsx — the two are one
+   decision, and moving either without the other breaks it.
+
+   THE GROUND IS ONLY EVER UNDER A WORD.
+
+   The first version of this put the name's plateau on screen permanently — a
+   704×384 near-opaque pad in the top-left corner, there whether or not a name
+   was. At the home framing nothing sits in that corner and it looked fine. Zoom
+   in and the organism spreads outward, cells move into the corner, and their
+   numerals go under 96% black: the map lost its labels at exactly the moment a
+   reader was leaning in to read them.
+
+   So the two jobs are separated. What is permanent is *light* — a thin band
+   under the chrome bar and a gentle frame, neither strong enough to bury a
+   numeral. The plateau that actually carries the name is gated on the name:
+   `.name-ground` fades in with the caption and is gone the instant nothing is
+   touched, which is also the only moment it could ever be in the way. The
+   corner is dark exactly while there is something to read there. */
+:root { --ground: 0 0 0; }
+.theme-light { --ground: 255 255 255; }
+
+.ground-vignette {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    /* the bottom bar, which carries the wordmark and the controls. Thin,
+       because the bar is thin — it stops before it reaches the tissue. */
+    linear-gradient(to top,
+      rgb(var(--ground) / 0.88) 0%,
+      rgb(var(--ground) / 0.45) 5%,
+      rgb(var(--ground) / 0) 11%),
+    /* the frame, so the organism sits in a held field rather than running off
+       four hard edges. Held under a third so a cell at the edge still reads. */
+    radial-gradient(ellipse 116% 114% at 50% 48%,
+      rgb(var(--ground) / 0) 58%,
+      rgb(var(--ground) / 0.18) 82%,
+      rgb(var(--ground) / 0.34) 100%);
+}
+
+/* The surround's second function: depth of field.
+
+   The darkening alone flattens — it takes light off the edge of the drawing but
+   leaves everything on one focal plane, so the map still reads as a flat sheet
+   that happens to be dimmer at the rim. A lens does two things at once, and the
+   second is what actually makes a periphery read as periphery: it defocuses.
+
+   This is allowed here for the precise reason "Blur a Line, Never a Mass" gives:
+   blur a mass and you get fog, blur a line and you still have a line, with black
+   beside it. The map is line geometry and nothing else — filaments, beads and
+   somas over an empty ground — so a soft pass keeps the gaps between the strokes
+   and cannot lift the black. It is the same permission "A Figure Has a Far Plane"
+   spends on its field cells, applied to distance from the centre rather than to
+   a class of cell.
+
+   It is a `backdrop-filter`, not an SVG filter, and that is the whole of why it
+   is affordable. An `feGaussianBlur` over the map group is a pass over 7,500
+   live elements every frame, which is the regression "Bloom Costs Frames"
+   records at 30fps. A backdrop-filter is one GPU composite of the already
+   painted layer beneath, and it does not care how many elements made it.
+
+   The mask is the vignette's own ellipse, so the two functions share one
+   geometry: wherever the ground darkens, the drawing also softens, and the
+   surround reads as a single lens rather than two effects that happen to
+   overlap. Focus is held well past the centre — the organism must be sharp
+   wherever a reader is actually looking. */
+.depth-of-field {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  backdrop-filter: blur(2.5px);
+  -webkit-backdrop-filter: blur(2.5px);
+  -webkit-mask-image: radial-gradient(ellipse 116% 114% at 50% 48%,
+    transparent 56%, rgba(0, 0, 0, 0.55) 78%, #000 100%);
+  mask-image: radial-gradient(ellipse 116% 114% at 50% 48%,
+    transparent 56%, rgba(0, 0, 0, 0.55) 78%, #000 100%);
+}
+
+/* The name's own ground. Full bleed so it can be anchored in the screen corner
+   — its hard edges fall off the top and left of the viewport where nothing can
+   see them, and it feathers only on the two sides that meet the drawing. Its
+   opacity is driven from Orrery.tsx by the same condition as the caption, so
+   the two are one element in everything but markup. */
+.name-ground {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 44rem 24rem at 0% 0%,
+      rgb(var(--ground) / 0.96) 0%,
+      rgb(var(--ground) / 0.96) 55%,
+      rgb(var(--ground) / 0.85) 72%,
+      rgb(var(--ground) / 0.45) 86%,
+      rgb(var(--ground) / 0) 100%);
+}
+
+/* ═══════════════════════════════════════════ THE TURN — enter-only, pure CSS
+   The arriving sheet animates; the leaving one is simply gone. Single-sheet
+   transitions halve the node count alive during a turn, and the plain black
+   ground beneath makes the remount read as a dissolve rather than a removal.
+   Direction rides --turn-dir (1 next / -1 prev), so one keyframe set serves
+   both ways. */
+@keyframes turn-fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes turn-settle {
+  from { opacity: 0; transform: scale(0.988); }
+  to   { opacity: 1; transform: scale(1); }
+}
+@keyframes turn-slide {
+  from { opacity: 0; transform: translateX(calc(var(--turn-dir, 1) * 140px)); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+/* the tide: the page floods outward from the spine — a clip-path circle is
+   compositor-interpolable, so the wave costs one pass, not per-element work */
+@keyframes turn-tide {
+  from { opacity: 0.35; clip-path: circle(36% at 50% 50%); }
+  to   { opacity: 1; clip-path: circle(125% at 50% 50%); }
+}
+.turn-fade   { animation: turn-fade   0.22s var(--ease-organic) both; }
+.turn-settle { animation: turn-settle 0.22s var(--ease-organic) both; }
+.turn-slide  { animation: turn-slide  0.2s var(--ease-organic) both; }
+.turn-tide   { animation: turn-tide   0.28s var(--ease-organic) both; }
+@media (prefers-reduced-motion: reduce) {
+  .turn-fade, .turn-settle, .turn-slide, .turn-tide { animation: none; }
+}
+
+/* ═══════════════════════════════════════════ A CTA THAT ASKS WITHOUT SHOUTING
+   The one control that carries forward out of a figure — the rule that applies
+   it — has to stay findable while a reader studies the drawing, and it may not
+   do that the way the rest of the web does it. No colour, no growth, no bounce:
+   this dossier argues against arousal design and would be lying if its own
+   forward control pulsed like a notification.
+
+   So it breathes, on light alone, in the house register. The keyframe is
+   asymmetric with a second smaller swell inside one cycle (MO-04 — "A Two-Stop
+   Keyframe Is a Metronome": symmetric rise and fall is what a machine does, and
+   the eye finds the beat and stops seeing it). Nine seconds, which is slower
+   than any notification and close enough to the tide to belong to the organism.
+   Opacity only — nothing moves, so nothing can catch the eye by moving. */
+@keyframes cta-breathe {
+  0%   { opacity: 0.38; }
+  18%  { opacity: 1; }
+  34%  { opacity: 0.70; }
+  46%  { opacity: 0.92; }
+  100% { opacity: 0.38; }
+}
+.cta-breathe { animation: cta-breathe 9s var(--ease-organic) infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  .cta-breathe { animation: none; opacity: 1; }
+}
+
+/* ═══════════════════════════════════════════════════════ THE FIGURE'S RIM
+   A vignette over every figure, and the second feathered surface permitted
+   after PLAIN GROUND retired the glass. It is allowed for exactly the reason
+   THE GROUND UNDER A NAME is allowed, and the reason is worth repeating
+   because it is the only test that matters here: it sits IN FRONT of the
+   drawing and darkens toward the ground the drawing already sits on, so it
+   can only ever move a pixel toward black. It cannot lift black to grey, and
+   lifting the black is what made every other soft mass fail ("A Cell That
+   Emits No Light Takes No Temperature", GR-07).
+
+   This is NOT a field drawn on the ground. GR-01 forbids a grid, a rule, a
+   field or a technical backdrop BEHIND the tissue; nothing is added back
+   there. Where this vignette is transparent — the whole middle of the frame,
+   where the drawing actually lives — it paints nothing at all.
+
+   What it does is end the frame. Filaments ran to the edge of the viewBox and
+   stopped dead against it, which reads as a drawing that was cropped rather
+   than one that carries on past what you are being shown. The arbors are
+   longest and sparsest at the rim, so that is precisely where a hard cut is
+   most visible.
+
+   No theme variant, deliberately. Every drawing surface is black in both
+   themes (GR-01) and `isDark` must never reach one, so the rim is black in
+   both and takes no theme at all.
+
+   Verify by measurement, never by eye (ME-01, and GR-07's own gate): the
+   ground must not lift, so sample the frame with the rim and without it and
+   require the mean luma of non-drawing pixels to be unchanged within 3/255.
+   A gradient that only ever subtracts light passes this by construction. */
+/* THE GROUND THE RIM DARKENS TOWARD.
+
+   The whole permission for this vignette is that it moves a pixel toward the
+   ground the drawing already sits on and can never lift it. That argument only
+   holds if it uses the RIGHT ground. Hardcoded black it was true on the stage
+   and false on a prose sheet in the light theme, where an inline figure sits on
+   white — and a black vignette over white is not a rim, it is the grey cloud
+   GR-07 exists to forbid. Measured: figure ground rgb(255,255,255), rim
+   painting pure black across it.
+
+   Space-separated so an alpha can be applied per stop, matching the
+   `rgb(var(--lume-rgb, 255 255 255))` pattern the Orrery already uses. */
+:root, .theme-dark { --fig-ground-rgb: 0 0 0; }
+.theme-light { --fig-ground-rgb: 255 255 255; }
+
+.figure-rim { position: relative; }
+/* Two knobs, because a figure that sets type outside its drawing has to be
+   able to say where the drawing actually is. `--rim-cy` moves the centre of
+   the falloff; `--rim-clear` says how far out it stays fully transparent.
+   Both default to the values every other figure uses, so nothing changes for
+   a figure that never mentions them. */
+.figure-rim::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse 76% 74% at 50% var(--rim-cy, 50%),
+    transparent var(--rim-clear, 44%),
+    rgb(var(--fig-ground-rgb) / 0.38) 74%,
+    rgb(var(--fig-ground-rgb) / 0.86) 92%,
+    rgb(var(--fig-ground-rgb)) 100%);
+}
+
+/* A preview is small, and a rim tuned for a full stage eats most of it. */
+/* It still has to honour the knobs. This hardcoded its own centre and falloff,
+   so a figure that moved them — FIG 0.1, whose sum sits in a band under the
+   field — was obeyed on the stage and silently ignored in the page preview,
+   which is the surface most readers meet it on. */
+.figure-rim-inert::after {
+  background: radial-gradient(ellipse 84% 82% at 50% var(--rim-cy, 50%),
+    transparent var(--rim-clear, 56%),
+    rgb(var(--fig-ground-rgb) / 0.26) 82%,
+    rgb(var(--fig-ground-rgb) / 0.72) 96%,
+    rgb(var(--fig-ground-rgb)) 100%);
+}

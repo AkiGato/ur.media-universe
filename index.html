@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Antifragile Information Systems Manifesto</title>
+    <meta name="description" content="U.R. Strategic Dossier — an antifragile framework for communication design in the attention economy. A calm, offline-capable reader." />
+    <meta name="color-scheme" content="dark light" />
+    <meta name="theme-color" content="#000000" />
+    <!-- Typeface is self-hosted (see src/index.css); no third-party font connection. -->
+    <link rel="preload" as="font" type="font/woff2" href="/fonts/plus-jakarta-sans-latin.woff2" crossorigin>
+
+    <!--
+      First paint, before a single byte of JavaScript.
+
+      The map is generated at runtime — ~8,000 SVG nodes built by React on every
+      load — so however small the bundle gets, there is a stretch between the
+      HTML arriving and the organism existing. That stretch used to be a white
+      flash followed by a blank black rectangle, which is the worst possible
+      reading: the app looks broken until suddenly it doesn't.
+
+      This is the entire critical path inlined: the page ground, and one cell
+      breathing at the centre. It costs about 700 bytes, needs no network and no
+      script, and it is on screen in the same frame as the document. The real
+      core lands on exactly this spot, so the handoff is a thickening rather
+      than a replacement — nothing jumps, and there is no moment of nothing.
+    -->
+    <style>
+      html, body { margin: 0; height: 100%; background: #000; }
+      @media (prefers-color-scheme: light) { html, body { background: #fff; } }
+      #boot {
+        position: fixed; inset: 0; display: grid; place-items: center;
+        pointer-events: none; transition: opacity .25s cubic-bezier(0.45, 0.05, 0.3, 1);
+      }
+      #boot.done { opacity: 0; }
+      #boot svg { width: 132px; height: 132px; overflow: visible; color: #fff; }
+      @media (prefers-color-scheme: light) { #boot svg { color: #000; } }
+      @keyframes boot-breathe {
+        0%   { opacity: .34; transform: scale(1); }
+        46%  { opacity: .85; transform: scale(1.04); }
+        100% { opacity: .34; transform: scale(1); }
+      }
+      #boot g { transform-origin: 50% 50%; animation: boot-breathe 4.6s ease-in-out infinite; }
+      @media (prefers-reduced-motion: reduce) { #boot g { animation: none; opacity: .6; } }
+    </style>
+  </head>
+  <body>
+    <div id="boot" aria-hidden="true">
+      <svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-linecap="round">
+        <g stroke-width="1">
+          <path d="M50 50 Q57 40 62 27" /><path d="M50 50 Q60 52 74 48" />
+          <path d="M50 50 Q57 62 68 71" /><path d="M50 50 Q48 62 43 76" />
+          <path d="M50 50 Q38 57 26 60" /><path d="M50 50 Q40 44 28 36" />
+          <path d="M50 50 Q49 38 46 24" /><path d="M50 50 Q63 45 78 34" />
+          <circle cx="62" cy="27" r="1.4" fill="currentColor" stroke="none" />
+          <circle cx="74" cy="48" r="1.4" fill="currentColor" stroke="none" />
+          <circle cx="68" cy="71" r="1.4" fill="currentColor" stroke="none" />
+          <circle cx="43" cy="76" r="1.4" fill="currentColor" stroke="none" />
+          <circle cx="26" cy="60" r="1.4" fill="currentColor" stroke="none" />
+          <circle cx="28" cy="36" r="1.4" fill="currentColor" stroke="none" />
+          <circle cx="46" cy="24" r="1.4" fill="currentColor" stroke="none" />
+          <circle cx="78" cy="34" r="1.4" fill="currentColor" stroke="none" />
+          <circle cx="50" cy="50" r="2.2" fill="currentColor" stroke="none" />
+        </g>
+      </svg>
+    </div>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

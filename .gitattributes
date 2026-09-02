@@ -1,0 +1,6 @@
+# Normalise line endings in the repository; check out as LF everywhere so the
+# audits and the service-worker stamp see identical bytes on every platform.
+* text=auto eol=lf
+
+*.mp3   binary
+*.woff2 binary
