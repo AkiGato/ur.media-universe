@@ -17,6 +17,33 @@ const ALLOWLIST = new Set([
   'src/components/figures/FigurePrimitives.tsx' // owns <pattern> grid + DataTicks
 ]);
 
+/*
+ * DG-01 governs the ROOT/NEURAL/LIGHT SYSTEM — tissue. The icon set is not
+ * tissue: its glyphs sit on controls, grow out of nothing, carry no conduction
+ * and take no tide. The four directional ones were asked for as classical
+ * straight arrows, and at 12–20px the 2–4% bow that satisfies the rule
+ * elsewhere reads as a wobble on a control rather than as a pointer.
+ *
+ * So the exemption is by SYMBOL, not by file. Every other glyph in Icons.tsx is
+ * still held to the rule, and a straight stroke appearing anywhere else in it
+ * still fails — which is the point: a whole-file allow-list would have quietly
+ * released nineteen other glyphs nobody asked about.
+ */
+const STRAIGHT_SYMBOLS = new Map([
+  ['src/components/organic/Icons.tsx',
+   new Set(['ChevronLeft', 'ChevronRight', 'ArrowLeft', 'ArrowRight'])],
+
+  /* THE ONE COORDINATE PLANE IN THE BOOK.
+     A rule a reader measures a position against may not bow: a wobbling datum
+     turns the measurement into a guess, which is the opposite of what a plane
+     is for. Asked for directly, and scoped to the single exported symbol that
+     draws it — every other mark in that figure, including the two courses that
+     cross the plane, is still held to DG-01. See the note on CartesianPlane and
+     docs/OPEN.md 62. */
+  ['src/components/figures/FigurePlane.tsx',
+   new Set(['CartesianPlane'])]
+]);
+
 const violations = [];
 
 function walk(dir) {
@@ -34,8 +61,18 @@ function inspect(file) {
   const src = readFileSync(file, 'utf8');
   const lines = src.split(/\r?\n/);
 
+  /* Which exported symbol each line belongs to, so the exemption can be per
+     glyph rather than per file. A simple running marker: these are one-symbol-
+     per-block declarations, which is the shape the icon set is written in. */
+  const exempt = STRAIGHT_SYMBOLS.get(rel);
+  let current = null;
+
   lines.forEach((line, i) => {
     const at = `${rel}:${i + 1}`;
+
+    const decl = line.match(/^export const (\w+)/);
+    if (decl) current = decl[1];
+    if (exempt && current && exempt.has(current)) return;
 
     if (/<line\b/.test(line)) {
       violations.push({ at, rule: 'no <line> elements', text: line.trim() });

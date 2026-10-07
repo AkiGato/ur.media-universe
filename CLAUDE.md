@@ -10,7 +10,7 @@ React 19 + Vite + Tailwind 4. `npm run dev` (port 3000), `npm run lint`
 
 ## The design rules are binding, and they are not in this file
 
-**68 rules live in [`docs/design/`](docs/design/00-index.md).** They are the
+**70 rules live in [`docs/design/`](docs/design/00-index.md).** They are the
 record of what has already been tried on this drawing and what it cost; most
 were written after a regression and several carry the measured frame rate that
 produced them. Start at the index, then **read the file covering what you are
@@ -48,8 +48,10 @@ open the file before working against one.
   no zero-bow filament, no exception. `npm run lint` fails on it. (DG-01)
 - **Nothing is ever a filled area.** Flat tone over an area is a blob at any
   opacity. The only fills in the system are the light sources. (DG-02)
-- **Three type sizes — 9, 12, 18 — one family, one weight (300).** Named
-  Tailwind size steps are banned. Contrast never comes from weight. (TY-01, TY-02)
+- **Three type sizes — 9, 12, 18 — two families, one weight (300).** Newsreader
+  sets titles, IBM Plex Sans sets everything else, and nothing else is loaded.
+  Named Tailwind size steps are banned. Contrast never comes from weight, ever.
+  (TY-01, TY-02)
 - **Uppercase is tracked 0.2em. Nothing else is tracked at all.** (TY-03)
 - **One easing, `--ease-organic`**, mirrored by `EASE` in JS. (MO-02)
 - **The viewport never scrolls vertically.** Content scrolls inside its own

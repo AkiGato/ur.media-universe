@@ -10,13 +10,19 @@
     "preview": "node node_modules/vite/bin/vite.js preview",
     "clean": "node -e \"require('fs').rmSync('dist',{recursive:true,force:true})\"",
     "audit:lines": "node scripts/audits/static/audit-lines.mjs",
-    "lint": "node node_modules/typescript/bin/tsc --noEmit && npm run audit:lines && npm run audit:relations",
-    "audit:relations": "node scripts/audits/static/audit-relations.mjs"
+    "lint": "node node_modules/typescript/bin/tsc --noEmit && npm run audit:lines && npm run audit:relations && npm run audit:figures && npm run audit:definitions && npm run audit:copy && npm run audit:talk",
+    "audit:relations": "node scripts/audits/static/audit-relations.mjs",
+    "audit:figures": "node scripts/audits/static/audit-figures.mjs",
+    "audit:definitions": "node scripts/audits/static/audit-definitions.mjs",
+    "build:web": "node node_modules/vite/bin/vite.js build --outDir build/buildU01 --emptyOutDir && node scripts/stamp-sw.mjs build/buildU01",
+    "preview:web": "node node_modules/vite/bin/vite.js preview --outDir build/buildU01 --port 4174 --strictPort",
+    "audit:copy": "node scripts/audits/static/audit-copy.mjs",
+    "build:talk": "node node_modules/vite/bin/vite.js build --config vite.talk.config.ts && node scripts/stamp-talk.mjs",
+    "audit:talk": "node scripts/audits/static/audit-talk.mjs"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.14",
     "@vitejs/plugin-react": "^5.0.4",
-    "lucide-react": "^0.546.0",
     "react": "^19.0.1",
     "react-dom": "^19.0.1"
   },

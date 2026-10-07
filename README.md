@@ -29,12 +29,16 @@ documented in `.env.example`; copy it to `.env.local` if you want one.
 | `npm run build` | Production build, then `stamp-sw` — never run bare `vite build` |
 | `npm run stamp-sw` | Rewrites `dist/sw.js` with a cache version derived from the emitted asset hashes (`scripts/stamp-sw.mjs`) |
 | `npm run preview` | Serve the built output |
+| `npm run build:web` | The online export — same build, written to `build/` and stamped there. This is what gets uploaded. |
+| `npm run preview:web` | Serve `build/` on :4174, to check the export before it goes up |
 | `npm run clean` | Delete `dist/` |
-| `npm run lint` | `tsc --noEmit`, then both static design audits below |
+| `npm run lint` | `tsc --noEmit`, then the four static design audits below |
 | `npm run audit:lines` | DG-01, *Never a Straight Line* — fails on any `<line>` or `L`-only path (`scripts/audits/static/audit-lines.mjs`) |
 | `npm run audit:relations` | Walks every edge of the relations graph and round-trips every page through an anchor; fails on a dangling one (`scripts/audits/static/audit-relations.mjs`) |
+| `npm run audit:figures` | Checks the figures redrawn in `docs/presentation.html` against the app's own diagram components — same cells, same names, same edges (`scripts/audits/static/audit-figures.mjs`) |
+| `npm run audit:definitions` | TY-04, *Literal Document Text* — every glossary entry must be verbatim manuscript text (`scripts/audits/static/audit-definitions.mjs`) |
 
-Two further audits are **runtime** and need a rendered DOM — they are pasted into
+Three further audits are **runtime** and need a rendered DOM — they are pasted into
 the browser console rather than run from npm. See
 [scripts/README.md](scripts/README.md).
 
@@ -63,12 +67,15 @@ the browser console rather than run from npm. See
 │   │   ├── anchors.ts            where a mark points (stable across repagination)
 │   │   ├── searchIndex.ts        one index serving every lookup surface
 │   │   ├── userStore.ts          bookmarks, highlights, notes — localStorage only
+│   │   ├── definitions.ts        the dossier's definitions of its own terms, verbatim
+│   │   ├── emphasis.ts           the manuscript's *emphasis* markers, parsed once
 │   │   ├── causalAnalysis.ts     the Causal Taxonomy applied to a reader's source
 │   │   └── causalResearch.ts     the opt-in research instrument (reader-supplied key)
 │   ├── components/
 │   │   ├── Orrery.tsx            the map (lazy-loaded, its own chunk)
 │   │   ├── BookSpread.tsx        the paged reader
 │   │   ├── PageRenderer.tsx      renders one sheet from the page model
+│   │   ├── IntroScreen.tsx       the way in; three lines and the cell, before the map
 │   │   ├── FigureStage.tsx       full-bleed stage a figure opens onto
 │   │   ├── InstrumentStage.tsx   full-bleed stage for the research instrument
 │   │   ├── ChapterOpener.tsx     a chapter's cell, grown to the head of the page
@@ -79,13 +86,14 @@ the browser console rather than run from npm. See
 │   │   ├── figures/              LivingFigure + FigurePrimitives — every figure is built here
 │   │   ├── diagrams/             the six figures, each a LivingFigure declaration
 │   │   ├── organic/              the map's vocabulary applied to page chrome
-│   │   └── widgets/              FiveQuestionsWidget
+│   │   └── widgets/              FiveQuestionsWidget + AntifragilityGraph, ContentBudgetWidget
 │   └── utils/                  a11y, ambient music, page-turn audio, device tier,
-│                               fit-to-box, frame-budget probe
+│                               dismiss stack, fit-to-box, frame-budget probe
 │
 ├── public/
 │   ├── sw.js                   service worker template; stamped at postbuild
-│   ├── fonts/                  self-hosted woff2 (Plus Jakarta Sans, Zilla Slab 300)
+│   ├── fonts/                  self-hosted woff2 (IBM Plex Sans variable, Newsreader 300),
+│   │                           roman and italic, latin and latin-ext
 │   └── audio/                  three ambient tracks (~29 MB), named artist--title.mp3;
 │       └── CREDITS.md            served verbatim, never precached; provenance and licences here
 │
@@ -95,19 +103,24 @@ the browser console rather than run from npm. See
 │   └── audits/
 │       ├── static/             run by npm and CI
 │       │   ├── audit-lines.mjs       DG-01, Never a Straight Line
-│       │   └── audit-relations.mjs   relations graph + anchors round-trip
+│       │   ├── audit-relations.mjs   relations graph + anchors round-trip
+│       │   ├── audit-figures.mjs     the deck's figures against the app's
+│       │   └── audit-definitions.mjs TY-04, the glossary against the manuscript
 │       └── runtime/            paste into the browser console
 │           ├── graph-audit.js        OG-02, Nothing Floats
-│           └── label-audit.js        TY-08, label collision budget
+│           ├── label-audit.js        TY-08, label collision budget
+│           └── text-audit.js         TY-02/TY-03 sizes and tracking, LY-02 fit
 │
 ├── docs/
 │   ├── README.md               short index of this folder
 │   ├── design/                 the 68 binding rules, split by subject (start at 00-index.md)
 │   ├── OPEN.md                 known divergences between manuscript, figures, rules and code
-│   ├── presentation.html       a sixteen-sheet presentation of the project; self-contained
-│   └── archive/ai-studio/      manifest + env template from the original hosting; not read
+│   ├── dataviz.md              data-visualisation principles, and the monochrome constraint
+│   ├── presentation.html       a ten-sheet presentation of the project; self-contained
+│   └── presentationdesign.md   the design decisions behind the deck, and their measurements
 │
-└── dist/                       build output (git-ignored)
+├── dist/                       local build output (git-ignored)
+└── build/                      the online export (git-ignored) — `npm run build:web`
 ```
 
 ## Documentation map
@@ -120,15 +133,17 @@ Every Markdown file in the repository, and what it is for.
 | :-- | :-- |
 | [README.md](README.md) | This file — how to run, the layout, and where everything is documented. |
 | [CLAUDE.md](CLAUDE.md) | Instructions for agents and contributors: the twelve invariants that hold in every session, the table of which rules file covers what, and how to cite a rule. Read first. |
-| [AGENTS.md](AGENTS.md) | A pointer. The 68 rules that used to live here as one flat list were split into `docs/design/`; this file says so and sends you to `CLAUDE.md`. |
-| [docs/README.md](docs/README.md) | Short index of the `docs/` folder — rules, backlog, presentation, archive. |
+| [AGENTS.md](AGENTS.md) | The same entry point for agents that do not read `CLAUDE.md`: how to run the project, and a direct link to each of the ten rules files. |
+| [docs/README.md](docs/README.md) | Short index of the `docs/` folder — rules, backlog, presentation. |
 | [docs/OPEN.md](docs/OPEN.md) | The backlog of known divergences — ten entries, six of them closed and kept for the record. Check it before concluding something is a bug; add to it rather than leaving a `TODO`. |
-| [scripts/README.md](scripts/README.md) | The build step and the four audits: which are static (run in `lint` and CI), which are runtime (pasted into the console), and which rule each one enforces. |
+| [scripts/README.md](scripts/README.md) | The build step and the seven audits: which are static (run in `lint` and CI), which are runtime (pasted into the console), and which rule each one enforces. |
+| [docs/dataviz.md](docs/dataviz.md) | Data-visualisation principles: which channel carries magnitude, how identity is encoded when there is no colour, ordering, small multiples, and what interaction may and may not be asked to carry. |
+| [docs/presentationdesign.md](docs/presentationdesign.md) | The aesthetic and design decisions behind `docs/presentation.html`, and the measurements that settled them — including where the deck departs from `docs/design/` and why. |
 | [public/audio/CREDITS.md](public/audio/CREDITS.md) | Artist, title, source and licence for each ambient track. Two are CC BY-NC-SA; one is unverified and flagged. |
 
 ### Design rules — `docs/design/`
 
-68 rules, binding. Each has a stable ID cited in code comments and a name cited in
+69 rules, binding. Each has a stable ID cited in code comments and a name cited in
 prose; the index is the only place the two are bound together.
 
 | File | Prefix | Rules | Covers |
@@ -161,11 +176,13 @@ the page count follows from `BOOK_PAGES.length`. Removing a case study is a data
 edit; the book renumbers itself. Never hard-code a page count.
 
 **Design rules live in [docs/design/](docs/design/00-index.md)** and are binding —
-68 rules covering the drawing grammar, the graph, light, ground, figures,
+69 rules covering the drawing grammar, the graph, light, ground, figures,
 typography, motion, layout and the measured performance constraints behind them.
-Read the file covering what you are about to touch, before you touch it. Three of
-the rules are enforced by `scripts/` (see [scripts/README.md](scripts/README.md));
-the rest are held by [ME-01](docs/design/10-method.md).
+Read the file covering what you are about to touch, before you touch it. Some of
+the rules are enforced by `scripts/` — four static audits inside `lint` and CI,
+three runtime ones pasted into the console (see
+[scripts/README.md](scripts/README.md)); the rest are held by
+[ME-01](docs/design/10-method.md).
 
 [CLAUDE.md](CLAUDE.md) carries the invariants that hold in every session and the
 map of which rules file covers what. [docs/OPEN.md](docs/OPEN.md) tracks the
@@ -182,15 +199,18 @@ which round-trip everything through a JSON file the reader keeps.
 ## Offline
 
 A service worker precaches the built assets and serves them cache-first, with
-network-first navigations so a deploy is never shadowed by a stale shell. The
-typeface is self-hosted in `public/fonts`, so a cold offline load keeps its
-typography and no third-party host sees the reader. The ambient audio in
+network-first navigations so a deploy is never shadowed by a stale shell. Both
+typefaces are self-hosted in `public/fonts`, so a cold offline load keeps its
+typography and no third-party host sees the reader. `index.html` preloads the
+body face's latin subset and nothing else, and that href has to name a file that
+is actually there — it pointed at a deleted subset for a while, which spent a
+request on a 404 every cold load. The ambient audio in
 `public/audio` is deliberately left out of the precache; its provenance and
 licences are in [public/audio/CREDITS.md](public/audio/CREDITS.md).
 
 ## Presentation
 
-[docs/presentation.html](docs/presentation.html) is a sixteen-sheet presentation
-of the dossier, its six figures and the reader, drawn in the project's own
-grammar. It is self-contained — the typeface is embedded — and depends on
-nothing in the build. Open it in a browser directly.
+[docs/presentation.html](docs/presentation.html) is a ten-sheet presentation
+of the dossier, drawn in the project's own grammar: an opening, eight sheets in
+two parts — the diagnosis and the response — and a close. It is self-contained — the typeface is embedded — and
+depends on nothing in the build. Open it in a browser directly.

@@ -1,6 +1,6 @@
 # Design & Architectural Rules — Index
 
-68 rules, binding. They are the accumulated record of what has already been tried on this drawing and what it cost — most of them were written after a regression, and several carry the frame rate or the pixel measurement that produced them.
+70 rules, binding. They are the accumulated record of what has already been tried on this drawing and what it cost — most of them were written after a regression, and several carry the frame rate or the pixel measurement that produced them.
 
 **Read the file that covers what you are about to touch, before you touch it.** The one-line summaries below are pointers, not the rule; none of them is sufficient to work from.
 
@@ -14,7 +14,7 @@ Every rule has a stable ID (`DG-01`) and a name (*Never a Straight Line*). **Cod
 
 What a mark may be. These rules govern the geometry itself — the stroke, the fill that is never allowed, the taper, the wander, the grain. They apply identically to the map, the figures, the chapter openers and the seeds, because all four are one drawing made four times.
 
-- **DG-01** — [Never a Straight Line](01-drawing-grammar.md#dg-01--never-a-straight-line) — No `<line>`, no `L`-only path, no zero-bow filament — anywhere, with no exception.
+- **DG-01** — [Neurones Never have Straight Lines](01-drawing-grammar.md#dg-01--never-a-straight-line) — No `<line>`, no `L`-only path, no zero-bow filament anywhere in the drawing. Four interface arrows are exempt by symbol; nothing else is.
 - **DG-02** — [Only Lines. Nothing Is Ever a Filled Area](01-drawing-grammar.md#dg-02--only-lines-nothing-is-ever-a-filled-area) — Flat tone over an area is a blob at any opacity; a cell body is spoken by line density. The only fills left are the light sources.
 - **DG-03** — [A Lamp Burns Where the Tissue Is Thick](01-drawing-grammar.md#dg-03--a-lamp-burns-where-the-tissue-is-thick) — A beacon's intensity is keyed to the structure at its own node, within three guards, with a floor below which the fill is removed rather than dimmed.
 - **DG-04** — [Fibres Take Direct Courses](01-drawing-grammar.md#dg-04--fibres-take-direct-courses) — Wander is ~5% of span, one dominant frequency and one small secondary. A fibre under tension is going somewhere.
@@ -28,8 +28,8 @@ What a mark may be. These rules govern the geometry itself — the stroke, the f
 
 What connects to what, and how a connection is drawn. The map is one graph drawn by one routine; these rules keep it one, keep it oriented, and keep its anatomy at the scale that anatomy actually reads.
 
-- **OG-01** — [One Organism, One Routine](02-organism-and-graph.md#og-01--one-organism-one-routine) — One graph, one `tissue()`. A connection is one meandering process, never a bundle; emphasis is opacity on the same edges.
-- **OG-02** — [Nothing Floats](02-organism-and-graph.md#og-02--nothing-floats) — Everything interactive lives in `NODES` so proximity wiring reaches it, and a component walk bridges every island. Verified by DOM audit.
+- **OG-01** — [One Organism, One Routine](02-organism-and-graph.md#og-01--one-organism-one-routine) — One graph, one `tissue()`. A connection is one meandering process, never a bundle; emphasis is opacity on the same edges. Scoped: the two trend reports draw taut filaments and particle emitters instead, opt-in per figure.
+- **OG-02** — [Nothing Floats](02-organism-and-graph.md#og-02--nothing-floats) — Everything interactive lives in `NODES` everything is wired, and a component walk bridges every island. Verified by DOM audit.
 - **OG-03** — [A Connection Has a Direction](02-organism-and-graph.md#og-03--a-connection-has-a-direction) — Every edge is oriented pre → post, and the map says so with taper alone. Keep the polarity; spend nothing on saying it twice.
 - **OG-04** — [Crossings Must Fuse](02-organism-and-graph.md#og-04--crossings-must-fuse) — Every genuine crossing gets a bipolar interneuron. Two strands merely laid over each other read as unrelated ribbons.
 - **OG-05** — [A Mesh Closes Its Cells; A Graph Does Not](02-organism-and-graph.md#og-05--a-mesh-closes-its-cells-a-graph-does-not) — Anastomosis is where the reference's density comes from — but reticulation is confined to filler tissue and must never close a loop between semantic nodes.
@@ -69,7 +69,7 @@ The five data visualisations, the surfaces they open onto, and the arguments the
 - **FW-03** — [A Figure Is a World, and a World Has Three Passages](05-figures-and-worlds.md#fw-03--a-figure-is-a-world-and-a-world-has-three-passages) — No close cross. Three named exits — the chapter, the map, the practice — each drawn as a soma and a name.
 - **FW-04** — [A World Carries Less Text Than the Page It Came From](05-figures-and-worlds.md#fw-04--a-world-carries-less-text-than-the-page-it-came-from) — Inside a world the whole `FigureFrame` steps aside and names surface only under touch. The glyph exception stands.
 - **FW-05** — [A Figure Has a Far Plane](05-figures-and-worlds.md#fw-05--a-figure-has-a-far-plane) — Field cells recede behind one group-level Gaussian at 0.85 user units, only if they carry no name, with the original index carried through. No parallax.
-- **FW-06** — [Never a Shrunken Figure](05-figures-and-worlds.md#fw-06--never-a-shrunken-figure) — Below 600px a figure renders a legible stacked spine, never a scaled-down drawing. Branch on a value, never on an early return.
+- **FW-06** — [Never a Shrunken Figure, and Never a List Instead of One](05-figures-and-worlds.md#fw-06--never-a-shrunken-figure-and-never-a-list-instead-of-one) — 600px is the measured type floor. Below it every figure takes its `portrait` layout — the same cells stood up, ornament included; never a shrunken drawing and never a list. Branch on a value, never on an early return.
 - **FW-07** — [A Schematic Takes the Whole Sheet](05-figures-and-worlds.md#fw-07--a-schematic-takes-the-whole-sheet) — `BookSpread` groups pages rather than deriving pairs from index parity — parity puts a figure at half scale and can skip a page.
 - **FW-08** — [A Chapter Opens As Its Cell](05-figures-and-worlds.md#fw-08--a-chapter-opens-as-its-cell) — The chapter's soma grown large, on the chapter's existing first page — never as a new page, because marks are stored by index.
 - **FW-09** — [A List Is Not a Cause](05-figures-and-worlds.md#fw-09--a-list-is-not-a-cause) — FIG 3.1 is a causal order, not three peers in parallel columns: two external roots converge and pass through the reader as a relay.
@@ -79,7 +79,7 @@ The five data visualisations, the surfaces they open onto, and the arguments the
 
 One family, one weight, three sizes, one tracking rule — and the hard limit on what text may exist at all. Copy is the most easily invented thing in the app and the most expensive to strip out later.
 
-- **TY-01** — [One Voice, and It Is Light](06-typography-and-copy.md#ty-01--one-voice-and-it-is-light) — One family, one weight — 300. Contrast comes from size, spacing, opacity and light. Never from weight.
+- **TY-01** — [One Voice, and It Is Light](06-typography-and-copy.md#ty-01--one-voice-and-it-is-light) — Two families, one to a role: Newsreader sets titles, IBM Plex Sans everything else. One weight — 300. Contrast comes from size, spacing, opacity and light. Never from weight.
 - **TY-02** — [Three Type Sizes: 9, 12, 18](06-typography-and-copy.md#ty-02--three-type-sizes-9-12-18) — Three sizes and no others, written as arbitrary values. Named Tailwind steps are banned. Ties round downward. Verified by computed-style sweep.
 - **TY-03** — [One Spacing Rule, Everywhere](06-typography-and-copy.md#ty-03--one-spacing-rule-everywhere) — Uppercase is tracked 0.2em. Nothing else is tracked at all. In SVG it is derived, never passed; numerals and single glyphs are never tracked.
 - **TY-04** — [Literal Document Text](06-typography-and-copy.md#ty-04--literal-document-text) — No copy is written for this app unless it was asked for. This governs interface copy exactly as it governs the manuscript.
@@ -106,21 +106,23 @@ Idle motion and response are different properties with different budgets: ambien
 How the app is entered, how a page is bounded, how a gesture is read, and the small absolute prohibitions on interface geometry.
 
 - **LY-01** — [The Orrery Is the Front Door, Not a Maze](08-layout-and-chrome.md#ly-01--the-orrery-is-the-front-door-not-a-maze) — An orientation map you consult, never a transit system you fly through. Never hard-code the page count. Below 700px, a legible stacked spine.
-- **LY-02** — [No Page Scrolling](08-layout-and-chrome.md#ly-02--no-page-scrolling) — The viewport is never vertically scrollable. Long content scrolls inside its own column via `.soft-scroll`.
+- **LY-02** — [No Page Scrolling](08-layout-and-chrome.md#ly-02--no-page-scrolling) — The viewport is never vertically scrollable. Long content scrolls inside its own column via `.soft-scroll`. The manuscript fits because the cut is measured — every paragraph set offscreen and its height read back — never because a packing constant was guessed.
 - **LY-03** — [A Horizontal Scroll Is a Gesture, Not a Scrollbar](08-layout-and-chrome.md#ly-03--a-horizontal-scroll-is-a-gesture-not-a-scrollbar) — Intent, not overflow. Four guards — axis, momentum, ownership, overlays — and the unlock timer must not be cleared in the effect cleanup.
 - **LY-04** — [A Mode Is Never Sealed](08-layout-and-chrome.md#ly-04--a-mode-is-never-sealed) — Zen keeps exactly one control. Esc escalates: overlay, then zen, then the map. A mode whose only exit is an untold keystroke is a trap.
 - **LY-05** — [Zero Rounded Corners](08-layout-and-chrome.md#ly-05--zero-rounded-corners) — `rounded-none` across every element, with no exception.
 - **LY-06** — [No Hard Outlines](08-layout-and-chrome.md#ly-06--no-hard-outlines) — No 1px black/white borders, focus outlines or ring offsets. Hover shifts opacity softly, never a black↔white flip.
 - **LY-07** — [Theme classes](08-layout-and-chrome.md#ly-07--theme-classes) — The App root carries `theme-dark` / `theme-light`; global hairline CSS keys off these.
+- **LY-08** — [A Box Is Never Lit; the Glow Belongs to the Glyph](08-layout-and-chrome.md#ly-08--a-box-is-never-lit-the-glow-belongs-to-the-glyph) — No shadow, halo or soft field behind a control's box, ever. Two permitted forms: a glow on the ink (`text-shadow` / `drop-shadow`, for focus) or nothing at all (opacity only, for hover).
 
-### [Performance](09-performance.md) · `PF` · 4 rules
+### [Performance](09-performance.md) · `PF` · 5 rules
 
-Four rules, each written from a measured regression on this specific drawing. The numbers are the point — every one of them was a frame rate someone actually observed, and three of them were catastrophic.
+Five rules, each written from a measured regression on this specific drawing. The numbers are the point — every one of them was a frame rate or an element count someone actually observed, and three of them were catastrophic.
 
 - **PF-01** — [A Frame Budget Must Be Calibrated Against the Design Target, Not Against 60fps](09-performance.md#pf-01--a-frame-budget-must-be-calibrated-against-the-design-target-not-against-60fps) — The intended steady state is ~20fps with the flex filter on. The threshold is 85ms; a stricter one silently strips the app on a healthy machine.
 - **PF-02** — [transform-box: view-box, Never fill-box](09-performance.md#pf-02--transform-box-view-box-never-fill-box) — `fill-box` re-measures a group's bbox every frame. On the dendrite groups this alone took the map from 47fps to 1fps.
 - **PF-03** — [Filters Are Cheap; Transforms On Big Groups Are Not](09-performance.md#pf-03--filters-are-cheap-transforms-on-big-groups-are-not) — A transform on the ~6000-element organism measured 6fps; an animated turbulence + displacement filter over the same elements cost 1fps.
 - **PF-04** — [Bloom Costs Frames](09-performance.md#pf-04--bloom-costs-frames) — Never bloom a group that animates or holds many elements — measured 30fps → 57fps by removing it. Reserve it for small, bright, static marks.
+- **PF-05** — [A Retired Renderer Is Unmounted, Not Hidden](09-performance.md#pf-05--a-retired-renderer-is-unmounted-not-hidden) — `display: none` buys the paint and nothing else. Half the organism (10,302 of 20,552 nodes) was built every load and never seen; gating it cut the document 50.5% and a cold `getBBox()` from 281ms to 5.7ms.
 
 ### [Method](10-method.md) · `ME` · 1 rules
 
@@ -128,14 +130,13 @@ How a rule in this file is established, checked and overturned. One rule, cited 
 
 - **ME-01** — [Verify by Measurement, Not by Eye](10-method.md#me-01--verify-by-measurement-not-by-eye) — Where a rule has a threshold, the threshold is a number, the number is measured, and the value is recorded beside it. When the measurement and the eye disagree, the measurement wins.
 
-## Enforced rules
-
-Three rules are checked rather than remembered:
-
-| Rule | Check | When |
-| :-- | :-- | :-- |
-| DG-01 Never a Straight Line | `scripts/audits/static/audit-lines.mjs` | `npm run lint`, and CI |
-| OG-02 Nothing Floats | `scripts/audits/runtime/graph-audit.js` | pasted into the console, map on screen |
-| TY-08 Labels Have a Collision Budget | `scripts/audits/runtime/label-audit.js` | pasted into the console, figure on screen |
+### Text Justification & Typography Balance
+Alignment Rules
+ * Justification Standard: Body text utilizes precision block justification to maintain sharp, clean vertical margins matching the traditional ink-on-paper aesthetic.
+ * Orphan & Widow Prevention: Never leave a single isolated word on a trailing line (orphan/widow control). Layout logic must dynamically pull preceding words or push trailing content to ensure a minimum threshold of at least two words per final line.
+ * Stroke & Line Break Constraints: A single word must never be orphaned or separated on an isolated line segment or stroke division.
+Readability & Optical Balance
+ * Ragged Management: Where left-alignment or natural ragged balancing is applied, line lengths are constrained to an optimal character count (typically 45 to 75 characters per line) to eliminate saccadic fatigue.
+ * Optical Flow: Paragraph spacing and letter-spacing (tracking) adjust dynamically to prevent awkward word gaps (rivers) during full-width block justification, ensuring an even, harmonious reading rhythm across the aged paper canvas.
 
 Everything else is held by ME-01 — see [Method](10-method.md).

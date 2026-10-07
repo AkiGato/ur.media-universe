@@ -1,5 +1,6 @@
 import React from 'react';
-import { LivingFigure, FigureNode, FigureEdge } from '../figures/LivingFigure';
+import { CartesianPlane } from '../figures/FigurePlane';
+import { LivingFigure, FigureLayout, FigureNode, FigureEdge } from '../figures/LivingFigure';
 import { arcSegment } from '../figures/FigurePrimitives';
 
 interface BaitTaxonomyDiagramProps {
@@ -45,6 +46,43 @@ const H = 340;
 /** the plane's origin, and the cell the hook occupies */
 const OX = 400;
 const OY = 196;
+
+/* ------------------------------------------------------------- portrait --
+ *
+ * THIS ONE IS A COORDINATE SYSTEM, SO THE PORTRAIT IS A COORDINATE SYSTEM.
+ *
+ * Every other figure here could be rearranged; this one cannot. Both axes
+ * carry meaning — arousal vertical, valence horizontal — so the narrow form is
+ * the same plane in a taller rectangle, and every term keeps its position ON
+ * IT. What changes is only how many units an axis is given: valence is
+ * compressed to 0.42 and arousal stretched to 1.9, about the plane's own
+ * origin, so no term crosses the axis it did not cross before and the order
+ * along both axes is exactly the order in the wide form.
+ *
+ * The empty half stays empty. The low-arousal region below the horizontal axis
+ * is the diagnosis rather than spare room, so it keeps its share of the sheet
+ * rather than being reclaimed for the terms above it — the origin sits at the
+ * same fraction of the height in both forms.
+ *
+ * THE POLES ARE WHAT THE NARROW PLANE ACTUALLY COSTS. UNDESIRABLE EMOTION and
+ * DESIRABLE EMOTION are nineteen and seventeen characters at 11.5 units
+ * tracked 0.2em; measured, they need about 330 units between them, against a
+ * 360-unit sheet with the axis running between. They therefore sit on two rows
+ * rather than one, the undesirable pole above the axis and the desirable pole
+ * below it. That is a real loss — on the wide sheet the pair reads as one
+ * horizontal scale — and the alternatives were worse: shrinking the poles
+ * makes the frame of the taxonomy quieter than the five terms it contains,
+ * which is the exact fault their own note records being fixed once already.
+ */
+const P_W = 360;
+const P_H = 560;
+const P_OX = 180;
+const P_OY = 324;
+/** valence compressed, arousal stretched, both about the origin */
+const P_KX = 0.42;
+const P_KY = 1.9;
+const px = (x: number) => P_OX + (x - OX) * P_KX;
+const py = (y: number) => P_OY + (y - OY) * P_KY;
 
 /**
  * The poles outrank everything drawn on the plane.
@@ -173,17 +211,27 @@ const TERMS: Array<{
   }
 ];
 
-const NODES: FigureNode[] = [
+/**
+ * One description of the taxonomy, placed twice.
+ *
+ * Every name, share, estimate and caveat is written once; `place` supplies the
+ * point on the plane, which is the only thing that differs. See FigureLayout in
+ * LivingFigure for why this is not two node arrays.
+ */
+const build = (
+  place: (x: number, y: number) => { x: number; y: number },
+  hookArbor: number
+): FigureNode[] => [
   {
     id: 'hook',
     kind: 'core',
-    x: OX, y: OY,
+    ...place(OX, OY),
     r: 16,
     /* the dandelion: an arbor, grown by the map's own routine. Held well short
        of the radius that fogged FIG 0.1 — this gathers around a cell, it does
        not claim to be a field, and the arm count is the axis that buys density
        without buying speckle. */
-    arborR: 104,
+    arborR: hookArbor,
     arborArms: 13,
     label: 'THE HOOK',
     sub: 'fishing → marketing → feed',
@@ -203,7 +251,7 @@ const NODES: FigureNode[] = [
   ...TERMS.map(t => ({
     id: t.id,
     kind: 'cell' as const,
-    x: t.x, y: t.y,
+    ...place(t.x, t.y),
     r: radiusFor(t.share),
     label: t.label,
     sub: t.sub,
@@ -221,7 +269,7 @@ const NODES: FigureNode[] = [
   {
     id: 'unharvested',
     kind: 'minor',
-    x: 566, y: 272,
+    ...place(566, 272),
     r: 6,
     label: 'THE UNHARVESTED',
     sub: 'calm · boredom · reflection',
@@ -238,6 +286,9 @@ const NODES: FigureNode[] = [
     ]
   }
 ];
+
+const NODES: FigureNode[] = build((x, y) => ({ x, y }), 104);
+const PORTRAIT_NODES: FigureNode[] = build((x, y) => ({ x: px(x), y: py(y) }), 92);
 
 const EDGES: FigureEdge[] = [
   // radial: one mechanism, five aims
@@ -257,11 +308,13 @@ const EDGES: FigureEdge[] = [
  * kink rather than ruled segments. The bow is small enough to read as an axis
  * and large enough that the drawing is never machine-ruled.
  */
-const Plane: React.FC = () => (
+const Plane: React.FC<{
+  ox: number; oy: number; w: number; h: number; inset: number;
+}> = ({ ox, oy, w, h, inset }) => (
   <g aria-hidden="true">
-    <path d={arcSegment(OX, 30, OX, H - 26, 5)} fill="none" stroke="currentColor"
+    <path d={arcSegment(ox, 30, ox, h - 26, 5)} fill="none" stroke="currentColor"
       strokeWidth={0.45} opacity={0.26} />
-    <path d={arcSegment(58, OY, W - 58, OY, 6)} fill="none" stroke="currentColor"
+    <path d={arcSegment(inset, oy, w - inset, oy, 6)} fill="none" stroke="currentColor"
       strokeWidth={0.45} opacity={0.26} />
   </g>
 );
@@ -273,34 +326,48 @@ const Plane: React.FC = () => (
  * poles surface only under touch is a coordinate system you have to interrogate
  * before you can read anything placed on it.
  */
-const Poles: React.FC = () => (
+const Poles: React.FC<{
+  ox: number; oy: number; w: number; h: number; inset: number;
+  /* The two valence poles on one row, or stacked either side of the axis. One
+     row is right and it does not fit a 360-unit sheet — see the portrait note
+     at the top of this file. */
+  split?: boolean;
+}> = ({ ox, oy, w, h, inset, split = false }) => (
   <g aria-hidden="true">
-    <text x={OX} y={18} textAnchor="middle" fill="currentColor"
+    <text x={ox} y={18} textAnchor="middle" fill="currentColor"
       fontSize={POLE} fontWeight={300} letterSpacing={POLE_TRACK} opacity={0.7}>
       HIGH AROUSAL
     </text>
-    <text x={OX} y={H - 8} textAnchor="middle" fill="currentColor"
+    <text x={ox} y={h - 8} textAnchor="middle" fill="currentColor"
       fontSize={POLE} fontWeight={300} letterSpacing={POLE_TRACK} opacity={0.45}>
       LOW AROUSAL
     </text>
-    <text x={58} y={OY - 10} textAnchor="start" fill="currentColor"
+    <text x={inset} y={split ? oy - 34 : oy - 10} textAnchor="start" fill="currentColor"
       fontSize={POLE} fontWeight={300} letterSpacing={POLE_TRACK} opacity={0.7}>
       UNDESIRABLE EMOTION
     </text>
-    <text x={58} y={OY + 14} textAnchor="start" fill="currentColor"
+    <text x={inset} y={split ? oy - 12 : oy + 14} textAnchor="start" fill="currentColor"
       fontSize={SUB} fontWeight={300} opacity={0.4}>
       anger · fear · outrage · anxiety
     </text>
-    <text x={W - 58} y={OY - 10} textAnchor="end" fill="currentColor"
+    <text x={w - inset} y={split ? oy + 26 : oy - 10} textAnchor="end" fill="currentColor"
       fontSize={POLE} fontWeight={300} letterSpacing={POLE_TRACK} opacity={0.7}>
       DESIRABLE EMOTION
     </text>
-    <text x={W - 58} y={OY + 14} textAnchor="end" fill="currentColor"
+    <text x={w - inset} y={split ? oy + 48 : oy + 14} textAnchor="end" fill="currentColor"
       fontSize={SUB} fontWeight={300} opacity={0.4}>
       happiness · excitement · satisfaction
     </text>
   </g>
 );
+
+const PORTRAIT: FigureLayout = {
+  width: P_W,
+  height: P_H,
+  nodes: PORTRAIT_NODES,
+  backdrop: <Plane ox={P_OX} oy={P_OY} w={P_W} h={P_H} inset={10} />,
+  overlay: <Poles ox={P_OX} oy={P_OY} w={P_W} h={P_H} inset={8} split />
+};
 
 export const BaitTaxonomyDiagram: React.FC<BaitTaxonomyDiagramProps> = () => (
   <LivingFigure
@@ -308,10 +375,42 @@ export const BaitTaxonomyDiagram: React.FC<BaitTaxonomyDiagramProps> = () => (
     width={W}
     height={H}
     nodes={NODES}
+    portrait={PORTRAIT}
     edges={EDGES}
     core="hook"
-    backdrop={<Plane />}
-    overlay={<Poles />}
+    /*
+     * THE THIRD FIGURE THAT EARNS A GRID, AND THE ONLY OTHER ONE.
+     *
+     * Asked for: check whether any other figure needs a plane behind it. This
+     * is the one. It already draws AXES — arousal vertical, valence horizontal,
+     * about an origin — so it is a coordinate figure by construction, and a
+     * cell's meaning here is literally where it sits in a quadrant. Axes alone
+     * say which side of the origin a cell is on; they cannot say how far, and
+     * "how far" is what the taxonomy is claiming.
+     *
+     * The other six are not coordinates and get nothing: the scale mismatch is
+     * a field with no axis, the postures are states of one flower, the
+     * fragility index and the causal taxonomy are topologies, the Metric Lotus
+     * is a set, and the withdrawal figure carries its own vertical scale with
+     * its readings quoted on the cells. A grid behind any of those is the
+     * "technical backdrop" GR-01 removed, with nothing bought for it.
+     *
+     * Under its own axes, not instead of them — the axes are the argument and
+     * the grid is only the measure.
+     */
+    backdrop={
+      <>
+        <CartesianPlane
+          at={[OX - 244, OX - 122, OX + 122, OX + 244]}
+          top={58}
+          bottom={H - 58}
+          left={58}
+          right={W - 58}
+        />
+        <Plane ox={OX} oy={OY} w={W} h={H} inset={58} />
+      </>
+    }
+    overlay={<Poles ox={OX} oy={OY} w={W} h={H} inset={58} />}
     caption=""
     tag=""
     footLeft=""

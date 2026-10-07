@@ -1,38 +1,113 @@
 @import "tailwindcss";
 
-/* SELF-HOSTED TYPEFACE — the single family (TY-01, One Voice, and It Is Light).
-   Served from /fonts so first paint needs no third-party connection, the reader
-   is not announced to a font CDN, and offline reading keeps its typography. */
+/* SELF-HOSTED TYPEFACES — the deck's pairing, carried into the reader.
+
+   Newsreader Light sets the titles and IBM Plex Sans sets everything else, which
+   is the split `docs/presentationdesign.md` settled for the presentation and
+   the reason it gives: Newsreader is an editorial face fitted for headlines,
+   and Plex was drawn as a system for technical documentation, which is the
+   register the instruments, the readings and the figure annotations already
+   occupy.
+
+   Both are served from /fonts, so first paint needs no third-party connection,
+   the reader is not announced to a font CDN, and offline reading keeps its
+   typography. Both are OFL.
+
+   This is TWO families where TY-01 asks for one, on explicit instruction —
+   recorded as a divergence in docs/OPEN.md rather than silently. What TY-01 is
+   actually protecting is untouched: one weight, light, and contrast that never
+   comes from weight. Plex is variable so 300 is a real instance of the face
+   rather than a synthesised approximation of it.
+
+   Measured at 100px by the deck, cap height and x-height against Georgia:
+   Georgia 69/48, Newsreader 300 72/52, IBM Plex Sans 70/51. Both carry more
+   x-height than the reference, so neither needs the size inflation or negative
+   tracking a small-on-the-body face would — the title step stays at 18 and
+   TY-03's spacing is unchanged. */
 @font-face {
-  font-family: 'Plus Jakarta Sans';
+  font-family: 'Newsreader';
   font-style: normal;
-  font-weight: 200 800;
+  font-weight: 300;
   font-display: swap;
-  src: url('/fonts/plus-jakarta-sans-latin.woff2') format('woff2');
+  src: url('/fonts/newsreader-300-latin.woff2') format('woff2');
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 @font-face {
-  font-family: 'Plus Jakarta Sans';
+  font-family: 'Newsreader';
   font-style: normal;
-  font-weight: 200 800;
+  font-weight: 300;
   font-display: swap;
-  src: url('/fonts/plus-jakarta-sans-latin-ext.woff2') format('woff2');
+  src: url('/fonts/newsreader-300-latin-ext.woff2') format('woff2');
   unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
 }
 @font-face {
-  font-family: 'Plus Jakarta Sans';
-  font-style: italic;
-  font-weight: 200 800;
+  font-family: 'IBM Plex Sans';
+  font-style: normal;
+  font-weight: 100 700;
   font-display: swap;
-  src: url('/fonts/plus-jakarta-sans-latin-italic.woff2') format('woff2');
+  src: url('/fonts/ibm-plex-sans-var-latin.woff2') format('woff2');
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 @font-face {
-  font-family: 'Plus Jakarta Sans';
-  font-style: italic;
-  font-weight: 200 800;
+  font-family: 'IBM Plex Sans';
+  font-style: normal;
+  font-weight: 100 700;
   font-display: swap;
-  src: url('/fonts/plus-jakarta-sans-latin-ext-italic.woff2') format('woff2');
+  src: url('/fonts/ibm-plex-sans-var-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+
+/* THE ITALICS ARE REAL.
+
+   Until these were added the app declared no italic face at all, so every
+   italic in it — the pull quotes, the annotation on a prompt rule, the reading
+   under an instrument, and the authored emphasis in the manuscript — was the
+   browser mechanically slanting the roman. A synthesised oblique is not an
+   italic: the letterforms do not change, only their angle, so the shapes that
+   distinguish a true italic (the single-storey a, the entry and exit strokes)
+   never appear, the spacing is wrong, and the slant lands on the vertical stems
+   of a face that was never drawn to lean.
+
+   It is still two families, which is what was asked for: these are the italic
+   cuts of the two already here, not a third and fourth voice. Plex's italic is
+   variable across the same 100–700 its roman carries, so the app's single
+   weight of 300 is a real instance of the italic rather than an interpolation
+   toward one. Newsreader's is drawn at 300 to match its roman.
+
+   Both were taken from the same place the romans were, both are OFL, and both
+   are served from /fonts like everything else — first paint still needs no
+   third-party connection and offline reading still keeps its typography. */
+@font-face {
+  font-family: 'Newsreader';
+  font-style: italic;
+  font-weight: 300;
+  font-display: swap;
+  src: url('/fonts/newsreader-300-italic-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Newsreader';
+  font-style: italic;
+  font-weight: 300;
+  font-display: swap;
+  src: url('/fonts/newsreader-300-italic-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'IBM Plex Sans';
+  font-style: italic;
+  font-weight: 100 700;
+  font-display: swap;
+  src: url('/fonts/ibm-plex-sans-var-italic-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'IBM Plex Sans';
+  font-style: italic;
+  font-weight: 100 700;
+  font-display: swap;
+  src: url('/fonts/ibm-plex-sans-var-italic-latin-ext.woff2') format('woff2');
   unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
 }
 
@@ -55,9 +130,28 @@ button, a, input, select, textarea, div, span, label, svg {
   --tw-ring-width: 0px !important;
 }
 
-body, button, input, select, textarea, div, p, span, h1, h2, h3, h4, h5, h6,
+body, button, input, select, textarea, div, p, span, h3, h4, h5, h6,
 text, tspan {
-  font-family: 'Plus Jakarta Sans', ui-sans-serif, system-ui, -apple-system, sans-serif !important;
+  font-family: 'IBM Plex Sans', ui-sans-serif, system-ui, -apple-system, sans-serif !important;
+}
+
+/* The titles, and only the titles. h1 and h2 are the title role in this app —
+   every one of them is the largest thing on its sheet at the 18px step — so the
+   editorial face lands exactly where the deck puts it and nowhere else. The
+   blanket rule above carries !important, so this needs it too; the two are
+   disjoint by selector, never by cascade order. */
+h1, h2 {
+  font-family: 'Newsreader', Georgia, 'Times New Roman', serif !important;
+}
+
+/* The same title face for a title that is not an h1 or an h2.
+
+   The map's caption is the name of the cell under the pointer — a title by every
+   measure except its element, which is a div because it lives in a floating
+   readout rather than in a document outline. It is set in the face the sheets
+   set their titles in, so a name reads the same wherever the reader meets it. */
+.title-face {
+  font-family: 'Newsreader', Georgia, 'Times New Roman', serif !important;
 }
 
 /* THE HOUSE VOICE IS LIGHT.
@@ -72,8 +166,91 @@ body, button, input, select, textarea {
   font-weight: 300;
 }
 
+/* OPT-IN ACCESSIBLE / HIGH-READABILITY PROFILE
+   Weight 400 (using IBM Plex Sans native variable cut) + scaled font size +
+   enhanced stroke weight on tissue without altering biological geometry. */
+body[data-accessible="true"],
+body[data-accessible="true"] button,
+body[data-accessible="true"] input,
+body[data-accessible="true"] select,
+body[data-accessible="true"] textarea,
+body[data-accessible="true"] p,
+body[data-accessible="true"] span,
+body[data-accessible="true"] div,
+body[data-accessible="true"] h1,
+body[data-accessible="true"] h2,
+body[data-accessible="true"] h3,
+body[data-accessible="true"] h4,
+body[data-accessible="true"] .font-light,
+.accessible-reader,
+.accessible-reader * {
+  font-weight: 400 !important;
+}
+
+/* Scaled font-size in accessible mode:
+   12px body copy scales to 14.5px, 9px microcopy scales to 11px, 18px titles to 21px */
+body[data-accessible="true"] .text-\[12px\],
+.accessible-reader .text-\[12px\] {
+  font-size: 14.5px !important;
+  line-height: 1.65 !important;
+}
+
+body[data-accessible="true"] .text-\[9px\],
+.accessible-reader .text-\[9px\] {
+  font-size: 11px !important;
+}
+
+body[data-accessible="true"] .text-\[18px\],
+.accessible-reader .text-\[18px\] {
+  font-size: 21px !important;
+}
+
+/* Subtle stroke weight boost for veins & somas in accessible mode */
+body[data-accessible="true"] svg path,
+body[data-accessible="true"] svg circle,
+.accessible-reader svg path,
+.accessible-reader svg circle {
+  stroke-width: 1.35;
+}
+
+/* Contrast enhancement: reduces halation by boosting faint opacities */
+body[data-accessible="true"] .opacity-85,
+.accessible-reader .opacity-85 {
+  opacity: 0.98 !important;
+}
+
+body[data-accessible="true"] .opacity-70,
+.accessible-reader .opacity-70 {
+  opacity: 0.88 !important;
+}
+
+body[data-accessible="true"] .opacity-60,
+.accessible-reader .opacity-60 {
+  opacity: 0.78 !important;
+}
+
 /* LIQUID GLASS HAIRLINES — every border in the app becomes a translucent
-   hairline instead of a hard 1px outline. Neurologically low-arousal. */
+   hairline instead of a hard 1px outline. Neurologically low-arousal.
+
+   THE UNTHEMED DEFAULT IS NOT DECORATION, IT IS THE FLOOR. Tailwind 4 changed
+   the default border colour from gray-200 to `currentColor`, so a bare
+   `border` or `border-b` with no colour utility paints full-strength ink —
+   and fifteen call sites across the app write exactly that, because the two
+   rules below have always caught them.
+
+   They only catch them inside a theme. The moment a component renders without
+   `.theme-dark` or `.theme-light` on an ancestor, every one of those borders
+   goes to currentColor: measured in the talk deck's instrument frame, which
+   had no theme class, the budget widget drew a 1px rgb(255,255,255) rule
+   1352px wide under its title and another under its panels — two hard white
+   lines across the sheet, against LY-06.
+
+   So the hairline is the floor rather than a theme's privilege. Any colour
+   utility still wins on specificity, and the two themed rules still win
+   outright, so this changes nothing anywhere a theme is present. */
+*, *::before, *::after {
+  border-color: rgba(255, 255, 255, 0.12);
+}
 .theme-dark *, .theme-dark *::before, .theme-dark *::after {
   border-color: rgba(255, 255, 255, 0.12) !important;
 }
@@ -129,6 +306,136 @@ body, button, input, select, textarea {
 }
 
 /*
+   THE POINTER IS A DOT, AND OVER SOMETHING TOUCHABLE IT INVERTS.
+
+   Asked for: no hand, ever. A dot at rest; on anything clickable it glows up
+   and turns inside out — the white centre goes black and the light moves to
+   the ring around it. The inversion is the affordance, which is why it can be
+   this quiet: nothing else on the surface has to change to say "this answers".
+
+   BOTH ARE OS CURSOR IMAGES, which is the only form MO-04 permits near the
+   pointer. The rule refuses a FIELD CARRIED WITH THE CURSOR — one that can
+   never fall out of attention — and an image swapped by the browser has no
+   element, no lag, no trail and no animation. A div chasing the mouse with a
+   blend mode would be exactly the thing the rule is about, besides arriving a
+   frame late on every move.
+
+   LY-06 refuses a black-to-white flip on a CONTROL, and this is not one: it is
+   the pointer, and the control it passes over does not change at all. The
+   glow is on the ink, which is the form LY-08 allows.
+
+   ONE HOME, because a cursor set at twenty call sites is twenty places to
+   drift — the same reason tracking is derived rather than passed (TY-03).
+   Hotspots are centred (8 8 and 11 11) so the point being touched is under the
+   middle of the mark rather than its corner.
+*/
+:root {
+  --cursor-dot:
+    url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16'%3E%3Ccircle cx='8' cy='8' r='3.5' fill='white'/%3E%3C/svg%3E") 8 8, auto;
+
+  /* The same dot, carrying a dark edge so it survives the light theme. Used as
+     the shell's baseline; the bare one above stays on the black map. */
+  --cursor-dot-ui:
+    url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16'%3E%3Ccircle cx='8' cy='8' r='5' fill='black' opacity='0.42'/%3E%3Ccircle cx='8' cy='8' r='3.4' fill='white'/%3E%3C/svg%3E") 8 8, auto;
+
+  /*
+     THE TOUCHABLE POINTER IS A LITTLE BLACK HOLE WITH A GLOW.
+
+     Asked for in those words, and smaller than the first attempt — that one was
+     a 22px white disc with a black pip in it, which is a badge, not an eclipse.
+     This is 18px: a dark core, a bright rim right at its edge, and a falloff
+     that dissolves rather than ending.
+
+     It is built the one way DG-02 permits a fill at all — "the only fills left
+     in the system are the light sources ... layered radial falloffs, bright at
+     the heart" — inverted, so the heart is the dark and the light is the ring
+     around it. The stops carry the whole shape: nothing from the centre to 40%,
+     the rim at 48%, then a fall to nothing by the edge. No hard outline (LY-06)
+     because no stroke is drawn; the rim is a stop, not an edge.
+
+     `%23` is a literal `#`. Unencoded it would end the data URI at the fragment
+     and the gradient reference would silently resolve to nothing.
+  */
+  --cursor-dot-live:
+    url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18'%3E%3Cdefs%3E%3CradialGradient id='h'%3E%3Cstop offset='38%25' stop-color='white' stop-opacity='0'/%3E%3Cstop offset='47%25' stop-color='white' stop-opacity='0.95'/%3E%3Cstop offset='56%25' stop-color='white' stop-opacity='0.45'/%3E%3Cstop offset='74%25' stop-color='white' stop-opacity='0.13'/%3E%3Cstop offset='100%25' stop-color='white' stop-opacity='0'/%3E%3C/radialGradient%3E%3C/defs%3E%3Ccircle cx='9' cy='9' r='9' fill='url(%23h)'/%3E%3Ccircle cx='9' cy='9' r='3.4' fill='black'/%3E%3C/svg%3E") 9 9, auto;
+  /*
+     THE TEXT POINTER IS A CARET OF LIGHT, NOT AN I-BEAM.
+
+     The last default cursor in the app. It is built from the same idea as the
+     other two — light that dissolves rather than ends — so the bar fades out at
+     both ends instead of stopping on a cap, and the small serifs are there only
+     because without them a bare bar reads as a caret already placed in the text
+     rather than as a pointer about to place one.
+
+     IT CARRIES ITS OWN DARK EDGE, AND THAT IS THE ONE THING HERE THAT IS NOT
+     AESTHETIC. The map is black in both themes (GR-01), so the white dot can be
+     white; prose is NOT — a page follows the theme, and a pure white caret is
+     invisible on the light one. So a wider dark bar sits behind the white core:
+     on dark ground the core reads, on light ground the edge does. This is the
+     same reason every OS draws its cursors white-on-black-outline, and it is
+     not optional for a mark that has to survive two grounds.
+  */
+  --cursor-text:
+    url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24'%3E%3Cdefs%3E%3ClinearGradient id='c' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0%25' stop-color='white' stop-opacity='0'/%3E%3Cstop offset='16%25' stop-color='white' stop-opacity='1'/%3E%3Cstop offset='84%25' stop-color='white' stop-opacity='1'/%3E%3Cstop offset='100%25' stop-color='white' stop-opacity='0'/%3E%3C/linearGradient%3E%3Cmask id='m'%3E%3Crect width='24' height='24' fill='url(%23c)'/%3E%3C/mask%3E%3C/defs%3E%3Cg mask='url(%23m)'%3E%3Crect x='10.4' y='2' width='3.2' height='20' fill='black' opacity='0.5'/%3E%3Crect x='8.6' y='2.4' width='6.8' height='1' fill='black' opacity='0.4'/%3E%3Crect x='8.6' y='20.6' width='6.8' height='1' fill='black' opacity='0.4'/%3E%3Crect x='11.4' y='2' width='1.2' height='20' fill='white'/%3E%3Crect x='9.4' y='2.7' width='5.2' height='0.8' fill='white' opacity='0.75'/%3E%3Crect x='9.4' y='20.5' width='5.2' height='0.8' fill='white' opacity='0.75'/%3E%3C/g%3E%3C/svg%3E") 12 12, text;
+}
+
+/*
+   THE BASELINE, SO NOTHING FALLS BACK TO A SYSTEM ARROW.
+
+   Measured before this rule: 199 elements on a book sheet still computed
+   `cursor: auto`, which is the OS arrow — so the app was stylised on its
+   controls and its prose and stock everywhere between them, which reads as
+   unfinished rather than as restraint. `cursor` inherits, so one declaration on
+   the shell covers every descendant that does not override it.
+
+   IT IS NOT THE MAP'S DOT. That one is pure white and may be, because the map
+   is black in both themes (GR-01). The shell is not: it follows the theme, so
+   the baseline dot carries the same dark edge the caret does, for the same
+   reason — on dark ground the core reads, on light ground the edge does.
+*/
+body {
+  cursor: var(--cursor-dot-ui);
+}
+
+/* The drawing itself: the pure dot, on a ground that is always black. */
+.tissue-cursor { cursor: var(--cursor-dot); }
+
+/*
+   Anywhere a reader can select, including the fields they type into. Listed by
+   element rather than by a page class because prose is rendered from data and
+   the containers change shape; what does not change is that a paragraph is a
+   paragraph. The interactive rule above carries `!important` and so still wins
+   wherever text sits inside a control, which is correct — a label on a button
+   is not selectable prose.
+*/
+p, blockquote, li, h1, h2, h3, h4, h5, h6, figcaption,
+input:not([type="range"]):not([type="checkbox"]):not([type="radio"]):not([type="submit"]):not([type="button"]),
+textarea,
+[contenteditable="true"] {
+  cursor: var(--cursor-text);
+}
+
+/*
+   Anything that answers a touch takes the inverted one. `!important` because
+   Tailwind's `cursor-pointer` is on twenty elements and this has to beat it
+   without editing all twenty — the hand is what was objected to, and leaving
+   even one behind would read as a bug rather than as a rule.
+
+   Disabled controls are excluded: they do not answer, so they must not claim
+   to. They fall through to whatever the surface under them says.
+*/
+button:not(:disabled),
+a[href],
+[role="button"]:not([aria-disabled="true"]),
+summary,
+label[for],
+input[type="range"]:not(:disabled),
+input[type="checkbox"]:not(:disabled),
+.cursor-pointer:not(:disabled) {
+  cursor: var(--cursor-dot-live) !important;
+}
+
+/*
    THE OPENER YIELDS TO THE PROSE.
 
    A chapter's cell is a moment of scale, and a moment of scale is worth having
@@ -148,6 +455,35 @@ body, button, input, select, textarea {
 @media (max-height: 640px) { .opener-figure { display: none; } }
 /* a phone on its side has height to spare nowhere and width to spare here */
 @media (orientation: landscape) and (max-height: 520px) { .opener-figure { display: none; } }
+
+/*
+   THE ENTRY FIELD YIELDS THE SAME WAY THE OPENER DOES.
+
+   The particle field on the front door (`IntroField`) needs more room than the
+   cell it replaced, because the cell is only the first of the forms it spells
+   and the others are the size of the box. But the box sits above a title, three
+   lines of instruction and the way in, on a surface that must never scroll
+   (LY-02) — so it is bound to the height of the viewport rather than its width,
+   exactly as THE OPENER YIELDS TO THE PROSE binds the chapter figure, and for
+   the same reason: it is the short axis that runs out.
+
+   132px is the floor and it is not an arbitrary one — it is the size
+   `index.html` paints its splash cell at, and the size this field pins that
+   cell to however large the box gets. At the floor the box IS the cell and the
+   other forms simply have no more room than it did. Measured at 320×568: the
+   entry content ran 81px to 487px in a 568px viewport, so the 188px step costs
+   56 of the 81px of slack at each end and the layout still closes.           */
+.intro-field {
+  width: 132px;
+  height: 132px;
+  overflow: visible;
+}
+@media (min-height: 560px) { .intro-field { width: 188px; height: 188px; } }
+@media (min-height: 780px) { .intro-field { width: 232px; height: 232px; } }
+/* a phone on its side has no height to spend on a drawing at all */
+@media (orientation: landscape) and (max-height: 520px) {
+  .intro-field { width: 104px; height: 104px; }
+}
 
 /*
    CHROME AND MARGIN YIELD TOO.
@@ -270,12 +606,15 @@ body, button, input, select, textarea {
   content: none;
 }
 .bud {
-  opacity: 0.68;
+  /* 0.70 — the ladder's second step. It was 0.68, which is the same mark to
+     the eye and a different number to the sheet; a scale with a value that is
+     nearly but not exactly a step is a scale nobody can check. */
+  opacity: 0.70;
   transition: opacity 0.6s var(--ease-organic);
 }
 .bud:hover, .bud:focus-visible { opacity: 1; }
 .bud-lit { opacity: 1; }
-.bud:disabled { opacity: 0.22; }
+.bud:disabled { opacity: 0.25; }   /* the quiet step */
 
 /* A bud is a target as well as a mark. With a fine pointer its size is set by
    the glyph; with a coarse one it has to be reachable by a thumb, and an icon
@@ -283,6 +622,36 @@ body, button, input, select, textarea {
    that answers to touch. */
 @media (pointer: coarse) {
   .bud, button.glass-hover { min-height: 44px; min-width: 44px; }
+
+  /* The page-turn arrows are the reader's primary navigation and are neither
+     a bud nor a glass-hover, so the line above never reached them: measured
+     44×32 in the foot bar at every width. Padding is what sizes them, so the
+     glyph does not move — only the box that answers to a thumb. */
+  .reader-bar button { min-height: 44px; min-width: 44px; }
+
+  /* A slider is grabbed by the track, and this one is drawn 4px tall — the
+     whole of its target, with nothing around it that a thumb could hit
+     instead. (The checkboxes below it are the opposite case and need nothing:
+     each sits inside its own `p-3` label, which is the control.) `padding`
+     rather than `height`, against `content-box`: height grows the track the
+     browser paints and the slider comes back a thick rounded pill, which is
+     both a louder mark than the drawing asks for and a rounded corner
+     (LY-05). Padding leaves the painted track at 4px and grows only the box —
+     the same trade the bud makes above, measured here as 4px to 44px with the
+     mark unchanged. */
+  input[type="range"] {
+    box-sizing: content-box;
+    padding-block: 20px;
+  }
+
+  /* A band has to be able to hold what that rule puts in it. The heights under
+     CHROME AND MARGIN YIELD TOO shrink the bars for a shallow sheet, and at
+     390px tall — a phone on its side — the head band came to 41.6px while the
+     buds inside it were 44: measured top -1, bottom 43 against a band running
+     0 to 42, so every target in the chrome hung a pixel out of it at both
+     edges. The band yields to the sheet until it would be smaller than the
+     controls it carries, and then it stops. */
+  .reader-bar { min-height: 44px; }
 }
 
 /* Chrome bands dissolve into the page instead of sitting on it behind a rule */
@@ -391,6 +760,61 @@ body, button, input, select, textarea {
 }
 .settle { animation: surface-settle 0.28s var(--ease-organic) both; }
 
+/*
+   A CARD WITH TWO FACES TURNS; IT DOES NOT CROSS-FADE.
+
+   Asked for on the Content Pollution Control reading: a drawn face and a
+   written one, and a way to turn from either to the other. A fade between two
+   different things says they are the same thing at different opacities; a turn
+   says they are two sides of one card, which is what they are.
+
+   IT TURNS ON ONE FACE, NOT TWO. The obvious build stacks both faces, hides the
+   backs and rotates 180° — and it needs a definite height to stack them in.
+   This card does not have one below `lg`, where its row is `min-content` and
+   its height comes from its content; the widget's own header records what
+   happens when that panel is handed a height it cannot resolve (the reading
+   painting straight over the cards above and below it at 720×340). So only the
+   visible face is ever in the DOM, the card turns a quarter to hide it, the
+   face is swapped at the midpoint, and it turns back. Height follows the face
+   on show, the way it does when nothing is turning at all.
+
+   Half the duration, because it is half the turn: 0.14s each way against the
+   0.28s `.settle` above, on the one easing (MO-02). MO-03's budget for a
+   response to a press is 0.2–0.28s and this lands inside it.
+*/
+.turn-hold { perspective: 1100px; }
+.turn-face {
+  /* Opacity turns with the card, and that is what makes the swap invisible.
+     Edge-on alone hides it in theory — a card at 90° has no width — but the
+     face is swapped one frame either side of that, and at 0.14s the eye was
+     catching the new face already at three-quarters brightness as it came back
+     round. Dimming to near nothing across the same curve means the content
+     changes at the bottom of a fade as well as behind an edge.
+
+     0.19s each way rather than 0.14s. MO-03's budget for answering a press is
+     0.2–0.28s and a turn is two of these, which puts the whole gesture at
+     0.38s — between a page turn and the dive (520ms), which is the right place
+     for something larger than a turn of the page and smaller than a change of
+     surface. At 0.28s total it read as a flick rather than a turn.
+
+     `will-change` is on the resting state deliberately: declaring it at the
+     moment the transform is applied is a frame too late to promote the layer,
+     which is exactly the hitch it exists to remove. One element, one layer. */
+  transition:
+    transform 0.19s var(--ease-organic),
+    opacity 0.19s var(--ease-organic);
+  transform-origin: 50% 50%;
+  will-change: transform;
+  backface-visibility: hidden;
+}
+.turn-face[data-turning='true'] { transform: rotateY(90deg); opacity: 0.08; }
+
+@media (prefers-reduced-motion: reduce) {
+  /* the faces still swap — only the rotation goes */
+  .turn-face { transition: none; will-change: auto; }
+  .turn-face[data-turning='true'] { transform: none; opacity: 1; }
+}
+
 /* Soft hover for interactive glass — no harsh inversion flips */
 /* THE LIGHT COMES FROM THE TEXT, NEVER FROM THE BOX BEHIND IT.
 
@@ -408,7 +832,8 @@ body, button, input, select, textarea {
    has an edge, and the shape of the control stays invisible until it is
    pressed. */
 .glass-hover {
-  opacity: 0.72;
+  /* the same second step the bud rests on — these are one idea (see above) */
+  opacity: 0.70;
   transition: opacity 0.6s var(--ease-organic);
 }
 .glass-hover:hover, .glass-hover:focus-visible { opacity: 1; }
@@ -437,6 +862,18 @@ body, button, input, select, textarea {
 .hflow-hold { container-type: inline-size; }
 .hflow {
   height: 100%;
+  /* `width: 100%` against the column-width below, and the reading margin
+     depends on it. `100cqw` is the holder's content box, which is also every
+     pixel this flow has to lay out in — so a column is already as wide as the
+     box, and the flow's own `px-1.5` has nowhere to come from. A multicol box
+     may not be narrower than one column, so instead of absorbing that padding
+     the auto width refused to shrink and the flow grew by exactly the padding.
+     Measured on a 320px sheet: the flow ran 286px inside a 272px box and the
+     reading column sat 30px from the left edge and 18px from the right, on
+     every `.hflow` sheet in the book. A definite width is not subject to the
+     one-column floor, so the padding comes out of the width as it would
+     anywhere else: 272px, and 30px against 32px. */
+  width: 100%;
   column-width: 100cqw;
   column-gap: 5rem;
   column-fill: auto;
@@ -551,6 +988,86 @@ body, button, input, select, textarea {
   animation: strand-breathe 19.7s ease-in-out infinite;
 }
 
+/* THE ANSWER LANDS SOMEWHERE — a one-shot pulse tying a response to its result.
+ *
+ * The five-question panel had a gap in it that no amount of layout fixed: you
+ * pressed CLEARS on the left and a line moved on the right, and nothing said
+ * the two were the same event. The reading changed the way a clock changes —
+ * true when you looked again, never seen to happen.
+ *
+ * So the station the answer just moved brightens once, hard, and settles. It is
+ * one-shot (`both`, no iteration), it is opacity only, and it is keyed off the
+ * answer rather than off a timer, so it fires exactly when a reader acts and
+ * never otherwise. The contour is the spike's, not the tide's — LC-02's
+ * distinction: this is a discrete event, and a swell would read as breathing.
+ *
+ * It is not a travelling anything. One mark brightens in place; nothing slides
+ * along the trajectory, which is the shape LC-02 refuses.
+ */
+@keyframes answer-pulse {
+  0%   { opacity: var(--rest, 0.95); }
+  8%   { opacity: 1; }
+  100% { opacity: var(--rest, 0.95); }
+}
+.answer-pulse {
+  animation: answer-pulse 1.15s var(--ease-organic) both;
+}
+
+/* The same event on the segment that moved, which is the part of the drawing
+   the answer actually redrew. Width as well as light: a segment that only
+   brightened was lost against the two beside it at these stroke weights. */
+@keyframes answer-pulse-run {
+  0%   { opacity: 0.55; stroke-width: 1.5; }
+  10%  { opacity: 1;    stroke-width: 2.6; }
+  100% { opacity: 0.95; stroke-width: 1.5; }
+}
+.answer-pulse-run {
+  animation: answer-pulse-run 1.15s var(--ease-organic) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .answer-pulse, .answer-pulse-run { animation: none; }
+}
+
+/* THE FIELD STATIONS — a particle field that BRIGHTENS, never one that blinks.
+ *
+ * FIG 0.1's outer field is drawn as points rather than as line (DG-02's own
+ * carve-out: "points are not areas — a bouton, a seed tip, a nucleolus is a
+ * bright dot and is allowed"), and the figure is asked to show information
+ * moving through it.
+ *
+ * The first attempt fired those points on `.ranvier`, the saltatory spike, and
+ * it was the wrong clock — measured at rest, a station sat at 0.06 opacity and
+ * only touched 0.40 at its peak, so the field vanished between pulses and came
+ * back. A field that disappears is not a medium, it is a string of flashes.
+ *
+ * This is the TIDE instead, which is what LC-01 describes and what the figure
+ * actually needs: one shared period, phase taken from position, so brightening
+ * rolls through the field as a wave with no moving object and no ends. The
+ * contour is `strand-breathe`'s — asymmetric, cresting early at 43%, with the
+ * counter-swell on the way up and a held trough (LC-05) — and the floor is high
+ * enough that every station is present through the whole cycle.
+ *
+ * `--fire` is the station's own ceiling, so a point far out is dim throughout
+ * rather than dim at rest and bright at peak: the field dissolves toward the
+ * edge instead of arriving at a rim (DG-09).
+ */
+@keyframes field-tide {
+  0%   { opacity: calc(var(--fire, 1) * 0.50); }
+  14%  { opacity: calc(var(--fire, 1) * 0.72); }
+  27%  { opacity: calc(var(--fire, 1) * 0.66); }
+  43%  { opacity: var(--fire, 1); }
+  62%  { opacity: calc(var(--fire, 1) * 0.83); }
+  78%  { opacity: calc(var(--fire, 1) * 0.61); }
+  92%  { opacity: calc(var(--fire, 1) * 0.51); }
+  100% { opacity: calc(var(--fire, 1) * 0.50); }
+}
+.field-station {
+  /* the app's one period — LC-03, and the same number every other cycle here
+     reads (19.7s). The direction of travel is in the per-station delay. */
+  animation: field-tide 19.7s ease-in-out infinite;
+}
+
 /* Saltatory conduction.
 
    Between the wraps of myelin the axon membrane is bare, and the spike does not
@@ -563,14 +1080,270 @@ body, button, input, select, textarea {
    fires slightly later than the one behind it, which is what the real thing
    does. The rise is near-instant and the fall is quick — a spike that eases in
    and out is a swell, and swells belong to the tide, not to firing. */
+/* LC-02 — the peak is a variable so a station can fire weakly.
+
+   `--fire` is the strength this node reaches, 1 by default, which resolves to
+   the four literals this keyframe has always carried: a station that sets
+   nothing is animated exactly as before, to the value. It exists so a spike can
+   be made to die along a fibre rather than arrive — see `fade` on FigureEdge.
+   The floor and the tail scale with it, so a weak node is dim throughout its
+   cycle rather than dim at the peak and bright at rest. */
 @keyframes ranvier-fire {
-  0%   { opacity: 0.14; }
-  3%   { opacity: 1; }
-  11%  { opacity: 0.3; }
-  100% { opacity: 0.14; }
+  0%   { opacity: calc(var(--fire, 1) * 0.14); }
+  3%   { opacity: var(--fire, 1); }
+  11%  { opacity: calc(var(--fire, 1) * 0.3); }
+  100% { opacity: calc(var(--fire, 1) * 0.14); }
 }
 .ranvier {
   animation: ranvier-fire 7.4s ease-out infinite;
+}
+
+/*
+   A STREAM TOWARD WHAT HAS NOT BEEN OPENED — AND NOTHING IN IT MOVES.
+
+   Asked for: the unexplored parts faded, with particle streams running toward
+   them so it is clear they can be opened. The first half is opacity. The second
+   half is the one thing LC-02 forbids outright if it is built the obvious way —
+   a lit dash sliding along the fibre is a worm crossing the drawing, and no
+   amount of softening fixes it, because the lit segment has ends and the ends
+   are what the eye tracks.
+
+   So it is built the way that rule sanctions and OG-08 already uses for a
+   two-way edge: stations that sit still and take a delay from their position
+   along the fibre, so the spike appears to leap toward the far end. Every mark
+   stays exactly where it is and only its brightness changes — which is what
+   saltatory conduction actually is, and the only honest way to send light along
+   a strand here.
+
+   ON THE SPIKE'S CLOCK, NOT THE TIDE'S. 7.4s is `.ranvier`'s period and this
+   shares it rather than introducing a third (LC-03). The tide is the slow
+   metabolic swell of the whole organism; this is a fast discrete event, and
+   LC-02 is explicit that the two must not share a period or they collapse into
+   one effect. The contour is the spike's too — up in ~4%, down in ~14% — since
+   a spike that eases in and out is a swell.
+
+   It fires toward the node, so the delays count UP along the run: a station
+   nearer the cell being pointed at fires later. Get that backwards and the
+   stream runs away from the thing it is inviting you to open.
+*/
+/*
+   3.7s is HALF the spike's period, not a third clock. `.ranvier` fires every
+   7.4s, which is right for a node that is simply alive and wrong for a mark
+   whose whole job is to be noticed: a run that passes once and then leaves the
+   map still for seven seconds is not an invitation, it is an occasional event.
+   Halving keeps it locked to the spike — every second beckon coincides with a
+   ranvier fire rather than drifting against it, which is the beat LC-03 exists
+   to prevent.
+
+   And the floor is 0.22, not near-zero. The lesson is already recorded on the
+   figure's own station field above: at 0.06 resting the marks vanished between
+   pulses and "a field that disappears is not a medium, it is a string of
+   flashes". These have to read as a dotted approach to the cell even at the
+   bottom of the cycle; the spike is what draws the eye along it.
+*/
+@keyframes beckon-fire {
+  0%    { opacity: 0.22; }
+  5%    { opacity: 1; }
+  22%   { opacity: 0.22; }
+  100%  { opacity: 0.22; }
+}
+.beckon circle {
+  animation: beckon-fire 3.7s ease-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* the invitation stays, the firing goes — the stations simply sit there,
+     dim and present, which is still a mark pointing at an unopened cell */
+  .beckon circle { animation: none; opacity: 0.42; }
+}
+
+/*
+ * A NAME THAT SITS INSIDE ITS OWN CELL, AND BURNS.
+ *
+ * The only text in the app that is a light source rather than a label. It sits
+ * at the centre of the arbor it names, which means it has the densest tissue in
+ * the figure directly behind it — and at the resting opacity a label uses it
+ * would be illegible there. So it is held at full white with a tight bloom
+ * instead, which is also the honest reading: on a figure whose claim is that
+ * every cell is a centre, the cell you are standing in is the one that is lit.
+ *
+ * The glow is a text-shadow and not a filter. GR-07 permits a soft pass only on
+ * line geometry and PF-04 keeps real blur off anything that animates or is
+ * numerous; three tight stops on a single held name is neither, and costs
+ * nothing worth measuring.
+ *
+ * TY-03 is unchanged: 0.2em, which is what the drawn name already carried.
+ */
+.fig-name {
+  /* CONTRAST IS THE LIGHT IN THE NAME, NOT A LINE AROUND IT.
+     A ground-coloured stroke under the glyphs was tried here and removed: it
+     reads as a black outline drawn around the type, which is a border by another
+     name, and on a figure made entirely of light a letter with a dark edge is
+     the one mark that is not lit. So the name separates itself from the tissue
+     the way every other bright thing in this drawing does — by being brighter,
+     with the glow carried in the letter rather than beside it. At rest the bloom
+     is faint and scales with the name's own opacity, because opacity applies to
+     an element's shadow as well as its fill: a dim name gets a dim halo without
+     anything having to say so. */
+  text-shadow:
+    0 0 3px rgb(255 255 255 / 0.5),
+    0 0 8px rgb(255 255 255 / 0.28);
+  transition: opacity 0.42s var(--ease-organic), text-shadow 0.42s var(--ease-organic);
+}
+.fig-name-lit {
+  fill: #fff;
+  text-shadow:
+    0 0 4px rgb(255 255 255 / 0.9),
+    0 0 11px rgb(255 255 255 / 0.55),
+    0 0 26px rgb(var(--lume-halo-rgb, 255 255 255) / 0.4);
+}
+
+/*
+ * THE ANNOTATION BESIDE THE CELL.
+ *
+ * The reading used to sit in a fixed strip under the drawing, which means the
+ * eye has to leave the cell to find out what the cell is. On a figure whose
+ * whole method is that names surface where you are looking, that is the wrong
+ * place for the one piece of text that answers you. It now stands beside the
+ * cell it belongs to.
+ *
+ * Two things make it readable over a drawing, and neither of them is thicker
+ * type. GR-04 and GR-08: where copy sits over tissue the GROUND is emptied
+ * behind it. The radial well below does that, in the surface's own ground —
+ * `--fig-ground-rgb` is the token the figure vignette already uses, so the well
+ * is black on a stage and white on a prose sheet without knowing which it is
+ * on. And the quadrant is chosen against the figure's own geometry, so the
+ * emptying is a second line of defence rather than the whole answer.
+ *
+ * The measure is held near 34 characters. TY-06 wants 50–75 for running prose;
+ * this is an annotation of one or two sentences read at a glance beside the
+ * thing it names, which is the register a technical callout occupies, and at
+ * that length a long line makes the eye travel away from the cell and back.
+ */
+.fig-callout {
+  position: absolute;
+  z-index: 4;
+  width: max-content;
+  /* Narrow enough to have somewhere to go. At 34ch the annotation was 40% of
+     the figure's width, which on a drawing with a dense middle means every
+     corner collides with something and the scorer is only ever choosing the
+     least bad one. A shorter measure is also the right measure here: this is an
+     annotation read at a glance beside the thing it names, not running prose. */
+  max-width: min(26ch, 32%);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.42s var(--ease-organic);
+}
+.fig-callout.on { opacity: 1; }
+/*
+ * THE DRAWING STEPS BACK WHILE YOU ARE READING.
+ *
+ * When a cell is held, everything except that cell and its annotation dims and
+ * softens. The annotation carries no ground of its own — there is no box — so
+ * the contrast it needs has to come from the drawing yielding instead, which is
+ * GR-04's argument about emptying the ground, applied to the whole surface for
+ * as long as there is something to read on it.
+ *
+ * Two things keep this affordable, and PF-04 is why they matter: a real filter
+ * over animating tissue measured 1fps on the map, and that rule is written from
+ * it. First, the blur is small and lands on a handful of groups rather than on
+ * one enormous one. Second, on the connections the class REPLACES the flex
+ * displacement rather than stacking with it — a CSS filter overrides the SVG
+ * presentation attribute — so the number of filters running never rises, and
+ * while you are reading it falls, because a blur is cheaper than an animated
+ * turbulence and displacement pass.
+ *
+ * The dimming is plain opacity, which composites, and would carry this on its
+ * own if the blur ever has to come out.
+ */
+.fig-recede-live {
+  opacity: 0.3;
+  filter: blur(1.5px);
+  /* Slow. At 0.42s the drawing snapped back on every cell the pointer crossed,
+     which is a flicker rather than a focus, and it made a surface whose whole
+     argument is calm behave like a control panel. At 1.15s the recede reads as
+     the drawing settling back while you begin to read, and crossing a cell on
+     the way somewhere else barely disturbs it. This is the slowest transition
+     in the app after the tide itself, deliberately. */
+  transition: opacity 1.15s var(--ease-organic), filter 1.15s var(--ease-organic);
+}
+@media (prefers-reduced-motion: reduce) {
+  .fig-recede-live { transition: none; }
+}
+
+/*
+ * THERE IS NO BOX.
+ *
+ * The annotation is type standing on the drawing and nothing else: no panel, no
+ * well, no ground of its own, and nothing that lights up when you point at
+ * something. A radial light-well behind it was tried here and removed — it has
+ * an edge, the edge falls somewhere on the tissue, and a soft-edged rectangle
+ * over an organism is a panel however faint it is.
+ *
+ * The legibility it was buying is bought instead the same way the names buy it:
+ * light in the type. These sit only on the figure stage, which GR-01 holds black
+ * in both themes, so a white bloom always has a dark ground to separate from.
+ */
+.fig-callout .fig-callout-kind,
+.fig-callout .fig-callout-body,
+.fig-callout li {
+  text-shadow:
+    0 0 4px rgb(255 255 255 / 0.42),
+    0 0 10px rgb(255 255 255 / 0.22);
+}
+/* Balanced by the engine rather than by a hand-tuned width: the browser solves
+   for lines of even length across the whole block, which is the same thing the
+   deck's scorer does and is exactly what stops a two-line annotation ending on
+   one short word. */
+.fig-callout .fig-callout-body { text-wrap: balance; }
+
+/*
+ * THE PENDING CELL ASSEMBLES, EXACTLY AS THE SPLASH DOES.
+ *
+ * The boot splash in index.html and this are deliberately the same cell on the
+ * same spot: the note there calls the handover "a thickening rather than a
+ * replacement", and the whole point is that nothing jumps between them. So when
+ * the splash became a particle assembly this had to as well, or the reader
+ * would watch a drawing assemble from points and then be replaced by a solid
+ * one drawn the old way.
+ *
+ * The keyframes are duplicated rather than shared because the splash's copy
+ * must live inline in the document head — it runs before any stylesheet has
+ * been fetched, which is the only reason it exists. They are named differently
+ * so neither can silently override the other.
+ *
+ * Growth first, then grain: a dash longer than any path here swept in from full
+ * offset, which is the process arriving rather than light travelling along it,
+ * and then the pattern jumps to a near-zero dash against a gap, which on a
+ * round cap is a chain of discs. One path throughout; nothing is added and
+ * nothing animates once it has settled.
+ */
+@keyframes cell-grow { from { stroke-dashoffset: 60; } to { stroke-dashoffset: 0; } }
+@keyframes cell-grain {
+  0%, 58%   { stroke-dasharray: 60; }
+  59%, 100% { stroke-dasharray: 0.01 1.9; }
+}
+@keyframes cell-tip { from { opacity: 0; } to { opacity: 1; } }
+
+.pending-cell path {
+  stroke-dasharray: 60;
+  stroke-dashoffset: 60;
+  animation:
+    cell-grow 1.15s var(--ease-organic) both,
+    cell-grain 1.9s linear both;
+}
+/* the finer generation follows the one it forks from, so the cell fills out
+   from its trunks rather than everywhere at once */
+.pending-cell .pending-fine path {
+  animation-duration: 0.95s, 1.6s;
+  animation-delay: 0.34s, 0.34s;
+}
+.pending-cell circle { opacity: 0; animation: cell-tip 0.5s ease-out 1.2s both; }
+
+@media (prefers-reduced-motion: reduce) {
+  /* no assembly and no growth — the cell is simply already made of points */
+  .pending-cell path { animation: none; stroke-dasharray: 0.01 1.9; stroke-dashoffset: 0; }
+  .pending-cell circle { animation: none; opacity: 1; }
 }
 
 /* Depth planes — applied only to the backdrop, never to the organism. A
@@ -736,51 +1509,118 @@ body, button, input, select, textarea {
    reads as tissue squirming under a finger.
 
    Pure CSS: no React re-render, no rAF, no per-frame JS. The asymmetric timing
-   is the whole effect — 0.14s to answer, 1.6s to let go. */
+   is the whole effect — 0.2s to answer, 1.6s to let go.
+
+   IT ANSWERS IN OPACITY, AND IN NOTHING ELSE.
+
+   This used to set `stroke-width: 1.15` and `r: 1.6` on the touched mark, and
+   that was the bug behind "too intense and fast a pulse on hover". Resting
+   filaments here are hairlines — junction branchlets at 0.26 and 0.30, twigs at
+   0.22–0.34 — so a flat 1.15 was a **four-fold** thickening, and a fixed target
+   width means the thinner the strand the harder it jumps. Sweeping the pointer
+   across the map crossed dozens of them and every one flashed to a width fatter
+   than most trunks.
+
+   Two rules say not to do this and both were being broken. GR-04: "contrast is
+   bought with opacity — thickening a strand turns a bundle back into a stroke,
+   which is the one thing the grammar exists to avoid." DG-05: the generations
+   have to stay separably wide, and a twig that swells to trunk width while you
+   look at it erases the hierarchy at exactly the moment you are reading it.
+
+   So touch is opacity alone, which is also what every other control in the app
+   does (`.bud`, `.glass-hover`). The attack goes to 0.2s — MO-03's stated
+   response range is 0.16–0.2s and 0.14s sat outside it on the fast side. The
+   1.6s release is untouched: the asymmetry is the effect. */
 .tissue-live path,
 .tissue-live circle {
-  transition:
-    opacity 1.6s var(--ease-organic),
-    stroke-width 1.6s var(--ease-organic),
-    r 1.6s var(--ease-organic);
+  transition: opacity 1.6s var(--ease-organic);
 }
-.tissue-live path:not(.halo):hover {
-  opacity: 1;
-  stroke-width: 1.15;
-  transition:
-    opacity 0.14s var(--ease-organic),
-    stroke-width 0.14s var(--ease-organic);
-}
+.tissue-live path:not(.halo):hover,
 .tissue-live circle:hover {
   opacity: 1;
-  r: 1.6;
-  transition:
-    opacity 0.14s var(--ease-organic),
-    r 0.14s var(--ease-organic);
+  transition: opacity 0.2s var(--ease-organic);
 }
 @media (prefers-reduced-motion: reduce) {
   .tissue-live path, .tissue-live circle,
   .tissue-live path:hover, .tissue-live circle:hover { transition: none; }
 }
 
-/* FOCUS IS A BUD, NOT A RING
-   The global reset above kills every outline and ring, which left keyboard
-   readers with no way to see where they are. A hard outline is forbidden
-   (No Hard Outlines), so focus is what a control's hover already is: a swell
-   of light under the glyph — here soft-edged, so it never reads as a border. */
-:focus-visible {
-  box-shadow:
-    0 0 0 3px rgba(255, 255, 255, 0.07),
-    0 0 16px 3px rgba(255, 255, 255, 0.26) !important;
-  transition: box-shadow 0.35s var(--ease-organic);
+/* FOCUS IS A GLOW ON THE GLYPH, NEVER A BOX — LY-08
+   This was a box-shadow, and a box-shadow follows the border box. Its own
+   comment claimed it was "a swell of light under the glyph, soft-edged so it
+   never reads as a border", and that was simply not what it drew: a lit
+   rectangle stood behind every focused control, brightest on the entry button,
+   which carries autofocus and so wore one the moment the app opened.
+
+   A rectangle of tone is a filled area, and DG-02 refuses those at any opacity
+   — the fix there was never a lower number, it was removing the fill. GR-08
+   says a control is "a swell of light under the glyph, never a bordered pill",
+   and a soft-edged box is a bordered pill with the edge blurred.
+
+   So the light is carried by the ink. text-shadow can only ever fall on
+   letterforms, and the glyph's own drop-shadow follows its alpha rather than
+   its box, so a focused control glows exactly where it has marks and nowhere
+   else. The shape of the control stays invisible.
+
+   Scoped to controls, because text-shadow INHERITS: put it on :focus-visible
+   bare and a container taking focus — a dialog, an overlay, the figure world —
+   hands a glow to every paragraph inside it. */
+button:focus-visible,
+a:focus-visible,
+summary:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[role='button']:focus-visible {
+  opacity: 1;
+  text-shadow:
+    0 0 3px rgba(255, 255, 255, 0.5),
+    0 0 12px rgba(255, 255, 255, 0.38);
+  transition: text-shadow 0.35s var(--ease-organic);
 }
-.theme-light :focus-visible {
-  box-shadow:
-    0 0 0 3px rgba(0, 0, 0, 0.06),
-    0 0 16px 3px rgba(0, 0, 0, 0.20) !important;
+button:focus-visible svg,
+a:focus-visible svg,
+[role='button']:focus-visible svg {
+  filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.55));
+  transition: filter 0.35s var(--ease-organic);
 }
+
+.theme-light button:focus-visible,
+.theme-light a:focus-visible,
+.theme-light summary:focus-visible,
+.theme-light input:focus-visible,
+.theme-light select:focus-visible,
+.theme-light textarea:focus-visible,
+.theme-light [role='button']:focus-visible {
+  text-shadow:
+    0 0 3px rgba(0, 0, 0, 0.42),
+    0 0 12px rgba(0, 0, 0, 0.3);
+}
+.theme-light button:focus-visible svg,
+.theme-light a:focus-visible svg,
+.theme-light [role='button']:focus-visible svg {
+  filter: drop-shadow(0 0 5px rgba(0, 0, 0, 0.45));
+}
+
+/* A surface that takes focus programmatically is not a control and shows
+   nothing: overlays call focus() on their own wrapper to move the reader into
+   them, and that must not light the prose it contains. */
+[tabindex='-1']:focus-visible,
+[role='dialog']:focus-visible {
+  text-shadow: none;
+}
+
+/* Nothing anywhere may put a shadow behind a box. This is last of the focus
+   block on purpose, so it also catches anything reintroduced above it. */
+*:focus,
+*:focus-visible,
+*:hover {
+  box-shadow: none !important;
+}
+
 @media (prefers-reduced-motion: reduce) {
-  :focus-visible { transition: none; }
+  button:focus-visible, a:focus-visible, [role='button']:focus-visible { transition: none; }
+  button:focus-visible svg, a:focus-visible svg { transition: none; }
 }
 
 /* SKIP LINK — off-screen until focused, then a light-well at the top edge.
@@ -984,6 +1824,46 @@ body, button, input, select, textarea {
    see them, and it feathers only on the two sides that meet the drawing. Its
    opacity is driven from Orrery.tsx by the same condition as the caption, so
    the two are one element in everything but markup. */
+/* THE CONTROL PLATEAU.
+
+   The same device as the name's ground below, at the two bottom corners, and
+   unlike that one it is PERMANENT — because the controls it carries are now
+   permanent too. Resume and Reset view were asked for at full presence rather
+   than at the 0.45 they rested at, and Reset view was asked for whether or not
+   the view has anything to put back.
+
+   That is a deliberate departure from what the corner control was shaped for,
+   and the cost is the one the name's ground records two comments down: a pad
+   that is always on screen is a pad the drawing can wander into. It is kept
+   survivable by being sized to the control row and nothing more — 11rem against
+   the name ground's 24rem, and an ellipse anchored in the corner rather than a
+   band across the floor — so at any framing the plateau covers roughly the
+   strip the buttons already occupy. The middle of the field, where the organism
+   actually lives, is untouched.
+
+   It darkens toward the theme's OWN ground, which is the whole permission for
+   any feathered surface here: black stays black where it is transparent, so it
+   can only ever move a pixel toward what is already behind it. Verify by
+   measuring the ground, never by eye (ME-01). */
+.control-ground {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 30rem 11rem at 0% 100%,
+      rgb(var(--ground) / 0.94) 0%,
+      rgb(var(--ground) / 0.94) 40%,
+      rgb(var(--ground) / 0.76) 60%,
+      rgb(var(--ground) / 0.36) 81%,
+      rgb(var(--ground) / 0) 100%),
+    radial-gradient(ellipse 26rem 11rem at 100% 100%,
+      rgb(var(--ground) / 0.94) 0%,
+      rgb(var(--ground) / 0.94) 40%,
+      rgb(var(--ground) / 0.76) 60%,
+      rgb(var(--ground) / 0.36) 81%,
+      rgb(var(--ground) / 0) 100%);
+}
+
 .name-ground {
   position: absolute;
   inset: 0;
@@ -1022,11 +1902,151 @@ body, button, input, select, textarea {
   to   { opacity: 1; clip-path: circle(125% at 50% 50%); }
 }
 .turn-fade   { animation: turn-fade   0.22s var(--ease-organic) both; }
+/* The leaving half of the fade.
+
+   It has to be an ANIMATION and not a transition, and that is not a style
+   preference. `.turn-fade` fills `both`, so once a turn has finished the
+   keyframe is frozen on the element holding opacity at 1 — and a filled
+   animation outranks an inline declaration in the cascade. Setting
+   `style.opacity = 0` on the way out therefore did nothing at all: measured
+   every 20ms through a turn, the inline value read "0" while the computed value
+   stayed 1 for the whole out-phase and then cut. Two animations do not have
+   that problem: the one actually applied is the one that runs. */
+@keyframes turn-fade-out { from { opacity: 1; } to { opacity: 0; } }
+.turn-fade-out { animation: turn-fade-out 0.11s var(--ease-exit) both; }
 .turn-settle { animation: turn-settle 0.22s var(--ease-organic) both; }
 .turn-slide  { animation: turn-slide  0.2s var(--ease-organic) both; }
 .turn-tide   { animation: turn-tide   0.28s var(--ease-organic) both; }
 @media (prefers-reduced-motion: reduce) {
-  .turn-fade, .turn-settle, .turn-slide, .turn-tide { animation: none; }
+  .turn-fade, .turn-fade-out, .turn-settle, .turn-slide, .turn-tide { animation: none; }
+}
+
+/* THE BRANCH GLYPHS BREATHE AND DRIFT.
+
+   Asked for: animate the icons on the branch cards. The figures are the
+   reference sheet ones — orbits, lattices, conic sections — and what suits a
+   radially symmetric diagram is a turn, not a bounce.
+
+   Two clocks, both from the house register (MO-01): a breath on the
+   organism own ~18s cycle, which is the part the eye actually registers,
+   and a rotation slow enough to read as drift rather than as spin. Neither
+   is an arrival and neither answers an input, so both stay in idle motion
+   where soft fascination lives — a glyph that pulsed on a card would be the
+   notification mechanic this dossier argues against.
+
+   DESYNCHRONISED, because synchronised motion reads as machinery: each card
+   passes its own duration and a negative delay, so eight glyphs on one sheet
+   are never in step. That is the same trick aliveStyle() plays elsewhere,
+   written here as two custom properties.
+
+   Under reduced motion they simply rest at full presence. */
+@keyframes glyph-breath {
+  0%, 100% { opacity: 0.58; }
+  50%      { opacity: 0.92; }
+}
+/* THE BRANCH GLYPHS: A HAIRLINE, AND A SHAPE THAT KEEPS CHANGING.
+
+   HAIRLINE. The shared Glyph frame sets stroke-width 1.25 in a 24-unit box,
+   which is right at chrome scale and much too heavy once the figure is drawn
+   at 68px — 3.5 device pixels of stroke on a diagram whose whole character is
+   thinness. CSS wins over the attribute, so the weight is overridden here for
+   these plates alone and every icon in the chrome keeps the weight it was
+   drawn at.
+
+   A SHAPE THAT KEEPS CHANGING, ONE CARD AT A TIME. Each figure is built from
+   circles and arcs, and moving those relative to each other is what makes a
+   genuinely different figure rather than the same one wobbling: three fields
+   that overlap become three that nest, then three that separate. Sub-shapes
+   take one of three schedules by position, so a plate deforms rather than
+   drifting as a block.
+
+   The cycle is 40s with four configurations, and each card enters it five
+   seconds later than the one before (a negative delay, the aliveStyle trick).
+   Eight cards at five-second offsets means a change is always happening
+   somewhere and never in two places at once, which is what was asked for.
+   Each configuration holds for most of its quarter and the move between them
+   is brief, so the grid reads as still with one thing turning over in it —
+   the opposite of eight tiles animating in step, which is machinery.
+
+   Opacity still breathes underneath on its own slower period, so the two
+   clocks never coincide (LC-02). */
+@keyframes glyph-breath {
+  0%, 100% { opacity: 0.58; }
+  50%      { opacity: 0.92; }
+}
+@keyframes glyph-shift-a {
+  0%, 21%   { transform: translate(0px, 0px) scale(1); }
+  25%, 46%  { transform: translate(2.1px, -1.5px) scale(1.09); }
+  50%, 71%  { transform: translate(-1.8px, 1.9px) scale(0.9); }
+  75%, 96%  { transform: translate(1.4px, 1.7px) scale(1.04); }
+  100%      { transform: translate(0px, 0px) scale(1); }
+}
+@keyframes glyph-shift-b {
+  0%, 21%   { transform: translate(0px, 0px) scale(1); }
+  25%, 46%  { transform: translate(-2.2px, 1.1px) scale(0.88); }
+  50%, 71%  { transform: translate(1.9px, 1.6px) scale(1.11); }
+  75%, 96%  { transform: translate(-1.2px, -1.8px) scale(0.95); }
+  100%      { transform: translate(0px, 0px) scale(1); }
+}
+@keyframes glyph-shift-c {
+  0%, 21%   { transform: translate(0px, 0px) scale(1); }
+  25%, 46%  { transform: translate(0.9px, 2.2px) scale(0.93); }
+  50%, 71%  { transform: translate(-2.0px, -1.3px) scale(1.07); }
+  75%, 96%  { transform: translate(1.8px, -1.6px) scale(0.97); }
+  100%      { transform: translate(0px, 0px) scale(1); }
+}
+.glyph-alive {
+  animation: glyph-breath var(--breath, 18s) var(--ease-organic) infinite;
+  animation-delay: var(--breath-delay, 0s);
+}
+.glyph-alive svg { stroke-width: 0.4; }
+/* the parts move, not the plate: a block transform is a drift, not a shape */
+.glyph-alive svg > * {
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+  animation: glyph-shift-a 40s var(--ease-organic) infinite;
+  animation-delay: var(--morph-delay, 0s);
+}
+.glyph-alive svg > *:nth-child(3n+2) { animation-name: glyph-shift-b; }
+.glyph-alive svg > *:nth-child(3n+3) { animation-name: glyph-shift-c; }
+@media (prefers-reduced-motion: reduce) {
+  .glyph-alive, .glyph-alive svg > * { animation: none; opacity: 0.8; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .glyph-alive { animation: none; opacity: 0.8; }
+}
+
+/* THE MAP SAYS IT CAN BE MOVED, ONCE, AND THEN NEVER AGAIN.
+
+   The map zooms and pans and had no way of saying so: no scrollbar, no
+   handle, and an organism that fills its frame at rest. A reader who never
+   idly tries a pinch never learns the surface is navigable, which is the one
+   place on it where a reader can simply fail.
+
+   It is DRAWN, not written. Two bowed strokes that ease apart and back — the
+   shape of the gesture itself — so nothing here is copy and TY-04 is not
+   spent on a hint. No arrowheads (FW-02), no fill (DG-02), no straight rule
+   (DG-01): two arcs and the space between them.
+
+   Slow and faint on purpose. A hint that pulsed would be the notification
+   mechanic this dossier spends Chapter I diagnosing, so it breathes on the
+   organism own curve at an amplitude that reads as drift rather than as an
+   alert, and it is gone for good the moment the gesture works once. */
+@keyframes map-gesture-l {
+  0%, 100% { transform: translateX(0); opacity: 0.18; }
+  50%      { transform: translateX(-7px); opacity: 0.42; }
+}
+@keyframes map-gesture-r {
+  0%, 100% { transform: translateX(0); opacity: 0.18; }
+  50%      { transform: translateX(7px); opacity: 0.42; }
+}
+.map-gesture-l { animation: map-gesture-l 5.6s var(--ease-organic) infinite; }
+.map-gesture-r { animation: map-gesture-r 5.6s var(--ease-organic) infinite; }
+/* Leaving is the one motion that uses the exit curve (MO-02). */
+.map-gesture-out { animation: map-gesture-fade 0.9s var(--ease-exit) both; }
+@keyframes map-gesture-fade { from { opacity: 1; } to { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .map-gesture-l, .map-gesture-r { animation: none; opacity: 0.34; }
 }
 
 /* ═══════════════════════════════════════════ A CTA THAT ASKS WITHOUT SHOUTING
@@ -1098,6 +2118,11 @@ body, button, input, select, textarea {
    `rgb(var(--lume-rgb, 255 255 255))` pattern the Orrery already uses. */
 :root, .theme-dark { --fig-ground-rgb: 0 0 0; }
 .theme-light { --fig-ground-rgb: 255 255 255; }
+/* GR-01 — the full-bleed stages are black in BOTH themes, so on a light theme
+   they are the one place where the page's ground and the drawing's ground
+   disagree. Anything that empties the ground behind copy has to empty it to the
+   ground actually underneath, or it paints white wells on a black stage. */
+.fig-ground-black { --fig-ground-rgb: 0 0 0; }
 
 .figure-rim { position: relative; }
 /* Two knobs, because a figure that sets type outside its drawing has to be
@@ -1129,3 +2154,168 @@ body, button, input, select, textarea {
     rgb(var(--fig-ground-rgb) / 0.72) 96%,
     rgb(var(--fig-ground-rgb)) 100%);
 }
+
+/* ═══════════════════════════════════════════════════════ THE LINE, NOT THE TYPE
+   Typographic rules for running prose, scoped to the reading column and to
+   nothing else — never to the tracked uppercase labels (TY-03), never to SVG.
+
+   hyphens: auto with hyphenate-limit-chars 6 3 3 — words shorter than six
+   letters are never broken, and never fewer than three letters on either side
+   of the hyphen, which keeps a break on a morpheme boundary rather than in the
+   middle of one ("un-happy", never "uh-nappy"). The dictionary is the
+   browser's, keyed off <html lang="en">, which the page already carries.
+
+   text-wrap: pretty — the last line of a paragraph is never a single word.
+
+   orphans / widows: 2 and break-inside: avoid — the reading column is a
+   horizontal multicolumn flow (.hflow), and a paragraph may not be cut across
+   two columns mid-sentence; where it must break, at least two lines stay on
+   each side. Sheet breaks were already whole-paragraph by construction (the
+   paginator chunks paragraphs, never text); this extends that to columns. */
+.hflow p, .hflow blockquote {
+  hyphens: auto;
+  -webkit-hyphens: auto;
+  hyphenate-limit-chars: 6 3 3;
+  text-wrap: pretty;
+  orphans: 2;
+  widows: 2;
+  break-inside: avoid;
+}
+
+/*
+   THE PARTICLE MAP RETIRES THE DRAWN TISSUE; IT DOES NOT COVER IT.
+
+   Stage three, behind `?tissue=particles` (see `utils/tissueMode.ts`). Two
+   classes come off and nothing else does. `fibre-ink` is every connection and
+   ruleset root — the output of the one `tissue()` routine OG-01 names — and
+   `arbor-ink` is every dendrite arbor. What stays is everything that was never
+   tissue: the somas, the chapter beacons, the core emitter, the relay cells at
+   the crossings, the labels, the beckon stations and every transparent hit
+   target. Those are light sources and controls, and a point cloud has nothing
+   to say about either.
+
+   `display: none`, not `opacity: 0`. An invisible subtree at zero opacity is
+   still laid out, still composited and still costs the frame it was drawn in,
+   which would make the particle map the sum of both renderers rather than a
+   replacement for one — and being cheaper is most of the claim being tested.
+*/
+.tissue-particles .fibre-ink,
+.tissue-particles .arbor-ink { display: none; }
+
+/*
+   THE ENTRY GUIDE: A COLUMN WHERE THERE IS HEIGHT, ROWS WHERE THERE IS NOT.
+
+   One instruction to a line is the legible shape and the one asked for — five
+   points, each standing alone, no punctuation to parse. It also costs 92px
+   against the 34px the two middot runs took, and the entry screen may not
+   scroll (LY-02). Measured at 844×390 before the change: 33px of slack in the
+   whole screen, so the column cannot be unconditional.
+
+   Under 700px of viewport height the points flow into centred rows instead.
+   They are still each their own element with a real gap either side, which is
+   the separation that was asked for; what is lost is only the guarantee of one
+   per line, and a shallow frame is the one place that guarantee cannot be paid
+   for. Same words, same order, same register — a narrower shelf to put them on.
+*/
+.entry-points {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.55rem;
+}
+@media (max-height: 700px) {
+  .entry-points {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    column-gap: 1.3rem;
+    row-gap: 0.35rem;
+    /* The gap that sets the guide apart is the first thing to give back when
+       the screen runs out: measured at 844×390 with the full 44px, the whole
+       entry closed with 9px of slack at each end, which is not a margin, it is
+       a near miss. The ranking still reads at 22px because everything around it
+       shrank too. */
+    margin-top: 1.4rem !important;
+  }
+}
+
+/* THE TILE PLATES TAKE IT IN TURNS.
+
+   Asked for: each icon animates for about three seconds, and never two at
+   once — one finishes as the next begins. So there is ONE cycle shared by the
+   whole set and each plate is given its own slice of it, exactly the way the
+   relay stations on a fibre share `.ranvier-fire` and are separated by delay
+   rather than by period.
+
+   THE ROUND IS THIRTY SECONDS AND THE WINDOW IS A TENTH OF IT, so the motion
+   lasts three seconds whatever the set holds. It was a fifteen-second round
+   with a fifth of it moving, which gave three seconds for the overview's five
+   tiles and six for the library's ten — the same mark behaving differently on
+   two sheets a reader crosses between, which is what "consistent" was asked
+   about. One window, two spacings: the library steps its ten plates every
+   three seconds and the overview its five every six, and neither ever has two
+   moving at once.
+
+   It does not beat against the tide. LC-04 asks that no two clocks sit in a
+   simple integer ratio, and 30s against the app's fixed 19.7s is 1:0.657 —
+   the two come back into step every ~197s, which is long enough that the eye
+   never finds the coincidence.
+
+   LC-05's shape rule holds inside the slice: the rise is faster than the fall
+   and the crest sits off centre, so the plate does not read as a pulse. The
+   delay is set per tile in `RulesetOverview`. */
+/* LIGHT, NOT MOVEMENT. The turn carried a scale as well as an opacity, and a
+   sign that grows is a sign performing — the one register this dossier argues
+   against. Brightness alone is also what the rest of the app uses to say
+   `this one`: .bud rests at 0.70 and .bud-lit at 1, the tide is opacity, the
+   relay is opacity. A pure light change costs no raster either (PF-03). */
+@keyframes plate-turn {
+  0%    { opacity: 0.4; }
+  2.5%  { opacity: 0.95; }
+  5%    { opacity: 0.74; }
+  7.5%  { opacity: 0.52; }
+  10%   { opacity: 0.4; }
+  100%  { opacity: 0.4; }
+}
+
+.plate-turn {
+  animation: plate-turn var(--turn-cycle, 30s) var(--ease-organic) infinite;
+  animation-delay: var(--turn-delay, 0s);
+  will-change: opacity;
+}
+
+/* A plate that pulses at somebody is the notification this whole dossier
+   argues against; with the motion off it simply rests at its own weight. */
+@media (prefers-reduced-motion: reduce) {
+  .plate-turn { animation: none; opacity: 0.55; }
+}
+
+/* THE READING WEIGHT — one value, one place, for every long-form body text.
+
+   Reported: the body text is very hard to read, too bright. Measured on a
+   manuscript sheet at 1280x860: the prose rendered at pure white, alpha 1.000,
+   a contrast ratio of 21:1 against the black ground. That is the MAXIMUM a
+   screen can produce. WCAG asks 4.5:1 for body text and 7:1 for AAA, so 21:1 is
+   three times past the strictest requirement — the problem was never too little
+   contrast, it was far too much, which on a dark ground is glare rather than
+   legibility. Sustained reading of a long document at full white is what the
+   reader was describing.
+
+   IT IS OPACITY AND NOT WEIGHT, and that is TY-01 rather than a preference.
+   "Contrast comes from size, letter-spacing, opacity and light. Never from
+   weight" — and the rule bans any numeric weight other than 300 outright, so
+   "thinner" cannot be spelled with a font weight here. Lowering the light is
+   the same instrument the rest of the app already uses to say how loud a thing
+   is: .bud rests at 0.70, a label at 0.45, a lit control at 1.
+
+   0.85 IS AN EXISTING STEP, not a new one. The ladder actually in use across
+   src/ is 0.45 (64 call sites) and 0.70 (79) with 0.85 already present, and a
+   scale with a value that is nearly but not exactly a step is a scale nobody
+   can check — which is the argument .bud's own note makes about 0.68 against
+   0.70. Measured after: 14.9:1, still more than double AAA, and the prose sits
+   clearly above the 0.70 secondary text and below the titles at 1.
+
+   One class rather than a utility at each call site, because this is the value
+   most likely to drift: a new body paragraph written next year inherits the
+   reading weight by naming what it is. */
+.reading { opacity: 0.85; }

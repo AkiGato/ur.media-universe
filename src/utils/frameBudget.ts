@@ -90,6 +90,31 @@ export function useFrameBudget(budgetMs = 85, sampleMs = 1600): boolean {
     let timer = 0;
     let cancelled = false;
 
+    /*
+     * A HIDDEN TAB IS NOT A SLOW ONE.
+     *
+     * requestAnimationFrame is throttled hard in a background tab — to about
+     * one frame a second where it runs at all — so a probe that samples through
+     * a tab switch reads roughly 1000ms frames, compares them to an 85ms budget
+     * and latches. And this latch is one-way by design: it never un-strains a
+     * map, because effects flickering back on a recovering machine would be
+     * worse. Together those two facts mean a reader who glances at another tab
+     * during the first twenty seconds can lose the flex filter, the sway, the
+     * dive and the depth-of-field lens for the rest of the session, on a
+     * machine that was never struggling.
+     *
+     * So: never sample while hidden, and throw away any round that was
+     * interrupted, because its frames straddle the throttle and its median is
+     * meaningless. The probe waits for the tab to come back and starts that
+     * round again from nothing.
+     *
+     * This is also the measurement rule the presentation deck arrived at
+     * independently, after two false alarms: any reading taken while the
+     * surface is hidden is worthless.
+     */
+    let waitingForVisible = false;
+    const isHidden = () => typeof document !== 'undefined' && document.hidden;
+
     const decide = (): boolean => {
       // Three is enough for a median to mean anything; below that the renderer
       // has produced almost nothing and guessing would be worse than waiting.
@@ -102,6 +127,7 @@ export function useFrameBudget(budgetMs = 85, sampleMs = 1600): boolean {
 
     const startRound = () => {
       if (cancelled) return;
+      if (isHidden()) { waitingForVisible = true; return; }
       frames.length = 0;
       const roundStart = performance.now();
       last = roundStart;
@@ -109,6 +135,8 @@ export function useFrameBudget(budgetMs = 85, sampleMs = 1600): boolean {
 
       const tick = (now: number) => {
         if (cancelled) return;
+        /* the tab went away mid-round: this round is void, not slow */
+        if (isHidden()) { frames.length = 0; waitingForVisible = true; return; }
         const delta = now - last;
         last = now;
         if (now > roundWarmup) frames.push(delta);
@@ -126,11 +154,28 @@ export function useFrameBudget(budgetMs = 85, sampleMs = 1600): boolean {
       raf = requestAnimationFrame(tick);
     };
 
+    const onVisibility = () => {
+      if (cancelled) return;
+      if (isHidden()) {
+        /* abandon whatever is in flight rather than letting it finish on
+           throttled frames */
+        cancelAnimationFrame(raf);
+        window.clearTimeout(timer);
+        frames.length = 0;
+        waitingForVisible = true;
+      } else if (waitingForVisible) {
+        waitingForVisible = false;
+        startRound();
+      }
+    };
+    document.addEventListener('visibilitychange', onVisibility);
+
     startRound();
     return () => {
       cancelled = true;
       cancelAnimationFrame(raf);
       window.clearTimeout(timer);
+      document.removeEventListener('visibilitychange', onVisibility);
     };
   }, [budgetMs, sampleMs]);
 

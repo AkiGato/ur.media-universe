@@ -173,6 +173,37 @@ When designing community, referral, or social growth mechanics:
 5. Would this output pass the Restoration Delta test — does it leave the person's cognitive state equal to or better than it found them?
 `;
 
+/**
+ * WHAT EACH RULE IS CALLED, EVERYWHERE.
+ *
+ * The ruleset titles are "BRANCH 1 — Marketing Strategy & Positioning", and a
+ * reader choosing where to start does not think "branch one" — they think
+ * "strategy and positioning". The numbering is an artefact of how the document
+ * lists them, not a name, and it made every surface in the app read as a table
+ * of contents for a filing system.
+ *
+ * These are the domains themselves, in the fewest words that still locate one.
+ * The map already existed inside the branch folders and was doing this job for one
+ * component; it lives here now because three surfaces need the same answer and
+ * a name that differs between them is a name said twice and wrong once.
+ */
+export const RULE_NAMES: Record<string, string> = {
+  'global-rule': 'The global rule',
+  'branch-1': 'Strategy & positioning',
+  'branch-2': 'Content planning & calendars',
+  'branch-3': 'Copywriting, headlines & CTAs',
+  'branch-4': 'CRM & lifecycle messaging',
+  'branch-5': 'Image generation',
+  'branch-6': 'Video, motion & product design',
+  'branch-7': 'Interface & UX microcopy',
+  'branch-8': 'Community, growth & social',
+  'verification-checklist': 'The five-question gate'
+};
+
+/** The rule's own name if we have one, else whatever the ruleset called it. */
+export const ruleName = (id: string, fallback = ''): string =>
+  RULE_NAMES[id] || fallback;
+
 export const PROMPT_RULESET_DATA: Record<string, PromptRuleData> = {
   'global-rule': {
     id: 'global-rule',

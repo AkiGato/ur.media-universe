@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Copy, Check } from 'lucide-react';
+import { parsePromptText } from '../data/promptText';
+import { Copy, Check } from './organic/Icons';
 import { Vein, SomaLabel } from './organic/Organic';
 
 export interface PromptRuleData {
@@ -44,7 +45,7 @@ export const PromptRuleCard: React.FC<PromptRuleCardProps> = ({ data, isDark = f
           {data.title}
         </h3>
         {data.subtitle && !nested && (
-          <p className="text-[12px] font-light italic opacity-80 mt-0.5">
+          <p className="text-[12px] font-light italic opacity-70 mt-0.5">
             {data.subtitle}
           </p>
         )}
@@ -98,12 +99,43 @@ export const PromptRuleCard: React.FC<PromptRuleCardProps> = ({ data, isDark = f
           <Vein opacity={0.4} phase={18.5} />
         </div>
 
-        {/* one family throughout — contrast comes from weight, not from a
-            second typeface */}
-        <pre className="text-[9px] font-light leading-relaxed whitespace-pre-wrap select-all pr-1 opacity-85"
-          style={{ fontFamily: "'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif" }}>
-          {data.promptText}
-        </pre>
+        {/* THE PROMPT IS READ AS STRUCTURE, NOT AS A WALL.
+
+            It was one pre-formatted block at the 9px step: the author's hard
+            wraps and the reader's soft wraps both applying, numerals sitting
+            inline so a wrapped line ran back underneath its own number, and the
+            five things the gate actually asks arriving as a single grey mass.
+            It was reported as unreadable, and on the verification sheet — the
+            one page in the book a practitioner is meant to WORK from rather
+            than read — that is the worst place for it.
+
+            Numbered standards now take a two-column grid: the numeral in its
+            own track, the text in the other, so every wrapped line aligns under
+            the first and the list reads as a list. The numeral is at the 9px
+            label step because it is an index, not content; the standard itself
+            is at the body step, because a rule someone has to apply is not a
+            caption (TY-01, TY-02).
+
+            `select-all` moves to the wrapper so a reader can still take the
+            whole thing in one gesture, and the copy button above is untouched —
+            it sends `data.promptText` verbatim, because that string is what
+            gets pasted into a model and reflowing it here must never reach it. */}
+        <div className="select-all space-y-2 pr-1">
+          {parsePromptText(data.promptText).map((block, i) =>
+            block.kind === 'item' ? (
+              <div key={i} className="grid grid-cols-[1.25rem_1fr] gap-x-2 items-baseline">
+                <span className="text-[9px] font-light tabular-nums opacity-45 text-right">
+                  {block.marker}
+                </span>
+                <p className="text-[12px] font-light leading-relaxed opacity-70">{block.text}</p>
+              </div>
+            ) : (
+              <p key={i} className="text-[12px] font-light leading-relaxed opacity-70">
+                {block.text}
+              </p>
+            )
+          )}
+        </div>
       </div>
     </div>
   );

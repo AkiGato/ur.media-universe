@@ -91,7 +91,78 @@ const ROOTS: Array<{
  */
 type Depth = 'surface' | 'structure' | 'live';
 
-const buildNodes = (depth: Depth): FigureNode[] => {
+/* ------------------------------------------------------------- portrait --
+ *
+ * THE DIAMOND KEEPS ITS SHAPE, AND THE FINDINGS COME IN OFF THE EDGES.
+ *
+ * The causal order is vertical in both forms and does not move: the news on
+ * top, the two external roots and their meeting across the middle, the
+ * reader's own position on the fibre below it, the response at the bottom.
+ * Read down it is causal; read up — the direction a reader arrives — it is the
+ * deconstruction 4.2 asks for. That is the whole figure and it is orientation
+ * independent.
+ *
+ * What has to change is the span. The wide form pushes the six findings out to
+ * x 36 and 764 "so no two names are written close enough to touch", which is a
+ * horizontal answer to a horizontal problem and there is no horizontal left
+ * here. They come in against the roots instead and spend DEPTH for the
+ * separation, three to a side at three different heights — so no two names
+ * share a row, which is the same guarantee bought on the other axis.
+ *
+ * The roots sit 110 units either side of the spine rather than 244, so their
+ * fields are brought in with them: at the default r*3.8 the meeting's arbor and
+ * both roots' would be one mass across the middle of the sheet, and the meeting
+ * is the densest and smallest cell in the figure precisely so that it reads as
+ * a condition rather than a container.
+ */
+const P_W = 360;
+const P_H = 520;
+
+/** Where every cell goes, in each of the two forms. Geometry only. */
+interface Place {
+  headline: { x: number; y: number };
+  root: (i: number, r: typeof ROOTS[number]) => { x: number; y: number };
+  meeting: { x: number; y: number };
+  demographic: { x: number; y: number };
+  psychology: { x: number; y: number };
+  finding: (ri: number, k: number, item: typeof ROOTS[number]['items'][number]) => { x: number; y: number };
+  rootArbor?: number;
+  meetingArbor: number;
+  psychologyArbor?: number;
+}
+
+const WIDE: Place = {
+  headline: { x: 400, y: 62 },
+  root: (_i, r) => ({ x: r.x, y: r.y }),
+  meeting: { x: 400, y: 168 },
+  demographic: { x: 400, y: 240 },
+  psychology: { x: 400, y: 312 },
+  finding: (_ri, _k, item) => ({ x: item[3], y: item[4] }),
+  meetingArbor: 66
+};
+
+/** three to a side, at three different heights — see the note above */
+/* Measured once and pulled in: at x 26 and 334 the outermost two fields
+   reached x 4 and 356 of 360, which is a tuft on the frame rather than a
+   drawing inside it. */
+const P_FINDING: Array<Array<[number, number]>> = [
+  [[48, 112], [34, 268], [74, 330]],
+  [[312, 112], [326, 268], [286, 330]]
+];
+
+const PORTRAIT: Place = {
+  headline: { x: 180, y: 62 },
+  root: (i) => ({ x: i === 0 ? 70 : 290, y: 200 }),
+  meeting: { x: 180, y: 200 },
+  demographic: { x: 180, y: 280 },
+  psychology: { x: 180, y: 366 },
+  finding: (ri, k) => ({ x: P_FINDING[ri][k][0], y: P_FINDING[ri][k][1] }),
+  rootArbor: 56,
+  meetingArbor: 44,
+  psychologyArbor: 62
+};
+
+const buildNodes = (depth: Depth, place: Place = WIDE): FigureNode[] => {
   const deep = depth === 'structure';
   /* Names are legible at rest only in the structure depth. The surface depth is
      the System 1 read — a small bright event, a heavy meeting under it, and a
@@ -102,7 +173,7 @@ const buildNodes = (depth: Depth): FigureNode[] => {
       id: 'headline',
       kind: 'core',
       // low enough that the name above it clears the top of the frame
-      x: 400, y: 62, r: 22,
+      ...place.headline, r: 22,
       label: deep ? 'THE NEWS' : undefined,
       sub: deep ? 'the surface, and the only part reported' : undefined,
       labelAtRest: lit,
@@ -120,10 +191,11 @@ const buildNodes = (depth: Depth): FigureNode[] => {
           ]
         : undefined
     },
-    ...ROOTS.map(r => ({
+    ...ROOTS.map((r, i) => ({
       id: r.id,
       kind: 'cell' as const,
-      x: r.x, y: r.y, r: 24,
+      ...place.root(i, r), r: 24,
+      ...(place.rootArbor ? { arborR: place.rootArbor } : {}),
       label: deep ? r.title : undefined,
       sub: deep ? r.sub : undefined,
       labelAtRest: lit,
@@ -137,12 +209,12 @@ const buildNodes = (depth: Depth): FigureNode[] => {
          figure and the smallest — a convergence is a condition, not a container. */
       id: 'meeting',
       kind: 'cell',
-      x: 400, y: 168, r: 15,
+      ...place.meeting, r: 15,
       label: deep ? 'THEY MEET' : undefined,
       labelAtRest: lit,
       labelDy: -6,
       arborArms: 11,
-      arborR: 66,
+      arborR: place.meetingArbor,
       reading: {
         kind: 'The meeting · two causes becoming one condition',
         body: 'Neither root explains this alone; what reaches you is what they made together'
@@ -160,7 +232,7 @@ const buildNodes = (depth: Depth): FigureNode[] => {
          person. Drawn small and on the fibre, as every relay in this system is. */
       id: 'demographic',
       kind: 'minor',
-      x: 400, y: 240, r: 9,
+      ...place.demographic, r: 9,
       label: deep ? 'YOUR POSITION' : undefined,
       labelAtRest: lit * 0.85,
       intensity: deep ? 0.8 : 0.5,
@@ -178,7 +250,8 @@ const buildNodes = (depth: Depth): FigureNode[] => {
     {
       id: 'psychology',
       kind: 'cell',
-      x: 400, y: 312, r: 24,
+      ...place.psychology, r: 24,
+      ...(place.psychologyArbor ? { arborR: place.psychologyArbor } : {}),
       label: deep ? 'PSYCHOLOGY' : undefined,
       sub: deep ? 'the response produced in you' : undefined,
       labelAtRest: lit,
@@ -198,15 +271,15 @@ const buildNodes = (depth: Depth): FigureNode[] => {
     },
     /* what each external root terminates in — dim, load-bearing, and pushed
        outward so no two names are written close enough to touch */
-    ...ROOTS.flatMap(r =>
-      r.items.map(([short, full, t, fx, fy], k) => ({
+    ...ROOTS.flatMap((r, ri) =>
+      r.items.map((item, k) => ({
         id: `${r.id}-${k}`,
         kind: 'minor' as const,
-        x: fx, y: fy, r: 7,
-        label: deep ? short : undefined,
+        ...place.finding(ri, k, item), r: 7,
+        label: deep ? item[0] : undefined,
         labelAtRest: lit * 0.8,
         intensity: deep ? 0.62 : 0.34,
-        reading: { kind: `${r.title} · finding`, body: `${full} — ${t}` }
+        reading: { kind: `${r.title} · finding`, body: `${item[1]} — ${item[2]}` }
       }))
     )
   ];
@@ -287,7 +360,7 @@ export const CausalTaxonomyDiagram: React.FC<CausalTaxonomyDiagramProps> = () =>
         <CausalTaxonomyDemo />
         <button
           onClick={() => setDepth('structure')}
-          className="mt-1 px-2 py-1 text-[9px] font-light uppercase tracking-[0.2em] opacity-45 hover:opacity-90 outline-none rounded-none"
+          className="mt-1 px-2 py-1 text-[9px] font-light uppercase tracking-[0.2em] opacity-45 hover:opacity-100 outline-none rounded-none"
           style={{ transition: 'opacity 0.6s var(--ease-organic)' }}
         >
           Back to the chapter's example
@@ -303,6 +376,10 @@ export const CausalTaxonomyDiagram: React.FC<CausalTaxonomyDiagramProps> = () =>
         width={800}
         height={368}
         nodes={buildNodes(depth)}
+        /* Both depths take the same portrait geometry — the surface layer is
+           the same cells with their names withheld, so a second placement
+           would be a second figure. */
+        portrait={{ width: P_W, height: P_H, nodes: buildNodes(depth, PORTRAIT) }}
         edges={EDGES}
         core="headline"
         rest={deep
@@ -332,7 +409,7 @@ export const CausalTaxonomyDiagram: React.FC<CausalTaxonomyDiagramProps> = () =>
       <div className="mt-1 flex items-center gap-5">
         <button
           onClick={() => setDepth(deep ? 'surface' : 'structure')}
-          className="px-2 py-1 text-[9px] font-light uppercase tracking-[0.2em] opacity-45 hover:opacity-90 outline-none rounded-none"
+          className="px-2 py-1 text-[9px] font-light uppercase tracking-[0.2em] opacity-45 hover:opacity-100 outline-none rounded-none"
           style={{ transition: 'opacity 0.6s var(--ease-organic)' }}
         >
           {deep ? 'Return to the surface' : 'Descend to the structure'}
@@ -342,7 +419,7 @@ export const CausalTaxonomyDiagram: React.FC<CausalTaxonomyDiagramProps> = () =>
             you can point at your own morning feed is a tool. */}
         <button
           onClick={() => setDepth('live')}
-          className="px-2 py-1 text-[9px] font-light uppercase tracking-[0.2em] opacity-45 hover:opacity-90 outline-none rounded-none"
+          className="px-2 py-1 text-[9px] font-light uppercase tracking-[0.2em] opacity-45 hover:opacity-100 outline-none rounded-none"
           style={{ transition: 'opacity 0.6s var(--ease-organic)' }}
         >
           Run it on your own source

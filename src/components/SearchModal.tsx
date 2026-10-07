@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
-import { Search, X, ArrowRight, BookOpen } from 'lucide-react';
+import { Search, X, ArrowRight, BookOpen } from './organic/Icons';
 import { BookPage } from '../data/pageModel';
 import { searchGrouped, Hit } from '../data/searchIndex';
 import { UserPreferences } from '../data/userStore';
@@ -93,20 +93,25 @@ export const SearchModal: React.FC<SearchModalProps> = ({
       }`}>
 
         {/* Input Header */}
-        <div className="p-4 flex items-center space-x-3 rounded-none">
+        {/* A label, so the 50px row is the target rather than the 18px line of
+            type inside it — see the same note on the index drawer's filter.
+            The close button is exempt without being asked to be: a click on an
+            interactive descendant of a label never runs the label's own
+            action, so it still closes rather than focusing the field. */}
+        <label className="p-4 flex items-center space-x-3 rounded-none cursor-text">
           <Search className="w-5 h-5 opacity-70 shrink-0" />
           <input
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search all chapters, case studies, citations..."
+            placeholder="Search all chapters, the case study, citations..."
             autoFocus
             className="w-full bg-transparent border-none text-[12px] font-light focus:outline-none placeholder-current/40 rounded-none"
           />
           <button onClick={onClose} className="bud p-1.5 rounded-none outline-none" aria-label="Close search">
             <X className="w-4 h-4" />
           </button>
-        </div>
+        </label>
         <div className="opacity-45 px-4">
           <Vein opacity={0.5} phase={4.6} />
         </div>
@@ -114,13 +119,24 @@ export const SearchModal: React.FC<SearchModalProps> = ({
         {/* Search Results List */}
         <div ref={listRef} className="flex-1 overflow-y-auto soft-scroll p-4 space-y-4 rounded-none">
           {query.trim() === '' ? (
-            <div className="py-12 text-center opacity-55 text-[12px] space-y-2">
-              <BookOpen className="w-8 h-8 mx-auto mb-2 opacity-70" />
-              <p className="font-light uppercase tracking-[0.2em]">Type to search dossier and manifesto</p>
+            /* NO EMPTY-STATE SENTENCE. This said "Type to search dossier and
+               manifesto", which TY-04 names outright — "not an empty state, not
+               a sentence introducing a control". The field's own placeholder
+               already says what it searches, so the sentence was the second
+               time this surface said one thing (TY-05). The mark stays: it says
+               the well is empty without claiming to instruct. */
+            <div className="py-12 text-center opacity-40">
+              <BookOpen className="w-8 h-8 mx-auto opacity-70" aria-hidden="true" />
             </div>
           ) : flat.length === 0 ? (
-            <div className="py-12 text-center opacity-55 text-[12px] font-light uppercase tracking-[0.2em]">
-              No results found for "{query}".
+            /* A LABEL, NOT A SENTENCE. This read `No results found for "{query}".`
+               — an invented sentence that also quoted the reader's own words
+               back at them, which they can already see in the field above it
+               (TY-05). Two words is what this has to say, and two words is not
+               prose. The function survives: a search that answers with nothing
+               at all is indistinguishable from one that is broken. */
+            <div className="py-12 text-center opacity-45 text-[12px] font-light uppercase tracking-[0.2em]">
+              Nothing found
             </div>
           ) : (
             groups.map((group, gIdx) => (
@@ -149,17 +165,32 @@ export const SearchModal: React.FC<SearchModalProps> = ({
                           walked ? 'bud-lit' : ''
                         }`}
                       >
-                        <div className="space-y-1 truncate pr-2">
+                        {/* `truncate` here was a bug with two heads. It is
+                            shorthand for `overflow:hidden; text-overflow:
+                            ellipsis; white-space:nowrap`, and the nowrap
+                            inherited into the snippet below — which asks for two
+                            lines. So the snippet was forced onto ONE line and
+                            ran 77–88px past this box, where overflow:hidden cut
+                            it mid-word with no ellipsis, because the ellipsis
+                            belongs to the parent and the parent was not the
+                            thing overflowing.
+
+                            `min-w-0` is what was actually wanted: it lets this
+                            flex child shrink so its children can do their own
+                            truncation — the title still has `truncate` on the
+                            line where one line is right, and the snippet keeps
+                            `line-clamp-2`. */}
+                        <div className="space-y-1 min-w-0 pr-2">
                           <div className="flex items-center gap-2.5">
                             <Soma size={9} opacity={walked ? 1 : 0.5} phase={(at * 3.4) % 19} />
                             <span className="font-light text-[12px] truncate">{hit.doc.title}</span>
                             {/* how many times this one place answered — the
                                 reason five hits are one row and not five */}
                             {hit.count > 1 && (
-                              <span className="text-[9px] font-light opacity-50">({hit.count})</span>
+                              <span className="text-[9px] font-light opacity-45">({hit.count})</span>
                             )}
                           </div>
-                          <p className="text-[12px] font-light opacity-85 line-clamp-2 leading-relaxed pl-5">
+                          <p className="text-[12px] font-light opacity-70 line-clamp-2 leading-relaxed pl-5">
                             {hit.snippet}
                           </p>
                         </div>
@@ -179,8 +210,14 @@ export const SearchModal: React.FC<SearchModalProps> = ({
         <div className="opacity-40 px-4">
           <Vein opacity={0.45} phase={14.9} />
         </div>
-        <div className="p-3 text-center text-[9px] font-light uppercase tracking-[0.2em] opacity-55 rounded-none">
-          Press ESC or click backdrop to close
+        {/* "Press ESC or click backdrop to close" was invented, and it was also
+            a third wording for a thing the app already says two other ways —
+            the figure world says "Esc or swipe back", the instrument says "Esc
+            returns to the page". One wording, matching the instrument's, or
+            none. The backdrop half went with it: LY-04 is satisfied by Esc, and
+            a surface does not need to narrate its own dismissal. */}
+        <div className="p-3 text-center text-[9px] font-light uppercase tracking-[0.2em] opacity-45 rounded-none">
+          Esc returns to the page
         </div>
 
       </div>

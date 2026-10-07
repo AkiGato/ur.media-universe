@@ -1,7 +1,19 @@
-import React from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   FigureDefs, VortexSphere, Dendrites, GrowthCone, rnd, smoothPolyline
 } from './figures/FigurePrimitives';
+import { Formation } from './organic/Formation';
+import { record, SPACING } from '../utils/formation';
+import { DEVICE_TIER } from '../utils/deviceTier';
+
+/**
+ * Which chapter cells have already grown themselves, this session.
+ *
+ * Keyed by chapter, for the reason the map and the figures keep the same latch:
+ * a drawing that performs its own arrival every time you reach the page is
+ * asking to be watched, and this page is reached on an ordinary turn.
+ */
+const OPENERS_FORMED = new Set<string>();
 
 /**
  * The chapter opener.
@@ -99,6 +111,84 @@ export const ChapterOpener: React.FC<{
     return seg.length > 1 ? seg : null;
   }).filter(Boolean) as Array<Array<[number, number]>>;
 
+  /*
+   * THE CELL GROWS OUT OF ITS OWN SOMA, AND EVERY CHAPTER GROWS A DIFFERENT ONE.
+   *
+   * The formation needs courses to grow along, and the opener already has the
+   * two things that decide this cell's shape: the axon, and the bearings its
+   * dendrites leave on. Both are derived from `seed`, which is the chapter id —
+   * so chapter II grows a different arbor from chapter I without anything here
+   * choosing a shape, and the particles land on the drawing that is actually
+   * underneath them rather than on a second drawing invented for the animation.
+   *
+   * The dendrite courses are rebuilt here rather than read out of `Dendrites`,
+   * which generates its arbor internally and reports nothing. They share the
+   * generator's bearings and its reach, which is what the eye checks.
+   */
+  const strands = useMemo(() => {
+    const out: Array<{ pts: Array<[number, number]> }> = [{ pts: axon }];
+    dendriteDirs.forEach((dir, k) => {
+      for (let b = 0; b < 3; b++) {
+        const sp = dir + (b - 1) * 0.34 + (rnd(seed + k * 7 + b) - 0.5) * 0.3;
+        const reach = r * (2.1 + rnd(seed + k * 3 + b * 5) * 1.5);
+        out.push({
+          pts: Array.from({ length: 9 }, (_, i) => {
+            const t = i / 8;
+            const a = sp + Math.sin(t * 2.4 + rnd(seed + k + b)) * 0.2 * t;
+            const d = r * 0.55 + t * reach;
+            return [CX + Math.cos(a) * d, CY + Math.sin(a) * d] as [number, number];
+          })
+        });
+      }
+    });
+    return out;
+  }, [axon, dendriteDirs, seed]);
+
+  const willForm = useMemo(() => {
+    if (OPENERS_FORMED.has(chapterId)) return false;
+    if (typeof window === 'undefined') return false;
+    if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return false;
+    if (DEVICE_TIER === 'low') return false;
+    return true;
+  }, [chapterId]);
+
+  const [formed, setFormed] = useState(1);
+  const [forming, setForming] = useState(false);
+  const cellRef = useRef<SVGGElement | null>(null);
+
+  useEffect(() => {
+    if (!willForm || OPENERS_FORMED.has(chapterId)) return;
+    OPENERS_FORMED.add(chapterId);
+    setFormed(0);
+    setForming(true);
+  }, [willForm, chapterId]);
+
+  const formation = useMemo(() => {
+    if (!forming) return null;
+    const k = Math.min(W, H) / 900;
+    return record(strands, CX, CY, {
+      spacing: Math.max(1.9, SPACING * k),
+      scale: Math.max(0.3, k),
+      origins: [[CX, CY]]
+    });
+  }, [forming, strands]);
+
+  /* Written to the node, never through React — the map's measurement, and the
+     reason is the same here: re-rendering the cell every frame to move one
+     number starves the loop drawing the particles. */
+  const rampCell = (landed: number) => {
+    const g = cellRef.current;
+    if (!g) return;
+    const lead = Math.min(1, landed / 0.86);
+    g.style.opacity = String(landed >= 1 ? 1 : Math.pow(lead, 1.35));
+  };
+  const endFormation = () => {
+    const g = cellRef.current;
+    if (g) g.style.opacity = '';
+    setFormed(1);
+    setForming(false);
+  };
+
   return (
     <div className="relative w-full flex-shrink-0" aria-hidden="false">
       {/*
@@ -111,6 +201,9 @@ export const ChapterOpener: React.FC<{
         itself and then had nowhere to say anything. It is capped by viewport
         height and kept small until the sheet is wide enough to spare it.
       */}
+      {/* The canvas sits on the drawing and nothing else — this wrapper hugs
+          the svg, where the outer one also holds the title beneath it. */}
+      <div className="relative">
       <svg
         viewBox={`0 0 ${W} ${H}`}
         className="opener-figure w-full h-auto font-sans"
@@ -118,6 +211,38 @@ export const ChapterOpener: React.FC<{
         role="img"
         aria-label={`Chapter ${numeral} — ${title}`}
       >
+        {/*
+          THE FRAME MAY NOT CUT THE CELL.
+
+          The axon is built to run past the sheet — "one long fibre, bowed,
+          running out of the frame" — and at 250 units of reach from a centre at
+          x=260 it leaves the box at negative coordinates. A viewBox clips, so
+          what the reader actually saw was a hairline traveling out and stopping
+          dead against an invisible vertical: a rectangle drawn by subtraction,
+          which is the one thing the ground is not allowed to have (GR-01, and
+          LY-06 for the edge it amounts to).
+
+          DG-09 settles what to do instead, in the case it was written for: a
+          drawing that says "this space does not stop" may not draw a rim, and
+          the mechanism is material that is already dissolving by the time the
+          sheet crops it. So the whole cell is masked by a radial fade — the
+          same construction, the same stops, as the map's own `-edgemask` — and
+          the axon thins to nothing before it reaches the boundary. Nothing is
+          cut because there is nothing left to cut.
+        */}
+        <defs>
+          <radialGradient id={`${id}-edgefade`} cx="50%" cy="50%" r="62%">
+            <stop offset="0%" stopColor="#fff" stopOpacity="1" />
+            <stop offset="58%" stopColor="#fff" stopOpacity="1" />
+            <stop offset="80%" stopColor="#fff" stopOpacity="0.55" />
+            <stop offset="100%" stopColor="#fff" stopOpacity="0" />
+          </radialGradient>
+          <mask id={`${id}-edgemask`} maskUnits="userSpaceOnUse" x="0" y="0" width={W} height={H}>
+            <rect x="0" y="0" width={W} height={H} fill={`url(#${id}-edgefade)`} />
+          </mask>
+        </defs>
+        <g ref={cellRef} mask={`url(#${id}-edgemask)`}
+          style={formed < 1 ? { opacity: 0 } : undefined}>
         <FigureDefs id={id} blur={3} />
 
         {/* The axon, under everything: the process that leaves.
@@ -215,11 +340,23 @@ export const ChapterOpener: React.FC<{
           here too.
         */}
 
-        {/* the numeral surfaces from inside the cell rather than labelling it */}
+        {/* The numeral surfaces from inside the cell rather than labelling it.
+            300, like every other piece of type in the app. It was the one 200
+            in the whole source — a second weight introduced to make a 30-unit
+            glyph sit back, which is the job TY-01 gives to opacity and light:
+            "contrast comes from size, letter-spacing, opacity and light, never
+            from weight". It already carries an 0.82 opacity doing exactly that,
+            so the 200 was the same instruction given twice, in the one register
+            the rule refuses. */}
         <text x={CX} y={CY + 11} textAnchor="middle" fill="currentColor"
-          fontSize={30} fontWeight={200} opacity={0.82}>
+          fontSize={30} fontWeight={300} opacity={0.82}>
           {numeral}
         </text>
+
+        {/* The mask covers the drawing and stops short of the type: a fade is
+            for tissue running out of the sheet, and dimming a label at the frame
+            edge would be the legibility failure TY-08 guards, not a dissolve. */}
+        </g>
 
         {/* the title emerges out of the cell, on the tissue's own axis */}
         <text x={CX} y={CY + r + 52} textAnchor="middle" fill="currentColor"
@@ -228,12 +365,24 @@ export const ChapterOpener: React.FC<{
         </text>
       </svg>
 
+      {/* The cell grows out of its own soma — see the strands memo above. */}
+      {formed < 1 && formation && (
+        <Formation
+          record={formation}
+          active={forming}
+          view={{ x: 0, y: 0, w: W, h: H }}
+          onProgress={rampCell}
+          onDone={endFormation}
+        />
+      )}
+      </div>
+
       <div className="text-center px-2 -mt-1">
         <h2 className="text-[18px] font-light tracking-[0.2em] uppercase leading-tight">
           {title}
         </h2>
         {subtitle && (
-          <p className="mt-1 sm:mt-1.5 text-[12px] font-light opacity-65 max-w-xl mx-auto leading-relaxed line-clamp-2 sm:line-clamp-none">
+          <p className="mt-1 sm:mt-1.5 text-[12px] font-light opacity-70 max-w-xl mx-auto leading-relaxed line-clamp-2 sm:line-clamp-none">
             {subtitle}
           </p>
         )}

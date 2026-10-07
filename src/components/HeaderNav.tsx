@@ -1,5 +1,5 @@
 import React from 'react';
-import { Search, Bookmark, Sliders, Waypoints, List } from 'lucide-react';
+import { Search, Bookmark, Bookmarks, Sliders, Waypoints, List } from './organic/Icons';
 import { UserPreferences } from '../data/userStore';
 import { Vein, Soma } from './organic/Organic';
 
@@ -17,6 +17,8 @@ interface HeaderNavProps {
   onOpenMap: () => void;
   isBookmarked: boolean;
   onToggleBookmark: () => void;
+  /** Open the reader's saved places. */
+  onOpenBookmarks: () => void;
   isOffline: boolean;
 }
 
@@ -28,6 +30,7 @@ export const HeaderNav: React.FC<HeaderNavProps> = ({
   onOpenMap,
   isBookmarked,
   onToggleBookmark,
+  onOpenBookmarks,
   isOffline
 }) => {
   const isDark = prefs.theme === 'dark';
@@ -78,8 +81,25 @@ export const HeaderNav: React.FC<HeaderNavProps> = ({
         {/* Right: the instruments.
             Search, the bookmark and the settings drawer were all reachable
             only by a shortcut nobody was told about — the drawer that holds
-            font size, layout and the theme had no control anywhere in the app. */}
+            font size, layout and the theme had no control anywhere in the app.
+
+            THE SAVED PLACES COME FIRST, asked for directly. They are the only
+            thing in this group the reader made themselves: the other three act
+            on the app, and this one opens what the reader put into it. Its
+            neighbour is the toggle that ADDS to it, so the pair reads left to
+            right as the list and the act of adding to the list — which is also
+            why the two glyphs differ by their number of marked nodes rather
+            than by being unrelated drawings. */}
         <div className="flex items-center gap-1 min-[380px]:gap-2 sm:gap-3 outline-none">
+          <button
+            onClick={onOpenBookmarks}
+            className="bud p-2 rounded-none outline-none flex items-center justify-center"
+            title="Saved places"
+            aria-label="Saved places"
+          >
+            <Bookmarks className="w-4 h-4" />
+          </button>
+
           <button
             onClick={onOpenSearch}
             className="bud p-2 rounded-none outline-none flex items-center justify-center"
@@ -112,7 +132,7 @@ export const HeaderNav: React.FC<HeaderNavProps> = ({
 
           {/* Offline state — a lit cell, not a badge */}
           <div
-            className="hidden lg:flex items-center gap-2 text-[9px] font-light uppercase tracking-[0.2em] opacity-50 rounded-none pl-1"
+            className="hidden lg:flex items-center gap-2 text-[9px] font-light uppercase tracking-[0.2em] opacity-45 rounded-none pl-1"
             title={isOffline ? 'Working Offline' : 'Stored Offline Ready'}
           >
             <Soma size={7} opacity={isOffline ? 0.5 : 1} phase={14.2} />

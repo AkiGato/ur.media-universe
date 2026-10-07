@@ -1,6 +1,6 @@
 # Typography and Copy · `TY`
 
-One family, one weight, three sizes, one tracking rule — and the hard limit on what text may exist at all. Copy is the most easily invented thing in the app and the most expensive to strip out later.
+Two families, one to a role. One weight, three sizes, one tracking rule, and the hard limit on what text may exist at all. Copy is the most easily invented thing in the app and the most expensive to strip out later.
 
 [← index](00-index.md)
 
@@ -8,7 +8,11 @@ One family, one weight, three sizes, one tracking rule — and the hard limit on
 
 ## TY-01 — One Voice, and It Is Light
 
-One font family, and one weight: light. The map settled this — *a name is typography, not signage* — and the rest of the app was still setting every label in `font-bold uppercase`, which is the one register that makes an interface shout. `font-weight: 300` is the inherited default on `body`/`button`/`input` in `src/index.css`, so anything that never states a weight lands in the voice rather than a step above it. Contrast comes from size, letter-spacing, opacity and light. **Never from weight** — no `font-bold`, `font-semibold`, `font-medium`, `font-normal` anywhere, and no numeric `fontWeight` above 300 on SVG text. Where weight used to carry *state* (a selected tab, the current index row), state is now carried by light: `.bud` rests at 0.68 and `.bud-lit` at 1, which is the same thing the tissue does when you touch it.
+**Two families, one to a role. One weight, everywhere.**
+
+`Newsreader` 300 sets titles — `h1`, `h2`, and the `.title-face` blocks that stand in for them. `IBM Plex Sans` sets everything else, interface and figure annotation alike. Nothing else is loaded and nothing else may be named: `font-serif`, `font-mono` and any third face are as banned as a second weight. The rule read "one font family" until the pairing was made deliberate and confirmed; it was carrying a divergence rather than a decision, which is the one thing a rules file may not do (`docs/OPEN.md` 12, now closed). The reasoning for the pairing is recorded there — an editorial face for headlines, a documentation face for the register the instruments and the figure labels occupy, measured against Georgia so neither needs size inflation or negative tracking.
+
+The weight half was never in question and is unchanged: The map settled this — *a name is typography, not signage* — and the rest of the app was still setting every label in `font-bold uppercase`, which is the one register that makes an interface shout. `font-weight: 300` is the inherited default on `body`/`button`/`input` in `src/index.css`, so anything that never states a weight lands in the voice rather than a step above it. Contrast comes from size, letter-spacing, opacity and light. **Never from weight** — no `font-bold`, `font-semibold`, `font-medium`, `font-normal` anywhere, and no numeric `fontWeight` other than 300 on SVG text. *Other than*, not *above*: the wording was "above 300" and a `fontWeight={200}` on the chapter numeral sat under it for as long as the rule was written that way. It was a second weight doing a job the same element was already doing with `opacity={0.82}` — the instruction given twice, once in the register this rule refuses. Verify with `grep -rhoE 'fontWeight=\{[0-9]+\}' src/ | sort | uniq -c`: one line. Where weight used to carry *state* (a selected tab, the current index row), state is now carried by light: `.bud` rests at 0.68 and `.bud-lit` at 1, which is the same thing the tissue does when you touch it.
 
 ## TY-02 — Three Type Sizes: 9, 12, 18
 

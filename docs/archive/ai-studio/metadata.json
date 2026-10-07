@@ -1,6 +1,0 @@
-{
-  "name": "Media as Universe — U.R. Strategic Dossier",
-  "description": "An offline-capable black & white reader for the U.R. Strategic Dossier, opening on a living orientation map. No telemetry, no third-party requests.",
-  "requestFramePermissions": [],
-  "majorCapabilities": []
-}

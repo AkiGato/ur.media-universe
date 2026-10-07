@@ -8,11 +8,17 @@ import { createHash } from 'node:crypto';
 import { readdirSync, readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 
-const dist = join(process.cwd(), 'dist');
+/* The output directory, so one script can stamp either build.
+   `npm run build` writes dist/ for local preview; `npm run build:web` writes
+   build/, which is what gets uploaded. The stamping is identical — the cache
+   version is derived from the emitted asset hashes either way — so passing the
+   directory in was the whole change needed. */
+const outDir = process.argv[2] || 'dist';
+const dist = join(process.cwd(), outDir);
 const swPath = join(dist, 'sw.js');
 
 if (!existsSync(swPath)) {
-  console.error('stamp-sw: dist/sw.js not found — run the build first.');
+  console.error(`stamp-sw: ${outDir}/sw.js not found — run the build first.`);
   process.exit(1);
 }
 

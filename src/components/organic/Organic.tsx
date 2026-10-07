@@ -165,7 +165,7 @@ export const SomaLabel: React.FC<{
  * one the book's own argument about a finite attention budget should answer.
  *
  * Rather than a second readout (which would be two instruments saying one
- * thing, see AGENTS.md "A Name Is Said Once"), the same gradient carries both:
+ * thing — TY-05, A Name Is Said Once), the same gradient carries both:
  * the current chapter's span is lifted out of the ground on either side of it,
  * so the strand shows where the chapter began, where you are inside it, and how
  * much of it is left. Extent, never percentage — the lit span is a fact about
@@ -245,7 +245,13 @@ export const ProgressStrand: React.FC<{
         </linearGradient>
       </defs>
       <path
-        d="M 0 5.4 Q 250 2.8 500 4.6 T 1000 3.2"
+        /* THE LINE OF NAVIGATION IS A RULE, SO IT IS RULED.
+           It wandered by 2.6 units over a 1000-unit span, which is a meander on
+           the one mark in the app whose whole job is to say how far along you
+           are — a position read against a wavy datum is a position you cannot
+           read. Straight to the limit the grammar allows: a 0.06 bow, which is
+           PlateCalendar's settlement and keeps DG-01 untouched. */
+        d="M 0 4.2 Q 500 4.14 1000 4.2"
         fill="none"
         stroke={`url(#${gid})`}
         strokeWidth={1}

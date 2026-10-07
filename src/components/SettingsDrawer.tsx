@@ -6,9 +6,11 @@ import {
   Eye,
   Moon,
   Sun,
-  Music
-} from 'lucide-react';
+  Music,
+  BookOpen
+} from './organic/Icons';
 import { UserPreferences } from '../data/userStore';
+import { ReportPanel } from './ReportPanel';
 import { Vein, Soma, SomaLabel } from './organic/Organic';
 import { useOverlayFocus } from '../utils/a11y';
 
@@ -92,7 +94,7 @@ export const SettingsDrawer: React.FC<SettingsDrawerProps> = ({
           <div className="space-y-2">
             <div className="flex justify-between items-center">
               <SomaLabel opacity={0.7} phase={1.2}>Font Size</SomaLabel>
-              <span className="text-[9px] font-light uppercase tracking-[0.2em] opacity-60">{prefs.fontSize}px</span>
+              <span className="text-[9px] font-light uppercase tracking-[0.2em] opacity-70">{prefs.fontSize}px</span>
             </div>
             <input
               type="range"
@@ -109,7 +111,7 @@ export const SettingsDrawer: React.FC<SettingsDrawerProps> = ({
           <div className="space-y-2">
             <div className="flex justify-between items-center">
               <SomaLabel opacity={0.7} phase={8.4}>Line Height</SomaLabel>
-              <span className="text-[9px] font-light uppercase tracking-[0.2em] opacity-60">{prefs.lineHeight.toFixed(1)}x</span>
+              <span className="text-[9px] font-light uppercase tracking-[0.2em] opacity-70">{prefs.lineHeight.toFixed(1)}x</span>
             </div>
             <input
               type="range"
@@ -220,12 +222,54 @@ export const SettingsDrawer: React.FC<SettingsDrawerProps> = ({
             </label>
           </div>
 
+          {/* Accessible Reader (High Readability) Toggle */}
+          <div className="space-y-2 pt-1">
+            <div className="opacity-40">
+              <Vein opacity={0.45} phase={6.9} />
+            </div>
+            <label
+              className={`flex items-center justify-between p-3 cursor-pointer rounded-none ${
+                prefs.accessibleReader ? 'membrane-lit' : 'membrane-faint'
+              }`}
+            >
+              <span className="flex items-center space-x-2.5 font-light">
+                <Soma size={9} opacity={prefs.accessibleReader ? 1 : 0.4} phase={11.5} />
+                <BookOpen className="w-4 h-4" />
+                <span>Accessible Reader</span>
+              </span>
+              <input
+                type="checkbox"
+                checked={!!prefs.accessibleReader}
+                onChange={(e) => onUpdatePrefs({ accessibleReader: e.target.checked })}
+                className="accent-current cursor-pointer"
+              />
+            </label>
+            {/* The control's own name is the whole of what it may say. This
+                carried "Weight 400 + scaled font size and enhanced strokes" —
+                a written-out description of an implementation, which is neither
+                the author's words nor anything anyone asked for, and which told
+                a reader nothing they could act on that the toggle does not
+                already show them the moment they use it (TY-04). */}
+          </div>
+
+          {/* REPORT A PROBLEM — last in the drawer, which is where it was asked
+              to go and also where it belongs: it is the only control here that
+              is not a preference, and the only one that sends anything
+              anywhere. The form talks to /api/report on this origin; the key
+              and the Brevo calls live in server/brevoReport.mjs. */}
+          <div className="space-y-2 pt-1">
+            <div className="opacity-40">
+              <Vein opacity={0.45} phase={9.4} />
+            </div>
+            <ReportPanel />
+          </div>
+
         </div>
 
         <div className="opacity-45 px-3">
           <Vein opacity={0.5} phase={18.2} />
         </div>
-        <div className="p-3 text-center text-[9px] font-light uppercase tracking-[0.2em] opacity-50 rounded-none">
+        <div className="p-3 text-center text-[9px] font-light uppercase tracking-[0.2em] opacity-45 rounded-none">
           Preferences saved locally
         </div>
 

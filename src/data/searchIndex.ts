@@ -1,4 +1,4 @@
-import { BOOK_PAGES, BookPage, FIGURES, firstPageOfDiagram } from './pageModel';
+import { BOOK_PAGES, BookPage, FIGURES, firstPageOfDiagram, subscribePagination } from './pageModel';
 import { Anchor, anchorForPage, pageForAnchor } from './anchors';
 import { SOURCES, citedBy, chapterOfCase } from './relations';
 import { PROMPT_RULESET_DATA } from './promptData';
@@ -249,7 +249,31 @@ function buildDocs(): Doc[] {
   return docs;
 }
 
-export const DOCS: Doc[] = buildDocs();
+/**
+ * THE INDEX IS BUILT ON FIRST USE, NOT AT STARTUP.
+ *
+ * These were module-level constants, so opening the app walked all 56 sheets,
+ * tokenised every field on every one of them and built a vocabulary — before
+ * the reader had seen anything, and whether or not they ever searched. Most
+ * never do. It is pure startup cost on the one surface where cost is most
+ * visible, because it lands while the first paint is being waited for.
+ *
+ * AND THE DOCUMENTS WERE A CONSTANT, WHICH WAS A BUG. The repagination
+ * subscription rebuilt the postings — out of a document set that could never
+ * change. After a re-cut the index therefore described the book as it had been
+ * cut at startup, so a hit resolved to the sheet a phrase used to sit on.
+ * Invalidating all three together is what makes that subscription mean what it
+ * says.
+ *
+ * Built at most once per pagination, on the first query, and thrown away when
+ * the book is re-cut.
+ */
+let _docs: Doc[] | null = null;
+const DOCS_ = (): Doc[] => (_docs ??= buildDocs());
+
+/** The documents the index is built from, for surfaces that list rather than
+    search. Deferred exactly as the postings are. */
+export const docs = (): Doc[] => DOCS_();
 
 /* ---------------------------------------------------------------------------
    POSTINGS
@@ -265,7 +289,7 @@ const tokenise = (s: string): string[] => s.toLowerCase().match(TOKEN) || [];
 
 function buildPostings(): Map<string, Map<number, number>> {
   const postings = new Map<string, Map<number, number>>();
-  DOCS.forEach((doc, docIdx) => {
+  DOCS_().forEach((doc, docIdx) => {
     doc.fields.forEach((f) => {
       const weight = WEIGHT[f.kind];
       tokenise(f.text).forEach((t) => {
@@ -281,8 +305,20 @@ function buildPostings(): Map<string, Map<number, number>> {
   return postings;
 }
 
-const POSTINGS = buildPostings();
-const VOCAB = Array.from(POSTINGS.keys());
+/* Postings are page indices, so a re-cut invalidates every one of them — a
+   search would otherwise send a reader to the sheet a phrase was on before the
+   book was re-cut for their frame. */
+let _postings: ReturnType<typeof buildPostings> | null = null;
+let _vocab: string[] | null = null;
+const POSTINGS_ = () => (_postings ??= buildPostings());
+const VOCAB_ = (): string[] => (_vocab ??= Array.from(POSTINGS_().keys()));
+subscribePagination(() => {
+  /* All three together: postings derive from documents, and rebuilding one
+     out of a stale other is the bug this replaced. */
+  _docs = null;
+  _postings = null;
+  _vocab = null;
+});
 
 /* ---------------------------------------------------------------------------
    QUERY
@@ -297,9 +333,9 @@ const VOCAB = Array.from(POSTINGS.keys());
  * matching half the book.
  */
 function expand(term: string, prefix: boolean): string[] {
-  if (!prefix) return POSTINGS.has(term) ? [term] : [];
-  if (POSTINGS.has(term) && term.length > 3) return [term];
-  return VOCAB.filter((t) => t.startsWith(term));
+  if (!prefix) return POSTINGS_().has(term) ? [term] : [];
+  if (POSTINGS_().has(term) && term.length > 3) return [term];
+  return VOCAB_().filter((t) => t.startsWith(term));
 }
 
 const escapeRe = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -369,7 +405,7 @@ export function search(query: string, limit = 40): Hit[] {
 
     const round = new Map<number, number>();
     tokens.forEach((t) => {
-      POSTINGS.get(t)?.forEach((weight, docIdx) => {
+      POSTINGS_().get(t)?.forEach((weight, docIdx) => {
         round.set(docIdx, Math.max(round.get(docIdx) || 0, weight));
       });
     });
@@ -388,10 +424,10 @@ export function search(query: string, limit = 40): Hit[] {
   }
 
   return Array.from(live || [])
-    .sort((a, b) => b[1] - a[1] || DOCS[a[0]].pageIndex - DOCS[b[0]].pageIndex)
+    .sort((a, b) => b[1] - a[1] || DOCS_()[a[0]].pageIndex - DOCS_()[b[0]].pageIndex)
     .slice(0, limit)
     .map(([docIdx, score]) => {
-      const doc = DOCS[docIdx];
+      const doc = DOCS_()[docIdx];
       const snip = snippetFor(doc, terms);
       /* The row stands for the section; the anchor points at the paragraph the
          query landed in, so a hit in the third sheet of a section opens the
@@ -446,6 +482,6 @@ export function searchGrouped(query: string, limit = 40): Group[] {
 export function matchingPages(query: string): Set<number> {
   const out = new Set<number>();
   if (!query.trim()) return out;
-  search(query, DOCS.length).forEach((h) => out.add(h.pageIndex));
+  search(query, DOCS_().length).forEach((h) => out.add(h.pageIndex));
   return out;
 }

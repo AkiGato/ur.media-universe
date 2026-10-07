@@ -4,22 +4,48 @@
     {
       "name": "dev",
       "runtimeExecutable": "node",
-      "runtimeArgs": ["node_modules/vite/bin/vite.js", "--port=3000", "--strictPort"],
+      "runtimeArgs": [
+        "node_modules/vite/bin/vite.js"
+      ],
       "port": 3000,
-      "autoPort": false
+      "autoPort": true
     },
     {
       "name": "preview",
       "runtimeExecutable": "node",
-      "runtimeArgs": ["node_modules/vite/bin/vite.js", "preview", "--port=4173", "--strictPort"],
+      "runtimeArgs": [
+        "node_modules/vite/bin/vite.js",
+        "preview",
+        "--port=4173",
+        "--strictPort"
+      ],
       "port": 4173,
       "autoPort": false
     },
     {
       "name": "dev-alt",
       "runtimeExecutable": "node",
-      "runtimeArgs": ["node_modules/vite/bin/vite.js", "--port=3011", "--strictPort"],
+      "runtimeArgs": [
+        "node_modules/vite/bin/vite.js",
+        "--port=3011",
+        "--strictPort"
+      ],
       "port": 3011,
+      "autoPort": false
+    },
+    {
+      "name": "web",
+      "runtimeExecutable": "node",
+      "runtimeArgs": [
+        "node_modules/vite/bin/vite.js",
+        "preview",
+        "--outDir",
+        "build/buildU01",
+        "--port",
+        "4174",
+        "--strictPort"
+      ],
+      "port": 4174,
       "autoPort": false
     }
   ]

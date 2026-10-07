@@ -21,6 +21,26 @@ const FADE_OUT_MS = 1200;
 /** Between tracks: long enough to read as a passage, short enough not to be a gap. */
 const FADE_BETWEEN_MS = 1800;
 
+/**
+ * How long the map gets to itself before the first byte of music is asked for.
+ *
+ * The gesture that starts the music is, on a first visit, the ENTER click — the
+ * exact moment the organism begins assembling. The tracks are 6–13MB and the
+ * element streams them eagerly once `src` is set, so the music was competing
+ * for bandwidth with the idle prefetch of the reader and the five figure worlds
+ * at the one moment the reader is watching something happen.
+ *
+ * Nothing is lost by waiting: the music arrives on a 2.5s ramp from silence
+ * anyway (MO-05 — nothing cuts), so the first second of it was inaudible by
+ * design. This just stops the download from being issued during the assembly.
+ *
+ * MEASURED FROM WHEN THE MUSIC WAS FIRST WANTED, NOT FROM THE GESTURE. A reader
+ * who studies the entry screen for half a minute has already given the map all
+ * the room it needs and should hear the music the moment they enter; only a
+ * reader who clicks ENTER straight away waits, and only for the remainder.
+ */
+const SETTLE_MS = 4000;
+
 /* Order as given. Named `artist--title.mp3`; provenance and licences are in
    `public/audio/CREDITS.md`. Files live in `public/audio`, so they are served verbatim at
    these paths and are never hashed into `assets/` — which also keeps them out
@@ -39,6 +59,10 @@ let ramp: Ramp | null = null;
 let armed: (() => void) | null = null;
 /** what the caller last asked for, so a late gesture or a tab return knows. */
 let wanted = false;
+/** when the music was first asked for — the clock `SETTLE_MS` is measured on. */
+let wantedSince = 0;
+/** a deferred `start`, so turning the music off can cancel one in flight. */
+let settling = 0;
 
 function cancelRamp() {
   if (ramp) {
@@ -125,7 +149,7 @@ function arm() {
   if (armed) return;
   const go = () => {
     disarm();
-    if (wanted) start();
+    if (wanted) startAfterSettle();
   };
   armed = () => {
     window.removeEventListener('pointerdown', go);
@@ -138,6 +162,39 @@ function arm() {
 function disarm() {
   armed?.();
   armed = null;
+}
+
+/** Cancel a deferred start. Turning the music off must beat a pending timer. */
+function cancelSettle() {
+  if (settling) window.clearTimeout(settling);
+  settling = 0;
+}
+
+/**
+ * `start`, but not while the map is still assembling — see `SETTLE_MS`.
+ *
+ * ON DEFERRING PLAYBACK OUT OF THE GESTURE HANDLER. Chrome and Firefox treat
+ * user activation as sticky for the page, so a `play()` a few seconds after the
+ * click is allowed. Safari is stricter and may reject it. That path is already
+ * built and already tested: `start` catches a rejected play and calls `arm()`,
+ * which waits for the next pointer or key event — and a reader who has just
+ * entered the map is about to pan, zoom or tap something within seconds. So the
+ * worst case on a strict browser is that the music begins on the next touch
+ * rather than this one, which is the same behaviour the app already had for
+ * anyone whose first gesture was not a trusted one.
+ */
+function startAfterSettle() {
+  cancelSettle();
+  const waited = wantedSince ? performance.now() - wantedSince : SETTLE_MS;
+  const left = Math.max(0, SETTLE_MS - waited);
+  if (left === 0) {
+    start();
+    return;
+  }
+  settling = window.setTimeout(() => {
+    settling = 0;
+    if (wanted) start();
+  }, left);
 }
 
 function start() {
@@ -164,13 +221,20 @@ function start() {
 export function setAmbientMusic(on: boolean) {
   wanted = on;
   if (on) {
+    /* The settle clock starts the first time the music is wanted at all, which
+       on a default-on preference is the app's own start — so the wait is spent
+       on the entry screen and is usually over before ENTER is clicked. */
+    if (!wantedSince) wantedSince = performance.now();
     if (el && !el.paused) {
       fadeTo(TARGET_VOLUME, FADE_BETWEEN_MS);
       return;
     }
-    start();
+    startAfterSettle();
     return;
   }
+  /* Off must beat a start that is merely pending: without this, switching the
+     music off during the settle window would be undone by the timer. */
+  cancelSettle();
   disarm();
   if (!el || el.paused) return;
   fadeTo(0, FADE_OUT_MS, () => el?.pause());
@@ -191,9 +255,11 @@ export function bindAmbientMusicToVisibility(): () => void {
       return;
     }
     /* `el` is null when the app mounted hidden and `start` declined to play.
-       Either way the first visible moment is where the music begins. */
+       Either way the first visible moment is where the music begins — through
+       the settle gate, which is already spent by the time a tab is returned to
+       and so only matters for a tab made visible within the first seconds. */
     if (!el || el.paused) {
-      start();
+      startAfterSettle();
       return;
     }
     // Playing, but a ramp was interrupted or never ran. Bring it to level.

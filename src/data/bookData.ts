@@ -49,7 +49,7 @@ export interface Section {
   content: string[];
   quotes?: string[];
   citations?: Citation[];
-  interactiveWidget?: 'cognitive-postures' | 'five-questions' | 'causal-taxonomy' | 'anti-engagement';
+  interactiveWidget?: 'cognitive-postures' | 'five-questions' | 'causal-taxonomy' | 'anti-engagement' | 'content-budget' | 'restoration-delta';
 }
 
 export interface Chapter {
@@ -78,7 +78,7 @@ export const BOOK_DATA: BookData = {
   subtitle: "An Antifragile Framework for Communication Design in the Attention Economy",
   author: "U.R. — Strategic Dossier",
   dossierTitle: "U.R. — STRATEGIC DOSSIER",
-  dossierSubtitle: "Field Evidence: case studies read through a Talebian lens.",
+  dossierSubtitle: "Field Evidence: a case study read through a Talebian lens.",
   
   caseStudies: [
     {
@@ -215,7 +215,7 @@ export const BOOK_DATA: BookData = {
           number: "1.4",
           title: "The Physiological Cost",
           content: [
-            "No need to say: when you live in a constant cortisol loop—spike, scroll, regret, repeat—your melts. You have noticed it yourself.",
+            "No need to say: when you live in a constant cortisol loop—spike, scroll, regret, repeat—your brain melts. You have noticed it yourself.",
             "Anxiety and fear are in the air we breathe.",
             "\"Media Pollution\" mimics environmental catastrophe. Just as smog makes it difficult to draw a physical breath, the emissions of the digital universe are suffocating us mercilessly.",
             "Our mental environment is saturated with toxins. In an ecologically healthy mind, you have the oxygen to think positively, to reflect, and to build alternative narratives for your own future. But in a polluted environment, your brain enters survival mode. You are merely reacting to the \"smog\" of the feed. This isn't living.",
@@ -265,24 +265,17 @@ export const BOOK_DATA: BookData = {
             "You assume the sponsored content is lying to you, politely.",
             "Once, acknowledging this only meant recognising your place inside a great and greedy propaganda machine.",
             "Uncomfortable, but navigable. A social pact.",
-            "In 2024, the Edelman Trust Barometer recorded institutional trust at historic lows across 28 countries. Governments, media, NGOs, businesses — all declining.",
+            "In 2024, the Edelman Trust Barometer recorded institutional trust in decline across the countries it surveys — governments, media, NGOs and businesses alike.",
             "This was just the beginning of a structural erosion on which the entire attention economy was built.",
             "Advertising is a trust-dependent medium. Every persuasion mechanic — social proof, authority, scarcity — operates on credibility.",
             "Remove the credibility and the mechanics invert: every \"limited offer\" reads as a trap. Every testimonial reads as a plant. Every algorithm-served recommendation reads as paid placement.",
             "Trust functions neurologically as a predictive safety signal. It reduces the cognitive cost of processing incoming information. When trust in a source is absent, the brain routes messages through heightened skepticism circuits — increasing metabolic cost, reducing the probability of behavioural change. Extractive marketing is not just losing its audience. It is losing the neurological access that made it work.",
-            "Just as this system was reaching the depths of the crisis, something fascinatingly creepy gave it a slight push back up.",
-            "Big enterprises were already doing it (thriving and surviving mainly on it) – constructing their own little charming realities through storytelling and gamification.",
-            "Here trust wasn't much of a problem.",
-            "For a moment we were in the same “credibility pact” we subscribe to with cinema and literature – you decide to accept that hobbits and elves are part of reality. If a fairy is selling you a necklace, in this magical world, well, most probably, the question “Do I trust this inexistent magical creature?” won't pop up in your head not even for just a second.",
-            "It is still art, it is culture (because it actually is our actual culture and fingerprint we are leaving on history).",
-            "And then AI entered the game.",
-            "Creating an alternate world in seconds became seemingly more affordable (always in short term, and not considering sustainability and ecological aspects).",
-            "Now you don't just “distrust” what you see. You “search for the sixth finger”.",
-            "It's hard to fight this distrust. To do so, most probably, the man in black would have to delete your memories. There's a problem with this too though – if by any chance you are part of the latest generation, they might have to delete every single memory of doubt and distrust in your life… All your life.",
-            "The solution – make the system run hotter, spin faster. More stimulation, shorter cycles, louder signals, extracting more aggressively as the substrate degrades. You spin and swipe, you're getting lost and dizzy. It's hard to find the sixth finger when your vision blurs and your head spins, isn't it?",
-            "Yet, as said: this was a short spike on the graph. A little push and the exhaustion caused by AI built up way faster, in less than a year, in comparison to a decade of dark marketing.",
-            "The graphics are changing quicker than any business might predict and the possibility for new “jumps” are lower than ever.",
-            "\"You can fool all the people some of the time, and some of the people all the time, but you cannot fool all the people all the time.\""
+            "For a period, the largest brands found a way around the trust problem. They built worlds — storytelling, gamification, branded fictions — and invited the audience inside. Trust was not required, because the audience had entered the pact that cinema and literature rely on: disbelief suspended by consent. A fiction you have agreed to is not a lie, and nobody asks whether the fairy selling the necklace is telling the truth.",
+            "Generative AI ended the pact. When a convincing world can be produced in seconds at negligible cost, the audience loses the one thing the pact depended on — the ability to tell which fictions it agreed to. Every image is now checked for the sixth finger. Suspicion stops being a response to a particular claim and becomes the default posture toward all content, including the honest kind.",
+            "This is *synthetic trust erosion*, and it is structurally different from the erosion the Barometer measures. Institutional distrust is a judgement about sources. Synthetic distrust is a judgement about the medium itself, and it cannot be repaired by a more credible source, because the doubt attaches before the source is identified.",
+            "The extractive model's answer was the only one its architecture permits: run hotter. More stimulation, shorter cycles, louder signals — extracting more aggressively as the substrate degrades. A reader who is spinning cannot search for the sixth finger.",
+            "It bought less time than the previous decade of dark marketing had. The exhaustion compounded within a year rather than ten, the curve now moves faster than any business can plan against, and each new jump is smaller than the last.",
+            "\"You can fool all the people some of the time, and some of the people all the time, but you cannot fool all the people all the time.\" — attributed to Abraham Lincoln"
           ],
           citations: [
             { authorOrSource: "Edelman Trust Barometer (2024)", text: "edelman.com/trust/2024/trust-barometer" }
@@ -313,7 +306,7 @@ export const BOOK_DATA: BookData = {
           content: [
             "“A system is fragile when it benefits from stability and suffers disproportionately from volatility.”",
             "The extractive model has four structural fractures (despite thousands of smaller bursts):",
-            "1. The Monopoly Problem. When a single platform controls the building, writes the lease, changes the rules mid-tenancy, and collects rent regardless of outcome, and when three billion people walk through that building every day, brands have no viable alternative address. In 2021, one such platform adjusted its algorithm. Organic reach dropped an estimated 52% within twelve months. Brands that had spent years building audiences inside that architecture lost access to them. It is the logical consequence of conducting your entire distribution strategy on someone else's property. (Especially if the landlord is a greedy, shameless tyrant)",
+            "1. The Monopoly Problem. When a single platform controls the building, writes the lease, changes the rules mid-tenancy, and collects rent regardless of outcome, and when three billion people walk through that building every day, brands have no viable alternative address. In 2021, one such platform adjusted its algorithm. Brands that had spent years building audiences inside that architecture lost access to them. It is the logical consequence of conducting your entire distribution strategy on someone else's property. (Especially if the landlord is a greedy, shameless tyrant)",
             "2. Attention is Finite. Simon established in 1971 that in an information-rich world, the scarce resource is not content but the human attention required to receive it. Every additional feed, every additional notification, every additional platform competes for the same fixed cognitive bandwidth.",
             "3. Regulatory Lag is Closing. The operating model was calibrated for a regulatory environment that no longer exists. Legacy platforms cannot retrofit ethical architecture under legal pressure at the pace the compliance wave is moving.",
             "4. Borrowed Trust. Platform credibility, influencer authority, algorithmic reach — none of it belongs to the brand. All of it is rented from systems whose trust is in measurable structural freefall. When the system fractures, the brands dependent on it fracture with it.",
@@ -389,7 +382,7 @@ export const BOOK_DATA: BookData = {
             "The practitioner who can accurately read these postures is equipped to communicate ethically and effectively.",
             "1. Restoration-Seeking: You know this one best after a difficult day at 11pm. System 1 is running everything. System 2 has left the building. The person is technically present but nothing is landing with weight, they are reaching for relief, not information. This is the most exploited cognitive state in the history of marketing, and the most ethically indefensible to target. Communication that meets genuine depletion with stillness, soft fascination, low demand, no urgency, builds trust by refusing to take what it could easily take. That refusal is remembered long after the cortisol spike fades.",
             "2. Agency-Seeking: This is the state you are in when you open a new tab with actual intention. System 2 is engaged. Directed attention has recovered enough for deliberate action. The person arrived with intention: a comparison, an explanation, a framework that helps them decide. The extractive model's response is to manufacture urgency before System 2 can complete its assessment: countdown timers, limited stock, social proof deployed at the exact moment of consideration. The ethical protocol moves in the opposite direction: reduce cognitive load through clarity, without pressure. A person who completes a genuine System 2 evaluation and still chooses you has made a decision they will defend. That is a structurally different, and more durable, commercial relationship than one built on a triggered panic-response.",
-            "3. Meaning-Seeking: You are reading something and realising it reflects exactly what you believe or exactly what you can't stand. The person is testing whether what you stand for is consistent with who they are trying to become. Three quarters of consumers report having ended a brand relationship over a value conflict rather than a quality failure. The meaning-seeking audience is the most sophisticated detector of inauthenticity in existence and this audience is expanding. The only thing that works here is something real. Authenticity, consistency, and genuine transparency are simultaneously the rarest and the most commercially durable values a brand can propose."
+            "3. Meaning-Seeking: You are reading something and realising it reflects exactly what you believe or exactly what you can't stand. The person is testing whether what you stand for is consistent with who they are trying to become. The meaning-seeking audience is the most sophisticated detector of inauthenticity in existence and this audience is expanding. The only thing that works here is something real. Authenticity, consistency, and genuine transparency are simultaneously the rarest and the most commercially durable values a brand can propose."
           ],
           interactiveWidget: "cognitive-postures",
           citations: [
@@ -554,7 +547,8 @@ export const BOOK_DATA: BookData = {
             "A person who leaves an interaction more capable than they arrived associates that capability with the brand that produced it. That association is a non-metric relationship.",
             "Relationships, unlike engagement metrics, can be antifragile: they grow stronger under the pressure of time, trust-testing, and the inevitable comparison with every extractive alternative the person encounters.",
             "This is the creative economy's competitive claim: ethical communication is more than morally superior. It produces a category of value the extractive model is architecturally incapable of generating. You cannot simultaneously deplete a person and build a relationship with them. The two objectives are in direct structural conflict.",
-            "A brand built on extractive mechanics is fragile, dependent on the stability of platform trust, attentional bandwidth, regulatory permissiveness, and audience credulity. As established in Chapter II, all four are deteriorating simultaneously. A brand built on restorative design, causal transparency, and genuine agency restoration is antifragile. The trust collapse makes it more credible. The regulatory wave validates its architecture. The attention depletion makes its restorative offer more valuable. The meaning-seeking audience finds it and stays."
+            "A brand built on extractive mechanics is fragile, dependent on the stability of platform trust, attentional bandwidth, regulatory permissiveness, and audience credulity. As established in Chapter II, all four are deteriorating simultaneously. A brand built on restorative design, causal transparency, and genuine agency restoration is antifragile. The trust collapse makes it more credible. The regulatory wave validates its architecture. The attention depletion makes its restorative offer more valuable. The meaning-seeking audience finds it and stays.",
+            "A word on the term, because it is borrowed and the distinction matters. Most of what this dossier prescribes is *robust* rather than *antifragile*: transparency, causal disclosure, restorative design, owned distribution. These resist breakage under volatility; they do not gain from it. Robustness is the floor, and on its own it is enough to outlast the extractive model. The antifragile claim is narrower and rests on one mechanism: a relationship built on disclosed, verifiable practice is strengthened by exactly the events that damage extractive competitors. Each trust collapse makes the disclosing brand more credible by contrast. Each regulatory tightening validates its architecture while imposing cost on everyone else. Each manipulation exposed elsewhere raises the value of the practitioner who never used one. The gain comes from disorder because disorder is what makes the difference visible. Where that mechanism is absent — where a practice merely avoids harm without being made more valuable by the harm others do — the honest word is *robust*, and this dossier uses it."
           ]
         },
         {
@@ -590,6 +584,43 @@ export const BOOK_DATA: BookData = {
           ],
           interactiveWidget: "anti-engagement",
           citations: [
+            { authorOrSource: "Williams, J. (2018)", text: "Stand Out of Our Light: Freedom and Resistance in the Attention Economy. Cambridge University Press." }
+          ]
+        },
+        {
+          id: "5.6",
+          number: "5.6",
+          title: "The Restoration Delta Instrument",
+          content: [
+            "Restoration Delta is the one metric a practitioner can run tomorrow, with no platform access and nothing they do not already control. Three questions, asked immediately before the interaction and immediately after, each answered from one to five; the *delta* is the after-reading minus the before, averaged across the three.",
+            "One. Right now, how easily could you concentrate on something that requires effort? One is not at all; five is easily.",
+            "Two. Right now, how much does anything feel urgent or demanding of you? One is everything; five is nothing, so that five is the restored state.",
+            "Three. Right now, could you make a considered decision, or only react? One is only react; five is a considered decision.",
+            "The averaged reading runs from 1.0 to 5.0 and the delta from −4.0 to +4.0. At or above +0.5 is restorative; between −0.5 and +0.5, neutral; at or below −0.5, depleting. A depleting score fails the fifth question of the Chapter III standard, whatever the conversion rate.",
+            "A worked example. A person opens a comparison page for software they intend to buy. Before: concentration 2, urgency 2, decision 3 — 2.33; tired, with an intention. They read a plain table of what each tier does and costs, no timer, no counter. After: 4, 4, 4 — 4.00. Delta +1.67: restorative. Same person, same intention, a landing page with a countdown, a stock counter and a testimonial carousel. Before: 3, 3, 3 — 3.00. After: 2, 1, 2 — 1.67. Delta −1.33: depleting. The second page may convert better tonight. The instrument records what it cost.",
+            "It is self-report: not attention measured, but the person's own account of their state, which is what the standard asks. Where a stronger reading is needed, pair it with time-to-decision, the Agency Index's own instrument."
+          ],
+          interactiveWidget: "restoration-delta",
+          citations: [
+            { authorOrSource: "Kaplan, S. & Kaplan, R. (1989)", text: "The Experience of Nature: A Psychological Perspective. Cambridge University Press." }
+          ]
+        },
+        {
+          id: "5.7",
+          number: "5.7",
+          title: "Content Minimisation",
+          content: [
+            "Every piece of content is a claim on a fixed resource. Simon's point in 1971 was that in an information-rich world the scarce thing is not content but the attention required to receive it; media pollution, as §1.4 names it, is what those claims look like in aggregate. No single piece is the smog. The sum is.",
+            "The extractive model's answer to finite attention is to produce more of it — to hold share against everyone else producing more. That is the cadence Branch 2 prohibits: a plan that decays without constant presence is an attention-economy dependency, not a content strategy.",
+            "*Minimisation* is the inverse discipline. A source's sustainable output is bounded by what its recipients can absorb and restore from, and by the fact that no source is the only one they follow. A brand is one of hundreds; a creator one of dozens; a friend one of a few. The fair share of a person's week shrinks as reach grows, because each piece from a large source lands on more nervous systems at once.",
+            "So the question is not how much can be produced but how much of a person's directed attention it is fair to claim, and what each piece costs them to receive. That is a *budget*, not a *target*. A campaign spends a budget faster and then owes a silence — the same shape as depletion followed by restoration. A burst with no rest after it is a cadence.",
+            "The instrument that follows makes those assumptions explicit and lets the practitioner replace them with a reading of their own. It is a model, not a measurement: the dossier holds no research figure for a right number of posts, and a calculator that produced one without showing its arithmetic would fail the third and fourth of the five questions.",
+            "What the budget is measured against is Williams's standard — whether the output increases or decreases the agency of the person receiving it. Fewer pieces, each leaving the reader better than it found them, is the anti-engagement metric applied to volume."
+          ],
+          interactiveWidget: "content-budget",
+          citations: [
+        { authorOrSource: "Simon, H.A. (1971)", text: "Designing Organizations for an Information-Rich World. — Attention as finite resource." },
+            { authorOrSource: "Kaplan, S. & Kaplan, R. (1989)", text: "The Experience of Nature: A Psychological Perspective. Cambridge University Press." },
             { authorOrSource: "Williams, J. (2018)", text: "Stand Out of Our Light: Freedom and Resistance in the Attention Economy. Cambridge University Press." }
           ]
         }

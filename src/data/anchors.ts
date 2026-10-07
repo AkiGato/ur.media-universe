@@ -1,4 +1,4 @@
-import { BOOK_PAGES, BookPage, FIGURES } from './pageModel';
+import { BOOK_PAGES, BookPage, FIGURES, subscribePagination } from './pageModel';
 import { BOOK_DATA } from './bookData';
 
 /**
@@ -200,7 +200,7 @@ function pageForAnchorInternal(a: Anchor): number {
  * was written into the page model rather than taken from the manuscript, no
  * paragraph matches and the section falls back to its chapter's first sheet.
  */
-const SECTION_SHEETS: Map<string, number> = (() => {
+const buildSectionSheets = (): Map<string, number> => {
   const out = new Map<string, number>();
   const paragraphs = new Map<string, number>();
   BOOK_PAGES.forEach((p) => {
@@ -220,7 +220,13 @@ const SECTION_SHEETS: Map<string, number> = (() => {
     });
   });
   return out;
-})();
+};
+
+/* Rebuilt when the book is re-cut. Without this a mark made before a
+   repagination resolves to the sheet that USED to carry its paragraph, which is
+   exactly the silent drift anchors exist to prevent. */
+let SECTION_SHEETS = buildSectionSheets();
+subscribePagination(() => { SECTION_SHEETS = buildSectionSheets(); });
 
 export const pageForManuscriptSection = (sectionId: string): number =>
   SECTION_SHEETS.get(sectionId) ?? 0;

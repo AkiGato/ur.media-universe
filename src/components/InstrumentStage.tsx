@@ -1,12 +1,51 @@
 import React, { Suspense, lazy } from 'react';
 import { createPortal } from 'react-dom';
 import { useOverlayFocus } from '../utils/a11y';
+import { useDismiss } from '../utils/dismissStack';
 import type { QuestionRef } from './widgets/FiveQuestionsWidget';
 import { Soma } from './organic/Organic';
 
 const FiveQuestionsWidget = lazy(() =>
   import('./widgets/FiveQuestionsWidget').then((m) => ({ default: m.FiveQuestionsWidget }))
 );
+const ContentBudgetWidget = lazy(() =>
+  import('./widgets/ContentBudgetWidget').then((m) => ({ default: m.ContentBudgetWidget }))
+);
+const RestorationDeltaWidget = lazy(() =>
+  import('./widgets/RestorationDeltaWidget').then((m) => ({ default: m.RestorationDeltaWidget }))
+);
+
+/** The instruments this surface can hold. Each one operationalises a section
+    that argues it, and opens from that section's own sheet. */
+export type Instrument = 'five-questions' | 'content-budget' | 'restoration-delta';
+
+/** What each one is called on the surface that holds it, said once, here.
+    The stage used to decide this inline with a ternary, which stopped being
+    able to spell three names the moment there were three. */
+const INSTRUMENT_NAME: Record<Instrument, string> = {
+  'five-questions': 'The five operational questions',
+  'content-budget': 'Content Pollution Control',
+  'restoration-delta': 'The Restoration Delta'
+};
+
+/**
+ * WHICH INSTRUMENTS FIT ONE SCREEN.
+ *
+ * This surface scrolled because the five questions used to be five open cards
+ * and the budget was a column of every assumption at once. Both are panels now
+ * — one question at a time, one accordion open at a time — sized to the frame
+ * they are given, so the scroll they needed is gone and LY-02 is satisfied the
+ * way the rest of the app satisfies it: by fitting, not by scrolling.
+ *
+ * The Restoration Delta is not in this set. It asks for six readings at once
+ * and its whole claim is comparative, so collapsing it into a sequence would
+ * hide the pair that is the measurement. It keeps the scrolling column.
+ */
+const FITS_ONE_SCREEN: Record<Instrument, boolean> = {
+  'five-questions': true,
+  'content-budget': true,
+  'restoration-delta': false
+};
 
 /**
  * One passage out of the instrument. The same two marks the figure worlds use,
@@ -61,21 +100,26 @@ export const InstrumentStage: React.FC<{
   onToMap: () => void;
   /** follow a proposed strategy to the part of the document that argues it */
   onFollow: (ref: QuestionRef) => void;
-}> = ({ onClose, onToChapter, onToMap, onFollow }) => {
+  /** which instrument this surface is holding */
+  instrument: Instrument;
+  /**
+   * The reader's own polarity, carried onto the instrument.
+   *
+   * GR-01 says every drawing surface is black in both themes, and this surface
+   * holds tissue — so this is a departure, made on instruction: the instruments
+   * were asked for in both polarities, black on white as well as white on
+   * black. It is scoped to the instruments; the map and the figure worlds still
+   * force their own ground, which is where that rule was actually earned.
+   */
+  isDark?: boolean;
+}> = ({ onClose, onToChapter, onToMap, onFollow, instrument, isDark = true }) => {
   const stageRef = useOverlayFocus<HTMLDivElement>(true);
 
-  React.useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        // stop App's own Escape handler from also sending us back to the map
-        e.preventDefault();
-        e.stopPropagation();
-        onClose();
-      }
-    };
-    window.addEventListener('keydown', onKey, true);
-    return () => window.removeEventListener('keydown', onKey, true);
-  }, [onClose]);
+  /* Escape belongs to the topmost surface, and this is one — see dismissStack.
+     The listener this replaced called stopPropagation to keep App from also
+     leaving for the map, which never worked: both listeners were on window, and
+     propagation is about targets. */
+  useDismiss(true, onClose);
 
   /* Portalled to <body> for the same reason the figure world is: the page turn
      is a motion transform, and a transformed ancestor becomes the containing
@@ -86,23 +130,31 @@ export const InstrumentStage: React.FC<{
       ref={stageRef}
       role="dialog"
       aria-modal="true"
-      aria-label="The five operational questions"
+      aria-label={INSTRUMENT_NAME[instrument]}
       className={`surface fixed inset-0 z-[60] flex flex-col ${
-        'bg-black text-white'
+        isDark ? 'theme-dark bg-black text-white' : 'theme-light bg-white text-black'
       }`}
     >
       <div className="flex-shrink-0 pt-3 px-5 sm:px-8 hidden sm:flex justify-end">
-        <span className="text-[9px] font-light uppercase tracking-[0.2em] opacity-30" aria-hidden="true">
+        <span className="text-[9px] font-light uppercase tracking-[0.2em] opacity-25" aria-hidden="true">
           Esc returns to the page
         </span>
       </div>
       <div className="flex-shrink-0 pt-3 sm:hidden" aria-hidden="true" />
 
-      {/* Unlike a figure, an instrument is taller than the frame once five
-          questions are open, so this surface scrolls where a figure world
-          never does. */}
-      <div className="flex-1 min-h-0 w-full overflow-y-auto soft-scroll px-4 sm:px-8 py-2">
-        <div className="max-w-2xl mx-auto">
+      {/* A fitted instrument is given the frame and told to fill it; the one
+          that is not keeps the scrolling column it needs. */}
+      <div className={`flex-1 min-h-0 w-full px-4 sm:px-8 py-2 ${
+        FITS_ONE_SCREEN[instrument] ? 'overflow-hidden flex' : 'overflow-y-auto soft-scroll'
+      }`}>
+        <div className={`mx-auto w-full ${
+          /* A fitted instrument is a panel, not a column of prose, so it
+             takes the width a panel needs. max-w-2xl is a reading measure and
+             the right cap for the scrolling instrument; holding the bento to
+             it left a 768px strip in a 1280px frame with the reading squeezed
+             beside the choices. */
+          FITS_ONE_SCREEN[instrument] ? 'max-w-6xl min-h-0 flex flex-col' : 'max-w-2xl'
+        }`}>
           <Suspense
             fallback={
               <div className="flex items-center gap-3 opacity-40 py-12" role="status" aria-live="polite">
@@ -111,7 +163,13 @@ export const InstrumentStage: React.FC<{
               </div>
             }
           >
-            <FiveQuestionsWidget onFollow={onFollow} />
+            {instrument === 'five-questions' ? (
+              <FiveQuestionsWidget onFollow={onFollow} />
+            ) : instrument === 'content-budget' ? (
+              <ContentBudgetWidget onFollow={onFollow} />
+            ) : (
+              <RestorationDeltaWidget onFollow={onFollow} />
+            )}
           </Suspense>
         </div>
       </div>

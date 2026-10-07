@@ -1,5 +1,5 @@
 import React from 'react';
-import { LivingFigure, FigureNode, FigureEdge } from '../figures/LivingFigure';
+import { LivingFigure, FigureLayout, FigureNode, FigureEdge } from '../figures/LivingFigure';
 
 interface CognitivePosturesDiagramProps {
   isDark?: boolean;
@@ -89,11 +89,54 @@ const LIT_POSTURE = 0.74;
 const LIT_ETHIC = 0.6;
 const LIT_TRAP = 0.4;
 
-const NODES: FigureNode[] = [
-  ...POSTURES.map(p => ({
+/* ------------------------------------------------------------- portrait --
+ *
+ * THE ROW BECOMES A DESCENT, WHICH IS WHAT IT ALWAYS WAS.
+ *
+ * The three postures are not three columns — the header of this file says so:
+ * "the same organism met at three moments", wired along the recovery of
+ * directed attention. A row is one way to draw a sequence and a descent is
+ * another, and the descent is the one that fits a column. Nothing about the
+ * order changes; `restoration → agency → meaning` still runs end to end, and
+ * it still runs in the direction attention recovers.
+ *
+ * Each posture keeps both satellites in the same relation it has in the wide
+ * form: the trap falls AWAY from the cell and sits lower and further out, the
+ * response sits closer and higher. That relation is the argument — what a state
+ * invites against what it is owed — and it is carried by position, so it is the
+ * one thing a re-layout is not free to rearrange for room.
+ *
+ * The satellites are on opposite sides of the spine so their names never share
+ * a row: TRAP is four characters and the responses run to sixteen, which at
+ * 8.5 units tracked 0.2em is about 106 — comfortable on one side of a 360-unit
+ * sheet and impossible on both.
+ */
+const PW = 360;
+const PH = 600;
+const P_SPINE = 150;
+const P_STEP = 180;
+const P_TOP = 100;
+
+/**
+ * One description of the three postures, placed twice.
+ *
+ * Every name, state, glyph and reading below is written once; only the four
+ * coordinate functions and the field radii differ between the forms.
+ */
+const build = (place: {
+  posture: (i: number, p: typeof POSTURES[number]) => { x: number; y: number };
+  trap: (i: number, p: typeof POSTURES[number]) => { x: number; y: number };
+  ethic: (i: number, p: typeof POSTURES[number]) => { x: number; y: number };
+  /* Not content — a 114-unit field is a seventh of the wide sheet and a third
+     of the narrow one, and three of them overlapping at that scale fuse. */
+  postureArbor?: number;
+  ethicArbor?: number;
+}): FigureNode[] => [
+  ...POSTURES.map((p, i) => ({
     id: p.id,
     kind: 'cell' as const,
-    x: p.x, y: CY, r: 30,
+    ...place.posture(i, p), r: 30,
+    ...(place.postureArbor ? { arborR: place.postureArbor } : {}),
     label: p.title,
     sub: p.state,
     glyph: p.glyph,
@@ -104,10 +147,10 @@ const NODES: FigureNode[] = [
     detail: p.detail
   })),
   // the trap laid for each posture — dim, and it falls away from the cell
-  ...POSTURES.map(p => ({
+  ...POSTURES.map((p, i) => ({
     id: `${p.id}-trap`,
     kind: 'minor' as const,
-    x: p.x - 70, y: CY + 100, r: 8,
+    ...place.trap(i, p), r: 8,
     label: 'TRAP',
     sub: p.trap,
     labelAtRest: LIT_TRAP,
@@ -115,10 +158,11 @@ const NODES: FigureNode[] = [
     reading: { kind: 'Extractive response · what this state invites', body: p.trapFull }
   })),
   // the response owed to it — lit, and it carries the weight
-  ...POSTURES.map(p => ({
+  ...POSTURES.map((p, i) => ({
     id: `${p.id}-ethic`,
     kind: 'cell' as const,
-    x: p.x + 56, y: CY + 64, r: 14,
+    ...place.ethic(i, p), r: 14,
+    ...(place.ethicArbor ? { arborR: place.ethicArbor } : {}),
     label: p.ethic,
     sub: p.ethicSub,
     labelAtRest: LIT_ETHIC,
@@ -127,6 +171,20 @@ const NODES: FigureNode[] = [
     detail: [p.ethicFull]
   }))
 ];
+
+const NODES: FigureNode[] = build({
+  posture: (_i, p) => ({ x: p.x, y: CY }),
+  trap: (_i, p) => ({ x: p.x - 70, y: CY + 100 }),
+  ethic: (_i, p) => ({ x: p.x + 56, y: CY + 64 })
+});
+
+const PORTRAIT_NODES: FigureNode[] = build({
+  posture: (i) => ({ x: P_SPINE, y: P_TOP + i * P_STEP }),
+  trap: (i) => ({ x: 74, y: P_TOP + i * P_STEP + 80 }),
+  ethic: (i) => ({ x: 250, y: P_TOP + i * P_STEP + 52 }),
+  postureArbor: 72,
+  ethicArbor: 42
+});
 
 const EDGES: FigureEdge[] = [
   // the postures are one organism recovering, not three columns
@@ -138,12 +196,15 @@ const EDGES: FigureEdge[] = [
   ])
 ];
 
+const PORTRAIT: FigureLayout = { width: PW, height: PH, nodes: PORTRAIT_NODES };
+
 export const CognitivePosturesDiagram: React.FC<CognitivePosturesDiagramProps> = () => (
   <LivingFigure
     id={ID}
     width={800}
     height={330}
     nodes={NODES}
+    portrait={PORTRAIT}
     edges={EDGES}
     core="restoration"
     caption=""

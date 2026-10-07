@@ -6,3 +6,6 @@ coverage/
 *.log
 .env*
 !.env.example
+
+# a render of the deck, not a source of it — regenerate rather than commit
+docs/talk-recording*.mp4

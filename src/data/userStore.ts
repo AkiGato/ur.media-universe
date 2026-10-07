@@ -36,6 +36,8 @@ export interface UserPreferences {
   viewMode: 'spread' | 'single'; // spread (2 pages side-by-side on desktop) or single page
   animationStyle: 'tide' | '3d-flip' | 'slide' | 'fade';
   zenMode: boolean;
+  /** opt-in accessible reader profile: weight 400 + scaled font size */
+  accessibleReader?: boolean;
 }
 
 export const DEFAULT_PREFERENCES: UserPreferences = {
@@ -46,10 +48,18 @@ export const DEFAULT_PREFERENCES: UserPreferences = {
   musicEnabled: true,
   viewMode: 'spread',
   // A page flip is paper. The tide is the organism's own motion — the same wave
-  // that crosses the map, passing through the sheet — so it is the default and
-  // the paper metaphors are the alternatives.
-  animationStyle: 'tide',
-  zenMode: false
+  // that crosses the map, passing through the sheet — and it remains the
+  // alternative closest to the drawing, alongside the paper metaphors.
+  //
+  // The default is the fade, asked for directly: the page leaves on light and
+  // arrives on light, with nothing travelling across the sheet. It is also the
+  // only turn that says nothing about which direction the reader went, which
+  // is the honest thing for a surface where a turn may be a step within a
+  // sheet as readily as a step between two (MO-07 names the tide as the
+  // default; this overrides that, and docs/OPEN.md records it).
+  animationStyle: 'fade',
+  zenMode: false,
+  accessibleReader: false
 };
 
 const STORAGE_KEY_PREFS = 'media_universe_prefs_v1';
@@ -134,106 +144,24 @@ export function saveHighlights(highlights: Highlight[]) {
   }
 }
 
-/* ---------------------------------------------------------------------------
-   Export / import
-   localStorage is the only home this reader's marks have, and it is not durable:
-   Safari's ITP evicts script-written storage after ~7 days without a visit, and
-   clearing site data takes everything with no warning. A plain JSON file the
-   reader holds themselves is the only recovery path that does not require an
-   account, a server, or trusting us with their annotations.
---------------------------------------------------------------------------- */
-
-export interface ReaderStateExport {
-  format: 'media-as-universe/reader-state';
-  /** 1 stored page indices; 2 stores anchors. Version 1 files still restore. */
-  version: 2;
-  exportedAt: string;
-  prefs: UserPreferences;
-  bookmarks: Bookmark[];
-  highlights: Highlight[];
-  /** where the reader stopped, as an anchor */
-  lastAnchor: Anchor;
-  /** the same place as an index, for a build that predates anchors */
-  lastPage: number;
-}
-
-export function buildReaderState(): ReaderStateExport {
-  const lastAnchor = loadLastAnchor();
-  return {
-    format: 'media-as-universe/reader-state',
-    version: 2,
-    exportedAt: new Date().toISOString(),
-    prefs: loadPreferences(),
-    bookmarks: loadBookmarks(),
-    highlights: loadHighlights(),
-    lastAnchor,
-    lastPage: pageForAnchor(lastAnchor)
-  };
-}
-
-/** Downloads the reader's marks as a dated JSON file. */
-export function exportReaderState() {
-  const state = buildReaderState();
-  const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `media-as-universe-marks-${state.exportedAt.slice(0, 10)}.json`;
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-  URL.revokeObjectURL(url);
-}
-
-export interface ImportResult {
-  ok: boolean;
-  message: string;
-  bookmarks?: Bookmark[];
-  highlights?: Highlight[];
-  prefs?: UserPreferences;
-}
-
-/**
- * Merges a previously exported file into local storage. Merge, never replace:
- * importing an older backup must not delete marks made since.
+/* BACKUP AND RESTORE OF A READER'S MARKS WAS HERE, AND IT WAS UNREACHABLE.
+ *
+ * `buildReaderState`, `exportReaderState`, `ImportResult` and
+ * `importReaderState` were complete and correct — a dated JSON download and a
+ * merge-never-replace import — and nothing in the app ever called any of them.
+ * No control anywhere offered either one.
+ *
+ * Removed rather than left standing, and the choice is arguable. Unreachable
+ * backup is worse than no backup: to anyone reading this file it looks as
+ * though the marks are already safe, and they are not — the note above says
+ * plainly that localStorage is the only home these have and that it is not
+ * durable.
+ *
+ * IF IT COMES BACK it needs a control, not just the functions: two rows in the
+ * settings drawer beside "Preferences saved locally", which is the one line in
+ * the app that already tells a reader where their marks live. The merge
+ * semantics were right and are worth recovering from git rather than rewriting.
  */
-export function importReaderState(raw: string): ImportResult {
-  let parsed: unknown;
-  try {
-    parsed = JSON.parse(raw);
-  } catch {
-    return { ok: false, message: 'Not a readable JSON file.' };
-  }
-
-  const data = parsed as Partial<ReaderStateExport>;
-  if (!data || data.format !== 'media-as-universe/reader-state') {
-    return { ok: false, message: 'Not a Media as Universe marks file.' };
-  }
-
-  const incomingBookmarks = (Array.isArray(data.bookmarks) ? data.bookmarks : []).map(withAnchor) as Bookmark[];
-  const incomingHighlights = (Array.isArray(data.highlights) ? data.highlights : []).map(withAnchor) as Highlight[];
-
-  const byId = <T extends { id: string }>(existing: T[], incoming: T[]): T[] => {
-    const seen = new Set(existing.map((x) => x.id));
-    return [...existing, ...incoming.filter((x) => x && x.id && !seen.has(x.id))];
-  };
-
-  const bookmarks = byId(loadBookmarks(), incomingBookmarks);
-  const highlights = byId(loadHighlights(), incomingHighlights);
-  const prefs = data.prefs ? { ...loadPreferences(), ...data.prefs } : loadPreferences();
-
-  saveBookmarks(bookmarks);
-  saveHighlights(highlights);
-  savePreferences(prefs);
-
-  return {
-    ok: true,
-    message: `Restored ${incomingBookmarks.length} marks and ${incomingHighlights.length} notes.`,
-    bookmarks,
-    highlights,
-    prefs
-  };
-}
 
 /**
  * Whether this reader has ever been into the book.
@@ -243,6 +171,44 @@ export function importReaderState(raw: string): ImportResult {
  * also reports zero. The two are only distinguishable by whether anything was
  * ever written, so that is what this asks.
  */
+const STORAGE_KEY_MAP_GESTURE = 'media_universe_map_gesture_v1';
+
+/**
+ * Whether this reader has already moved the map.
+ *
+ * The map zooms and pans and never said so. There is no scrollbar to imply it,
+ * no handle to grab, and the organism fills its frame at rest — so a reader who
+ * does not idly try a pinch has no way to learn that the thing is navigable.
+ * That is the one place on this surface where a reader can simply fail.
+ *
+ * Binary and one-way, the same shape as the visited set and for the same
+ * reason: it is a thing that has happened, not a score. It is written the first
+ * time a pan or a pinch actually succeeds — not on a tap, not on a hover —
+ * because the hint has done its job precisely when the gesture has worked once,
+ * and never needs to appear again for this reader.
+ */
+export function loadMapGestureLearned(): boolean {
+  try {
+    return localStorage.getItem(STORAGE_KEY_MAP_GESTURE) === '1';
+  } catch (e) {
+    /* A reader with storage blocked sees the hint every visit, which is the
+       safe failure: a hint too often is an irritation, a hint never is a
+       surface nobody can use. */
+    return false;
+  }
+}
+
+/** Records that the map has been moved. Returns true if this was the first time. */
+export function markMapGestureLearned(): boolean {
+  try {
+    if (localStorage.getItem(STORAGE_KEY_MAP_GESTURE) === '1') return false;
+    localStorage.setItem(STORAGE_KEY_MAP_GESTURE, '1');
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
 const STORAGE_KEY_VISITED = 'media_universe_visited_chapters_v1';
 
 /**
@@ -270,6 +236,42 @@ export function markChapterVisited(chapterId: string): string[] | null {
     if (seen.includes(chapterId)) return null;
     const next = [...seen, chapterId];
     localStorage.setItem(STORAGE_KEY_VISITED, JSON.stringify(next));
+    return next;
+  } catch (e) {
+    return null;
+  }
+}
+
+const STORAGE_KEY_VISITED_PAGES = 'media_universe_visited_pages_v1';
+
+/**
+ * The sheets this reader has opened.
+ *
+ * The same shape, and the same argument, as the chapters above: a set of names,
+ * never a count, never an ordering, and it never decreases. The map draws it as
+ * a cell that has been inside, so the organism carries a record of where the
+ * reader has been without anywhere on it filling up. A percentage or a bar
+ * would turn the drawing into a completion meter, which is the mechanic Chapter
+ * I diagnoses — the finer granularity makes that temptation stronger, not
+ * weaker, so it is worth saying twice.
+ */
+export function loadVisitedPages(): string[] {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY_VISITED_PAGES);
+    const parsed = raw ? JSON.parse(raw) : [];
+    return Array.isArray(parsed) ? parsed.filter(x => typeof x === 'string') : [];
+  } catch (e) {
+    return [];
+  }
+}
+
+/** Records a sheet as visited. Returns the new set, or null if unchanged. */
+export function markPageVisited(key: string): string[] | null {
+  try {
+    const seen = loadVisitedPages();
+    if (seen.includes(key)) return null;
+    const next = [...seen, key];
+    localStorage.setItem(STORAGE_KEY_VISITED_PAGES, JSON.stringify(next));
     return next;
   } catch (e) {
     return null;

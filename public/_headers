@@ -1,0 +1,44 @@
+# Netlify cache policy.
+#
+# Netlify's default for every file is `public, max-age=0, must-revalidate`,
+# which means a returning reader pays a conditional request for the entry, the
+# vendor chunk, the stylesheet, the map chunk and all eight font subsets before
+# a single byte of the dossier is on screen. The responses are 304s, so the
+# bytes are free — the round trips are not, and on a slow link they are most of
+# what "slow" means here.
+#
+# This lives in public/_headers rather than netlify.toml on purpose. Vite copies
+# public/ verbatim into whichever output directory the build was pointed at, so
+# the policy travels with `npm run build` (dist/) and `npm run build:web`
+# (build/) alike, and nothing here can contradict the build command and publish
+# directory already configured in the Netlify UI.
+
+# Vite content-hashes everything in /assets, so a changed file is a changed
+# name. These can never go stale: a deploy that edits the manuscript emits
+# index-<newhash>.js and the old entry is simply never asked for again.
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# The faces are NOT content-hashed — they are static files under public/fonts
+# and keep their names across deploys. A year is right for a typeface that has
+# not changed since it was subset, but it does mean a font REPLACED in place
+# would be invisible to anyone who already has it. If a face is ever re-subset
+# or swapped, rename the file; do not rely on this header expiring.
+/fonts/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# ~29MB of ambient music, deliberately excluded from the service worker cache
+# (see sw.js) so it can never evict the dossier. That makes the HTTP cache the
+# only thing standing between a second listen and a second 14MB download.
+/audio/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# The shell names the current hashes, so it is the one file that must never be
+# served stale — a cached index.html would point at deleted chunks.
+/index.html
+  Cache-Control: public, max-age=0, must-revalidate
+
+# And the worker itself even more so: a stale sw.js pins an old CACHE_VERSION
+# and the app stops updating for that reader entirely.
+/sw.js
+  Cache-Control: public, max-age=0, must-revalidate

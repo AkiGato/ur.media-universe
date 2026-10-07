@@ -7,8 +7,14 @@
     <meta name="description" content="U.R. Strategic Dossier — an antifragile framework for communication design in the attention economy. A calm, offline-capable reader." />
     <meta name="color-scheme" content="dark light" />
     <meta name="theme-color" content="#000000" />
-    <!-- Typeface is self-hosted (see src/index.css); no third-party font connection. -->
-    <link rel="preload" as="font" type="font/woff2" href="/fonts/plus-jakarta-sans-latin.woff2" crossorigin>
+    <!-- Typefaces are self-hosted (see src/index.css); no third-party font connection.
+         Only the body face is preloaded, and only its latin subset: it is the one
+         file every sheet needs. Newsreader sets the titles, and the -ext subsets
+         are conditional on the text, so both stay on the ordinary @font-face path.
+         This href has to name a file that exists in public/fonts. It pointed at a
+         deleted Plus Jakarta subset for a while, which spent a request on every
+         load and left the face actually in use unpreloaded. -->
+    <link rel="preload" as="font" type="font/woff2" href="/fonts/ibm-plex-sans-var-latin.woff2" crossorigin>
 
     <!--
       First paint, before a single byte of JavaScript.
@@ -41,17 +47,61 @@
         100% { opacity: .34; transform: scale(1); }
       }
       #boot g { transform-origin: 50% 50%; animation: boot-breathe 4.6s ease-in-out infinite; }
-      @media (prefers-reduced-motion: reduce) { #boot g { animation: none; opacity: .6; } }
+
+      /*
+       * THE CELL ARRIVES AS PARTICLES, AND THEN IS MADE OF THEM.
+       *
+       * Two one-shot animations on one stroke, on different properties, in
+       * sequence. First the process grows: a dash longer than any path here,
+       * swept in from full offset to none, which is the filament arriving
+       * rather than a light traveling along it — the distinction LC-02 turns
+       * on, and the reason this is allowed to be a dash animation at all. It
+       * ends at zero and never repeats.
+       *
+       * Then it resolves. At the moment the growth finishes, the dash pattern
+       * jumps to a near-zero dash against a gap, which on the round cap this
+       * drawing already uses renders as a chain of discs — the same trick the
+       * presentation uses to make its whole tissue particulate, and free for
+       * the same reason: it is one path either way, no new elements and nothing
+       * animating afterwards.
+       *
+       * The delays run outward from the soma, so the cell assembles from its
+       * centre rather than appearing at once. Nothing here is a fill and
+       * nothing is straight, so the splash is under the same grammar as the
+       * drawing it hands over to.
+       */
+      @keyframes boot-grow { from { stroke-dashoffset: 60; } to { stroke-dashoffset: 0; } }
+      @keyframes boot-grain {
+        0%, 58%   { stroke-dasharray: 60; }
+        59%, 100% { stroke-dasharray: 0.01 1.9; }
+      }
+      @keyframes boot-tip { from { opacity: 0; } to { opacity: 1; } }
+      #boot path {
+        stroke-dasharray: 60;
+        stroke-dashoffset: 60;
+        animation:
+          boot-grow 1.15s cubic-bezier(0.45, 0.05, 0.3, 1) var(--d, 0s) both,
+          boot-grain 1.9s linear var(--d, 0s) both;
+      }
+      #boot circle { opacity: 0; animation: boot-tip .5s ease-out var(--t, 1.2s) both; }
+      #boot .fine path { animation-duration: .95s, 1.6s; }
+
+      @media (prefers-reduced-motion: reduce) {
+        #boot g { animation: none; opacity: .6; }
+        /* no assembly, no growth: the cell is simply already made of points */
+        #boot path { animation: none; stroke-dasharray: 0.01 1.9; stroke-dashoffset: 0; }
+        #boot circle { animation: none; opacity: 1; }
+      }
     </style>
   </head>
   <body>
     <div id="boot" aria-hidden="true">
       <svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-linecap="round">
         <g stroke-width="1">
-          <path d="M50 50 Q57 40 62 27" /><path d="M50 50 Q60 52 74 48" />
-          <path d="M50 50 Q57 62 68 71" /><path d="M50 50 Q48 62 43 76" />
-          <path d="M50 50 Q38 57 26 60" /><path d="M50 50 Q40 44 28 36" />
-          <path d="M50 50 Q49 38 46 24" /><path d="M50 50 Q63 45 78 34" />
+          <path d="M50 50 Q57 40 62 27" style="--d:.02s" /><path d="M50 50 Q60 52 74 48" style="--d:.06s" />
+          <path d="M50 50 Q57 62 68 71" style="--d:.10s" /><path d="M50 50 Q48 62 43 76" style="--d:.14s" />
+          <path d="M50 50 Q38 57 26 60" style="--d:.18s" /><path d="M50 50 Q40 44 28 36" style="--d:.22s" />
+          <path d="M50 50 Q49 38 46 24" style="--d:.26s" /><path d="M50 50 Q63 45 78 34" style="--d:.30s" />
           <circle cx="62" cy="27" r="1.4" fill="currentColor" stroke="none" />
           <circle cx="74" cy="48" r="1.4" fill="currentColor" stroke="none" />
           <circle cx="68" cy="71" r="1.4" fill="currentColor" stroke="none" />

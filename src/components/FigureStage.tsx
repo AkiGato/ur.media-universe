@@ -2,28 +2,12 @@ import React, { Suspense, lazy } from 'react';
 import { createPortal } from 'react-dom';
 import { BookPage, FIGURES, figureCarriesItsOwnApplication } from '../data/pageModel';
 import { useOverlayFocus } from '../utils/a11y';
-import { ArrowLeft } from 'lucide-react';
+import { useDismiss } from '../utils/dismissStack';
+import { ArrowLeft } from './organic/Icons';
 import { Soma } from './organic/Organic';
 import { FigureWorldContext } from './figures/FigurePrimitives';
 
-const MediaUniverseDiagram = lazy(() =>
-  import('./diagrams/MediaUniverseDiagram').then((m) => ({ default: m.MediaUniverseDiagram }))
-);
-const BaitTaxonomyDiagram = lazy(() =>
-  import('./diagrams/BaitTaxonomyDiagram').then((m) => ({ default: m.BaitTaxonomyDiagram }))
-);
-const FragilityIndexDiagram = lazy(() =>
-  import('./diagrams/FragilityIndexDiagram').then((m) => ({ default: m.FragilityIndexDiagram }))
-);
-const CausalTaxonomyDiagram = lazy(() =>
-  import('./diagrams/CausalTaxonomyDiagram').then((m) => ({ default: m.CausalTaxonomyDiagram }))
-);
-const CognitivePosturesDiagram = lazy(() =>
-  import('./diagrams/CognitivePosturesDiagram').then((m) => ({ default: m.CognitivePosturesDiagram }))
-);
-const AntiEngagementDiagram = lazy(() =>
-  import('./diagrams/AntiEngagementDiagram').then((m) => ({ default: m.AntiEngagementDiagram }))
-);
+import { DIAGRAMS } from './diagrams/registry';
 
 /** The worlds, in chapter order — the list is `FIGURES` in pageModel, and the
     count follows it rather than being restated here. */
@@ -103,19 +87,13 @@ export const FigureStage: React.FC<{
   onToFigure: (f: BookPage['diagramType']) => void;
 }> = ({ figure, title, isDark, onClose, onToMap, onToPractice, onToFigure }) => {
   const stageRef = useOverlayFocus<HTMLDivElement>(true);
+  const StageDiagram = figure ? DIAGRAMS[figure] : null;
 
-  React.useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        // stop App's own Escape handler from also sending us back to the map
-        e.preventDefault();
-        e.stopPropagation();
-        onClose();
-      }
-    };
-    window.addEventListener('keydown', onKey, true);
-    return () => window.removeEventListener('keydown', onKey, true);
-  }, [onClose]);
+  /* Escape belongs to the topmost surface, and this is one — see dismissStack.
+     The listener this replaced called stopPropagation to keep App from also
+     leaving for the map, which never worked: both listeners were on window, and
+     propagation is about targets. */
+  useDismiss(true, onClose);
 
   /*
    * A backward gesture leaves the world.
@@ -190,7 +168,7 @@ export const FigureStage: React.FC<{
       role="dialog"
       aria-modal="true"
       aria-label={`Figure: ${title}`}
-      className={`surface fixed inset-0 z-[60] flex flex-col ${
+      className={`surface fig-ground-black fixed inset-0 z-[60] flex flex-col ${
         'bg-black text-white'
       }`}
     >
@@ -218,8 +196,18 @@ export const FigureStage: React.FC<{
           does, so the gesture and the mark are one behaviour with two doors. */}
       {/* Three columns rather than justify-between: the archive sits at the true
           centre of the bar whatever the two sides happen to weigh, and the
-          middle column collapses to nothing when it hides on a narrow screen. */}
-      <div className="flex-shrink-0 pt-3 px-5 sm:px-8 grid grid-cols-[1fr_auto_1fr] items-center gap-3">
+          middle column collapses to nothing when it hides on a narrow screen.
+
+          The third column only claims its half where there is something in it.
+          It holds the Esc hint, which is `hidden sm:inline` — but a `1fr` track
+          is paid for whether or not its content is displayed, so below `sm` the
+          bar was 128px of buds against 128px of nothing. Measured at 320px:
+          "Back" drew 17.5px of a 29px word and "The map" 34.5px of 50px, so the
+          two ways out of the figure read "B…" and "THE …". As `auto` the empty
+          track is 0 and the left column takes all 256px, which is where the
+          centring the three columns exist for stops mattering anyway — the
+          archive between them is hidden at the same breakpoint. */}
+      <div className="flex-shrink-0 pt-3 px-5 sm:px-8 grid grid-cols-[1fr_auto_auto] sm:grid-cols-[1fr_auto_1fr] items-center gap-3">
         <div className="flex items-center gap-1.5 sm:gap-3 min-w-0">
           <Passage onClick={onClose} label="Back" hint="Back to the page you came from" arrow />
           <Passage onClick={onToMap} label="The map" hint="Return to the orientation map" />
@@ -238,14 +226,14 @@ export const FigureStage: React.FC<{
                 hint={'Previous figure — ' + prev.short} />
               {/* TY-03: caps here are tracked 0.2em like every other label on this bar.
                   TY-05: the name appears nowhere else on the stage. */}
-              <span className="text-[9px] font-light uppercase tracking-[0.2em] opacity-30">Figure Archive</span>
+              <span className="text-[9px] font-light uppercase tracking-[0.2em] opacity-25">Figure Archive</span>
               <Passage onClick={() => onToFigure(next.type)} label={next.short + ' ›'}
                 hint={'Next figure — ' + next.short} />
             </div>
           );
         })()}
         </div>
-        <span className="text-[9px] font-light uppercase tracking-[0.2em] opacity-30 hidden sm:inline justify-self-end"
+        <span className="text-[9px] font-light uppercase tracking-[0.2em] opacity-25 hidden sm:inline justify-self-end"
           aria-hidden="true">
           Esc or swipe back
         </span>
@@ -255,7 +243,20 @@ export const FigureStage: React.FC<{
           and every figure drawn under it drops its caption, tag, veins and foot
           rather than restating on this surface what the surface already says. */}
       <FigureWorldContext.Provider value={true}>
-      <div className="flex-1 min-h-0 w-full flex items-center justify-center p-3 sm:p-6">
+      {/* CENTRED WHEN IT FITS, TOP-ALIGNED WHEN IT DOES NOT.
+
+          This was `items-center`, and flex centring does not clip — it pushes.
+          A figure taller than the stage had its top driven ABOVE the frame with
+          no way to reach it: measured at 540px, the Two Trajectories face
+          selector sat at y = -45, so a narrow reader could see whichever face
+          happened to rest and could not reach the other two. Two thirds of that
+          figure was unreachable, and nothing on screen said so.
+
+          `items-start` with `my-auto` on the child is the pair that behaves:
+          the auto margins still centre a short figure, and a tall one starts at
+          the top and scrolls instead of overflowing upward. `soft-scroll` keeps
+          it inside its own column, which is what LY-02 asks for. */}
+      <div className="flex-1 min-h-0 w-full flex items-start justify-center overflow-y-auto soft-scroll p-3 sm:p-6 [&>*]:my-auto">
         <Suspense
           fallback={
             <div className="flex items-center gap-3 opacity-40" role="status" aria-live="polite">
@@ -264,12 +265,11 @@ export const FigureStage: React.FC<{
             </div>
           }
         >
-          {figure === 'scale-mismatch' && <MediaUniverseDiagram isDark={isDark} />}
-          {figure === 'media-universe' && <CognitivePosturesDiagram isDark={isDark} />}
-          {figure === 'bait-taxonomy' && <BaitTaxonomyDiagram isDark={isDark} />}
-          {figure === 'fragility-index' && <FragilityIndexDiagram isDark={isDark} />}
-          {figure === 'causal-taxonomy' && <CausalTaxonomyDiagram isDark={isDark} />}
-          {figure === 'neuro-aesthetic' && <AntiEngagementDiagram isDark={isDark} />}
+          {/* One table, shared with the page (see diagrams/registry.ts). This
+              was a chain of `{figure === '...' && <X />}`, which has no
+              exhaustiveness: a figure type added without a line here rendered
+              NOTHING and compiled clean. */}
+          {StageDiagram && <StageDiagram isDark={isDark} />}
         </Suspense>
       </div>
       </FigureWorldContext.Provider>

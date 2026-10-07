@@ -192,7 +192,7 @@ export const CausalTaxonomyDemo: React.FC = () => {
     'w-full bg-transparent border-0 border-b outline-none rounded-none ' +
     'text-[12px] font-light placeholder-current/30 py-1.5';
   const control =
-    'text-[9px] font-light uppercase tracking-[0.2em] opacity-65 hover:opacity-90 outline-none rounded-none';
+    'text-[9px] font-light uppercase tracking-[0.2em] opacity-70 hover:opacity-100 outline-none rounded-none';
 
   const busy = phase === 'reading' || phase === 'researching';
 
@@ -219,7 +219,7 @@ export const CausalTaxonomyDemo: React.FC = () => {
               reading strip only shows one at a time. */}
           {sources.length > 0 && (
             <div className="max-w-2xl w-full px-4">
-              <div className="text-[9px] font-light uppercase tracking-[0.2em] opacity-55 mb-1.5">
+              <div className="text-[9px] font-light uppercase tracking-[0.2em] opacity-45 mb-1.5">
                 Established at
               </div>
               <ul className="space-y-1">
@@ -238,7 +238,7 @@ export const CausalTaxonomyDemo: React.FC = () => {
           )}
 
           {note && (
-            <p className="max-w-2xl text-center text-[9px] font-light uppercase tracking-[0.2em] opacity-55 leading-relaxed px-3">
+            <p className="max-w-2xl text-center text-[9px] font-light uppercase tracking-[0.2em] opacity-45 leading-relaxed px-3">
               {note}
             </p>
           )}
@@ -302,7 +302,7 @@ export const CausalTaxonomyDemo: React.FC = () => {
                 {haveKey() ? 'Researching is on · edit key' : 'Add a key to research the structure'}
               </button>
               {haveKey() && (
-                <span className="text-[9px] font-light uppercase tracking-[0.2em] opacity-55">
+                <span className="text-[9px] font-light uppercase tracking-[0.2em] opacity-45">
                   economic · historical answerable
                 </span>
               )}
@@ -319,7 +319,7 @@ export const CausalTaxonomyDemo: React.FC = () => {
                   spellCheck={false}
                   className={field}
                 />
-                <p className="mt-2 text-[9px] font-light leading-relaxed opacity-55">
+                <p className="mt-2 text-[9px] font-light leading-relaxed opacity-45">
                   Free from Google AI Studio. Kept in this browser, sent to Google and
                   nowhere else — there is no server here to send it to. Clear the field
                   to remove it. Without a key the lexicon still reads the text; the
@@ -329,11 +329,11 @@ export const CausalTaxonomyDemo: React.FC = () => {
             )}
           </div>
 
-          {note && <p className="text-[9px] font-light leading-relaxed opacity-55">{note}</p>}
+          {note && <p className="text-[9px] font-light leading-relaxed opacity-45">{note}</p>}
 
           {/* What it cannot do, said before it is tried rather than after it
               fails. The closed platforms are most of what people will paste. */}
-          <p className="text-[9px] font-light leading-relaxed opacity-55 border-t pt-3">
+          <p className="text-[9px] font-light leading-relaxed opacity-45 border-t pt-3">
             Ordinary articles and blogs are read through a free extraction proxy, so the
             link is sent to that service. YouTube gives up only a title. X, Instagram,
             TikTok, Facebook, LinkedIn and paywalled news serve nothing to a signed-out

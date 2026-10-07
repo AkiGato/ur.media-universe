@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { BOOK_PAGES, BookPage, chapterBounds } from '../data/pageModel';
+import { ChevronLeft, ChevronRight } from './organic/Icons';
+import { BOOK_PAGES, BookPage, chapterBounds, takesWholeSheet } from '../data/pageModel';
 import { UserPreferences, Highlight } from '../data/userStore';
 import { PageRenderer } from './PageRenderer';
 import { Vein, ProgressStrand } from './organic/Organic';
@@ -20,8 +20,10 @@ interface BookSpreadProps {
   /** walk one step back along that trail */
   onBack: () => void;
   /** leave for a page while remembering the way back through it */
-  onJumpWithTrail: (target: number, trail: number[]) => void;
   pendingFigure?: BookPage["diagramType"] | null;
+  /** an instrument asked for from outside — opened by the sheet that owns it */
+  pendingTool?: string | null;
+  onToolOpened?: () => void;
   onFigureOpened?: () => void;
 }
 
@@ -34,8 +36,9 @@ export const BookSpread: React.FC<BookSpreadProps> = ({
   onLeaveToMap,
   backTrail,
   onBack,
-  onJumpWithTrail,
   pendingFigure,
+  pendingTool,
+  onToolOpened,
   onFigureOpened
 }) => {
   const [direction, setDirection] = useState<'next' | 'prev'>('next');
@@ -103,7 +106,8 @@ export const BookSpread: React.FC<BookSpreadProps> = ({
    * partner was rendered alone.
    */
   const groups = React.useMemo<number[][]>(() => {
-    const solo = (i: number) => i === 0 || BOOK_PAGES[i]?.type === 'diagram';
+    /* The cover, every schematic, and the ruleset library — see takesWholeSheet. */
+    const solo = (i: number) => i === 0 || takesWholeSheet(BOOK_PAGES[i]);
     const out: number[][] = [];
     let i = 0;
     while (i < totalPages) {
@@ -132,10 +136,56 @@ export const BookSpread: React.FC<BookSpreadProps> = ({
   const chapterSpan = chapterBounds(leftPageIndex);
   const rightPage: BookPage | null = rightPageIndex !== null ? BOOK_PAGES[rightPageIndex] || null : null;
 
+  /**
+   * A fade has two halves, and only one of them was here.
+   *
+   * `turn-fade` animates the ARRIVING sheet from transparent to present. The
+   * leaving sheet had no exit at all: React swapped the content on the same
+   * frame the class replayed, so the old page vanished on a cut and the new one
+   * faded in over the ground. Asked for: fade out and fade in.
+   *
+   * So the turn is deferred by exactly the length of the out-phase. The sheet
+   * goes to transparent, the page changes while nothing is legible, and the
+   * arriving sheet plays its own half. 110ms each way is 220ms end to end,
+   * inside the 0.2–0.28s MO-03 allows a page turn — the reader waits no longer
+   * than before, they simply see the first half of what was already happening.
+   *
+   * Only for the fade. The tide, the slide and the settle carry their own exit
+   * in their keyframes, and reduced motion takes the cut, because an engine
+   * that has been told not to animate must not be handed a timer instead.
+   *
+   * The out-phase swaps the CLASS rather than setting an inline opacity. The
+   * arriving keyframe fills `both`, so between turns it sits frozen on this
+   * element holding opacity at 1, and a filled animation outranks an inline
+   * style — an inline `opacity: 0` measured as no change at all for the whole
+   * out-phase. `.turn-fade-out` replaces it instead, and the applied animation
+   * is the one that runs.
+   */
+  const [fadingOut, setFadingOut] = React.useState(false);
+  const fadeTimer = React.useRef<number | null>(null);
+  const FADE_OUT_MS = 110;
+
+  React.useEffect(() => () => {
+    if (fadeTimer.current !== null) clearTimeout(fadeTimer.current);
+  }, []);
+
+  const commitTurn = React.useCallback((go: () => void) => {
+    const reduced = typeof matchMedia === 'function'
+      && matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (prefs.animationStyle !== 'fade' || reduced) { go(); return; }
+    if (fadeTimer.current !== null) clearTimeout(fadeTimer.current);
+    setFadingOut(true);
+    fadeTimer.current = window.setTimeout(() => {
+      fadeTimer.current = null;
+      setFadingOut(false);
+      go();
+    }, FADE_OUT_MS);
+  }, [prefs.animationStyle]);
+
   const handlePrev = () => {
     if (groupIdx <= 0) return;
     setDirection('prev');
-    onPageChange(groups[groupIdx - 1][0]);
+    commitTurn(() => onPageChange(groups[groupIdx - 1][0]));
     playPageTurnSound(prefs.soundEnabled);
   };
 
@@ -153,7 +203,7 @@ export const BookSpread: React.FC<BookSpreadProps> = ({
   const handleBackOrPrev = () => {
     if (backTrail.length > 0) {
       setDirection('prev');
-      onBack();
+      commitTurn(onBack);
       playPageTurnSound(prefs.soundEnabled);
       return;
     }
@@ -163,7 +213,7 @@ export const BookSpread: React.FC<BookSpreadProps> = ({
   const handleNext = () => {
     if (groupIdx >= groups.length - 1) return;
     setDirection('next');
-    onPageChange(groups[groupIdx + 1][0]);
+    commitTurn(() => onPageChange(groups[groupIdx + 1][0]));
     playPageTurnSound(prefs.soundEnabled);
   };
 
@@ -338,7 +388,7 @@ export const BookSpread: React.FC<BookSpreadProps> = ({
               if (dx < 0) handleNext(); else handleBackOrPrev();
             }}
             style={{ '--turn-dir': direction === 'next' ? 1 : -1 } as React.CSSProperties}
-            className={`${turnClass} w-full h-full flex overflow-hidden transition-colors duration-500 rounded-none ${
+            className={`${fadingOut ? 'turn-fade-out' : turnClass} w-full h-full flex overflow-hidden transition-colors duration-500 rounded-none ${
               isDark ? 'text-white' : 'text-black'
             }`}
           >
@@ -362,8 +412,9 @@ export const BookSpread: React.FC<BookSpreadProps> = ({
                 onLeaveToMap={onLeaveToMap}
                 backTrail={backTrail}
                 onBack={onBack}
-                onJumpWithTrail={onJumpWithTrail}
                 pendingFigure={pendingFigure}
+                pendingTool={pendingTool}
+                onToolOpened={onToolOpened}
                 onFigureOpened={onFigureOpened}
               />
             </div>
@@ -376,6 +427,16 @@ export const BookSpread: React.FC<BookSpreadProps> = ({
                   <Vein orientation="v" opacity={0.4} phase={5.2} />
                 </div>
                 <div className="flex-1 min-w-0 h-full relative hidden lg:block overflow-hidden rounded-none">
+                  {/* The right page takes the same pending requests as the left.
+                      It did not, and a figure or an instrument asked for from
+                      the index simply never opened when its sheet happened to
+                      fall on this side of the spread — which is half of them,
+                      and is why §5.6's instrument could be reached from its own
+                      sheet but not from the index. Both renderers guard on
+                      matching their OWN page, so only the one actually carrying
+                      the thing ever acts; handing the request to both is how it
+                      stops depending on which side of the gutter a section
+                      landed after the last repagination. */}
                   <PageRenderer
                     page={rightPage}
                     prefs={prefs}
@@ -385,7 +446,10 @@ export const BookSpread: React.FC<BookSpreadProps> = ({
                     onLeaveToMap={onLeaveToMap}
                     backTrail={backTrail}
                     onBack={onBack}
-                    onJumpWithTrail={onJumpWithTrail}
+                        pendingFigure={pendingFigure}
+                    pendingTool={pendingTool}
+                    onToolOpened={onToolOpened}
+                    onFigureOpened={onFigureOpened}
                   />
                 </div>
               </>
@@ -432,10 +496,22 @@ export const BookSpread: React.FC<BookSpreadProps> = ({
                   It is the chapter's own name, never the section's: the section
                   is named at the top of the sheet that starts it, and repeating
                   that here would be the same string twice on one frame. */}
-              <div className="flex-1 max-w-md mx-auto px-2 flex flex-col items-center gap-1"
+              {/* `min-w-0`, and the page-turn controls depend on it. A flex
+                  item's automatic minimum is its content's minimum, and the
+                  running head below is `truncate` — whose `overflow: hidden`
+                  sits on the span, not on this column, so it never shrinks this
+                  box. Measured at 375px: the column took the full 448px of nowrap
+                  title inside a 343px bar and carried Next out to x=540, 165px
+                  past the right edge of the phone — unreachable, on a surface
+                  where the viewport does not scroll (LY-02) and the swipe is
+                  the only other way to turn (LY-03). With the minimum released
+                  the column folds to 223px and the button lands at 359. The
+                  bare strand overflowed too, at 250px against 223: 11px on a
+                  sheet carrying no running head at all. */}
+              <div className="flex-1 min-w-0 max-w-md mx-auto px-2 flex flex-col items-center gap-1"
                 aria-label={`Page ${leftPageIndex + 1} of ${totalPages}`}>
                 {leftPage.chapterTitle && (
-                  <span className="text-[9px] font-light uppercase tracking-[0.2em] opacity-30 truncate max-w-full leading-none">
+                  <span className="text-[9px] font-light uppercase tracking-[0.2em] opacity-25 truncate max-w-full leading-none">
                     {leftPage.chapterTitle}
                   </span>
                 )}

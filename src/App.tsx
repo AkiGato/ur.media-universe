@@ -1,5 +1,9 @@
-import { useState, useEffect, lazy, Suspense } from 'react';
-import { BOOK_PAGES, BookPage, firstPageOfDiagram } from './data/pageModel';
+import { useState, useEffect, useSyncExternalStore, lazy, Suspense } from 'react';
+import {
+  sheetKey, BOOK_PAGES, BookPage, firstPageOfDiagram,
+  subscribePagination, getPaginationVersion
+} from './data/pageModel';
+import { useSheetBudget } from './utils/sheetBudget';
 import { anchorForPage, pageForAnchor } from './data/anchors';
 import { 
   loadPreferences, 
@@ -11,7 +15,9 @@ import {
   loadLastAnchor,
   saveLastPage,
   loadVisitedChapters,
-  markChapterVisited, 
+  markChapterVisited,
+  loadVisitedPages,
+  markPageVisited, 
   hasReadBefore, 
   Bookmark, 
   Highlight, 
@@ -19,7 +25,9 @@ import {
 } from './data/userStore';
 import { HeaderNav } from './components/HeaderNav';
 import { Soma } from './components/organic/Organic';
-import { TableOfContentsDrawer } from './components/TableOfContentsDrawer';
+import { TableOfContentsDrawer, TocTab } from './components/TableOfContentsDrawer';
+import { IntroScreen } from './components/IntroScreen';
+import { dismissDepth } from './utils/dismissStack';
 import { SettingsDrawer } from './components/SettingsDrawer';
 import { SearchModal } from './components/SearchModal';
 import { setAmbientMusic, bindAmbientMusicToVisibility } from './utils/ambientMusic';
@@ -85,7 +93,7 @@ function MapPending() {
   return (
     <div className="w-full h-full flex flex-col items-center justify-center" role="status" aria-live="polite">
       <svg viewBox="0 0 100 100" width="132" height="132" fill="none"
-        stroke="currentColor" strokeLinecap="round" className="ambient-breathe"
+        stroke="currentColor" strokeLinecap="round" className="ambient-breathe pending-cell"
         style={{ overflow: 'visible' }} aria-hidden="true">
         {/* the splash's eight processes, exactly */}
         <g strokeWidth="1" opacity="0.85">
@@ -95,7 +103,7 @@ function MapPending() {
           <path d="M50 50 Q49 38 46 24" /><path d="M50 50 Q63 45 78 34" />
         </g>
         {/* the generation the splash could not afford: finer, forking on */}
-        <g strokeWidth="0.45" opacity="0.5">
+        <g strokeWidth="0.45" opacity="0.5" className="pending-fine">
           <path d="M62 27 Q66 21 65 14" /><path d="M62 27 Q68 24 73 19" />
           <path d="M74 48 Q82 46 88 49" /><path d="M74 48 Q80 52 84 58" />
           <path d="M68 71 Q73 77 72 84" /><path d="M68 71 Q75 72 81 77" />
@@ -116,7 +124,7 @@ function MapPending() {
         {/* the glow the tide passes through, as every soma carries */}
         <circle cx="50" cy="50" r="10" fill="currentColor" stroke="none" opacity="0.06" />
       </svg>
-      <span className="mt-4 text-[9px] font-light uppercase tracking-[0.2em] opacity-30">
+      <span className="mt-4 text-[9px] font-light uppercase tracking-[0.2em] opacity-25">
         Tissue settling
       </span>
     </div>
@@ -138,13 +146,43 @@ export default function App() {
   const [bookmarks, setBookmarks] = useState<Bookmark[]>(() => loadBookmarks());
   const [highlights, setHighlights] = useState<Highlight[]>(() => loadHighlights());
 
+  /* The entry screen, asked for as a surface the reader dismisses rather than
+     one that fades on a timer. It stands where the inlined boot mark hands over,
+     so it is up before the map has finished building and the reader is never
+     looking at a blank ground. Not remembered across visits: it was asked for as
+     a gate, and a gate that only appears once is a splash with extra steps. */
+  const [introOpen, setIntroOpen] = useState(true);
+
+  /*
+   * THE BOOK IS CUT FOR THIS FRAME, AND THE COUNT FOLLOWS THE CUT.
+   *
+   * LY-01 has never allowed a hard-coded page count, and now the count is not
+   * even fixed across frames: a phone holds less of a section per sheet than a
+   * desktop does, so it gets more sheets. Subscribing here is what makes the
+   * reader, the running head and the live region all read the SAME cut — a
+   * cached count would go on saying "of 47" on a frame that now has 61.
+   *
+   * Marks are unaffected by design: bookmarks, highlights and the saved
+   * position are anchors — a section and a paragraph — resolved to a sheet at
+   * read time, so a re-cut moves the page number and never the place.
+   */
+  useSyncExternalStore(subscribePagination, getPaginationVersion, getPaginationVersion);
+
   const [isTocOpen, setIsTocOpen] = useState(false);
+  /* Which folder the index opens on. The chrome has two controls that open this
+     one drawer — the index and the saved places — and each has to arrive at
+     the thing it names rather than at the drawer's last state. */
+  const [tocTab, setTocTab] = useState<TocTab>('contents');
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isOffline, setIsOffline] = useState(!navigator.onLine);
 
   // The Orrery is the front door: the app always opens on the map.
   const [view, setView] = useState<'orrery' | 'reader'>('orrery');
+
+  /* Measured once the reader is actually on screen: the cut is taken from real
+     prose in a real column, and there is none of either on the map. */
+  useSheetBudget([view]);
   // The reader surfaces out of the dive rather than cutting in. Cleared once
   // the emergence has played, so returning to a page later is not re-animated.
   const [arrivedByDive, setArrivedByDive] = useState(false);
@@ -179,6 +217,14 @@ export default function App() {
     savePreferences(updated);
   };
 
+  useEffect(() => {
+    if (prefs.accessibleReader) {
+      document.body.setAttribute('data-accessible', 'true');
+    } else {
+      document.body.removeAttribute('data-accessible');
+    }
+  }, [prefs.accessibleReader]);
+
   /**
    * The trail back out of an excursion.
    *
@@ -195,6 +241,25 @@ export default function App() {
   /* Chapters the reader has opened. The map draws this as memory — a cell that
      has been inside — and never as progress; see the nucleolus in Orrery. */
   const [visitedChapters, setVisitedChapters] = useState<string[]>(() => loadVisitedChapters());
+  const [visitedPages, setVisitedPages] = useState<string[]>(() => loadVisitedPages());
+
+  /*
+   * A sheet is remembered on arrival, by whatever route.
+   *
+   * This is an effect on the index rather than a line inside the page-turn
+   * handler, because turning a page is only one of the ways a reader arrives at
+   * one: the map enters directly, search jumps, the index drawer jumps, a
+   * figure's "see the application" jumps, the back-trail returns, and the very
+   * first sheet of a session is arrived at without any handler running at all.
+   * Marking where the reader IS catches every one of those; marking where they
+   * went catches whichever ones someone remembered to edit.
+   */
+  useEffect(() => {
+    const key = sheetKey(BOOK_PAGES[currentPageIndex]);
+    if (!key) return;
+    const next = markPageVisited(key);
+    if (next) setVisitedPages(next);
+  }, [currentPageIndex]);
 
   const handlePageChange = (newIdx: number) => {
     setCurrentPageIndex(newIdx);
@@ -205,13 +270,6 @@ export default function App() {
       const next = markChapterVisited(chapterId);
       if (next) setVisitedChapters(next);
     }
-  };
-
-  /** leave for a page while remembering the way back through it */
-  const jumpWithTrail = (target: number, trail: number[]) => {
-    setCurrentPageIndex(target);
-    saveLastPage(target);
-    setBackTrail(trail);
   };
 
   /** one step back along the trail; two steps is simply this twice */
@@ -248,6 +306,9 @@ export default function App() {
     }
   };
 
+  /* Removing from the list, rather than from the sheet the mark is on. The
+     header toggle can only unset the page the reader is standing on; the list
+     is where a mark made three chapters ago is actually let go of. */
   const handleRemoveBookmark = (id: string) => {
     const updated = bookmarks.filter(b => b.id !== id);
     setBookmarks(updated);
@@ -260,12 +321,6 @@ export default function App() {
       id: `hl-${Date.now()}`
     };
     const updated = [newHl, ...highlights];
-    setHighlights(updated);
-    saveHighlights(updated);
-  };
-
-  const handleRemoveHighlight = (id: string) => {
-    const updated = highlights.filter(h => h.id !== id);
     setHighlights(updated);
     saveHighlights(updated);
   };
@@ -284,6 +339,18 @@ export default function App() {
     handleSelectPage(firstPageOfDiagram(type));
     setPendingFigure(type);
   };
+
+  /* An instrument asked for from outside the reader.
+
+     The index's Application column used to raise this: a branch row carried a
+     chip for its instrument, and opening one turned to the sheet that specifies
+     it and let that sheet open it. Those chips were removed from the branch
+     rows, so nothing sets this any more — the state and its prop chain stay
+     because PageRenderer still consumes them, but the only route that filled it
+     is gone. Reachability of the instruments from the index is an open question
+     recorded in docs/OPEN.md, not something to answer by leaving a dead
+     function here. */
+  const [pendingTool, setPendingTool] = useState<string | null>(null);
 
   const handleSelectPage = (pageIndex: number) => {
     if (view === 'orrery') handleEnterFromMap(pageIndex);
@@ -331,8 +398,17 @@ export default function App() {
         return;
       }
 
-      // Esc dismisses the topmost overlay, then zen mode, then returns to the map
+      /* Escape, once every surface that owns one has had its turn.
+
+         A portalled surface — a figure world, an instrument, the evidence —
+         registers itself on the dismiss stack, and while any of them is open
+         this handler never runs: the stack's own listener takes the key and
+         stops it dead. So by the time control arrives here, nothing is open
+         that could be closed, and what is left is this app's own ladder. The
+         drawers stay on the ladder rather than on the stack because they are
+         App's own state and it can see all three of them from here. */
       if (e.key === 'Escape') {
+        if (dismissDepth() > 0) return;
         e.preventDefault();
         if (isSearchOpen) setIsSearchOpen(false);
         else if (isSettingsOpen) setIsSettingsOpen(false);
@@ -351,8 +427,8 @@ export default function App() {
      argument it makes is about a body, and Chapter II — the fragile market — is
      the first cool one. Anything with no chapter emits neutral white. */
   const lumeRegister = ((): 'ember' | 'cyanotype' | undefined => {
-    /* Only prose pages carry a chapterId — the schematics, the case studies and
-       the ruleset pages do not. Reading the current page alone therefore made the
+    /* Only prose pages carry a chapterId — the schematics and the ruleset pages
+       do not. Reading the current page alone therefore made the
        light blink back to white on every diagram in the middle of a chapter, which
        is the one thing a temperature is supposed not to do. So the register comes
        from the nearest chapter at or before this page, and holds until the next
@@ -382,6 +458,10 @@ export default function App() {
       className={`app-shell w-full flex flex-col overflow-hidden font-sans transition-colors duration-150 rounded-none ${
         prefs.theme === 'dark' ? 'theme-dark bg-black text-white' : 'theme-light bg-white text-black'
       }`}>
+      {/* The way in. Rendered before everything else it covers, and holding no
+          state of its own that the map needs back. */}
+      {introOpen && <IntroScreen onEnter={() => setIntroOpen(false)} />}
+
       {/* Keyboard readers land on the map's ~6000 nodes first; this is the way past it. */}
       <a href="#reader-main" className="skip-link" onClick={() => setView('reader')}>
         Skip to the reader
@@ -405,6 +485,7 @@ export default function App() {
               isDark={prefs.theme === 'dark'}
               onOpenFigure={openFigure}
               visitedChapters={visitedChapters}
+              visitedPages={visitedPages}
               lastPage={currentPageIndex}
               onEnter={handleEnterFromMap}
               returning={returning}
@@ -412,6 +493,7 @@ export default function App() {
               onToggleSound={() => handleUpdatePrefs({ soundEnabled: !prefs.soundEnabled })}
               onOpenIndex={() => setIsTocOpen(true)}
               focusNodeId={mapFocus}
+              held={introOpen}
             />
           </Suspense>
         </div>
@@ -421,12 +503,13 @@ export default function App() {
       {view === 'reader' && !prefs.zenMode && (
         <HeaderNav
           prefs={prefs}
-          onOpenToc={() => setIsTocOpen(true)}
+          onOpenToc={() => { setTocTab('contents'); setIsTocOpen(true); }}
           onOpenSettings={() => setIsSettingsOpen(true)}
           onOpenSearch={() => setIsSearchOpen(true)}
           onOpenMap={leaveToMap}
           isBookmarked={isBookmarked}
           onToggleBookmark={handleToggleBookmark}
+          onOpenBookmarks={() => { setTocTab('saved'); setIsTocOpen(true); }}
           isOffline={isOffline}
         />
       )}
@@ -452,8 +535,9 @@ export default function App() {
               onLeaveToMap={leaveToMap}
               backTrail={backTrail}
               onBack={goBack}
-              onJumpWithTrail={jumpWithTrail}
               pendingFigure={pendingFigure}
+              pendingTool={pendingTool}
+              onToolOpened={() => setPendingTool(null)}
               onFigureOpened={() => setPendingFigure(null)}
             />
           </Suspense>
@@ -477,21 +561,15 @@ export default function App() {
 
       {/* Navigation Sidebar & Drawer */}
       <TableOfContentsDrawer
+        visitedPages={visitedPages}
         isOpen={isTocOpen}
         onClose={() => setIsTocOpen(false)}
         currentPageIndex={currentPageIndex}
         onSelectPage={handleSelectPage}
-        bookmarks={bookmarks}
-        highlights={highlights}
-        onRemoveBookmark={handleRemoveBookmark}
-        onRemoveHighlight={handleRemoveHighlight}
         prefs={prefs}
-        onOpenFigure={openFigure}
-        onImported={() => {
-          setBookmarks(loadBookmarks());
-          setHighlights(loadHighlights());
-          setPrefs(loadPreferences());
-        }}
+        bookmarks={bookmarks}
+        onRemoveBookmark={handleRemoveBookmark}
+        initialTab={tocTab}
       />
 
       {/* Reader Settings Drawer */}

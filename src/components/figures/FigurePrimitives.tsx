@@ -86,7 +86,52 @@ interface DendriteSeg {
 }
 
 
-function growDendrite(o: DendriteSeg, out: React.ReactNode[], k: string): void {
+/**
+ * One drawn piece of an arbor, in the coordinates it was grown in.
+ *
+ * WHY THE GEOMETRY IS NOW A VALUE. `growDendrite` computed an arbor and emitted
+ * React nodes in the same pass, so the only way to find out where an arbor runs
+ * was to render one and read the DOM back. That was fine while the SVG was the
+ * only consumer. It stops being fine the moment anything else needs the same
+ * courses — a particle field standing in for the tissue, a formation landing on
+ * it, a hit test — because each of those would otherwise carry its own copy of
+ * the growth rules, and two generators of one drawing drift the first time
+ * either is touched (`docs/OPEN.md` 29 names this as the change worth making).
+ *
+ * So growth answers in marks and rendering is a separate, dumb pass over them.
+ * Every number the renderer used to compute inline — the clamped stroke width,
+ * the bead radius, the boosted opacities — is computed once here and carried,
+ * so the two cannot disagree about what a generation looks like either.
+ *
+ * The order of the array IS the paint order, and it is the order the recursion
+ * produced before: a segment, then its beads, its spines and its terminal, then
+ * its children. SVG has no z-index; changing this changes the drawing.
+ */
+export interface DendriteMark {
+  /** the meandering course of this segment */
+  pts: Array<[number, number]>;
+  /** stroke width, already clamped as the renderer used to clamp it */
+  width: number;
+  opacity: number;
+  /** varicosities along the course — the two finest generations only */
+  beads: Array<{ x: number; y: number; r: number; opacity: number }>;
+  /** dendritic spines: a bowed stalk and its bulb head */
+  spines: Array<{
+    x1: number; y1: number; x2: number; y2: number;
+    bow: number; headR: number; stalkOpacity: number; headOpacity: number;
+  }>;
+  /** the beaded ending, on a segment that closes its branch */
+  terminal?: { x: number; y: number; r: number; opacity: number };
+}
+
+/**
+ * Grow one segment and its children into `out`.
+ *
+ * Pure: no React, no DOM, no module state beyond the seeded `rnd`. The body is
+ * the body that was here before, with every `out.push(<element/>)` replaced by
+ * the numbers that element was going to be built from.
+ */
+function growDendriteGeo(o: DendriteSeg, out: DendriteMark[]): void {
   if (o.depth <= 0 || o.length < 2.5) return;
 
   const curl = (rnd(o.seed) - 0.5) * 0.7;
@@ -125,17 +170,14 @@ function growDendrite(o: DendriteSeg, out: React.ReactNode[], k: string): void {
     pts.push([bx + nx * off, by + ny * off]);
   }
 
-  out.push(
-    <path
-      key={k}
-      d={smoothPolyline(pts)}
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={Math.max(0.22, o.width)}
-      strokeLinecap="round"
-      opacity={o.opacity}
-    />
-  );
+  const mark: DendriteMark = {
+    pts,
+    width: Math.max(0.22, o.width),
+    opacity: o.opacity,
+    beads: [],
+    spines: []
+  };
+  out.push(mark);
 
   /*
    * Beading along the length.
@@ -146,33 +188,22 @@ function growDendrite(o: DendriteSeg, out: React.ReactNode[], k: string): void {
    * has substance and the whole arbor gains the granular texture that is most
    * of its character. Sparse and seeded, on the finer generations only, where
    * the eye actually reads texture rather than structure.
+   *
+   * Budget: beading is per-segment and the arbor count is large, so the naive
+   * version added ~3,800 circles. Measured on the current map the baseline is
+   * 7,564 elements and the density lift takes it to 8,057 (+6.5%). Revert by
+   * returning the keep rate to 0.34 if a frame budget ever says so.
    */
-  // Budget: beading is per-segment and the arbor count is large, so the naive
-  // version added ~3,800 circles. The "6,000 element" figure this note used to
-  // quote is stale: measured on the current map the baseline is 7,564, and the
-  // density lift below takes it to 8,057 (+6.5%). Revert by returning the keep
-  // rate to 0.34 if a frame budget ever says so.
-  // Restricted to the two finest generations, where texture actually reads.
-  // Density is the texture. The references this drawing answers to get their
-  // material richness from thousands of small marks reading as one surface, and
-  // in a line-only system the only equivalent is more, finer beads — so the keep
-  // rate is up from 0.34 and each bead is smaller, which trades a countable
-  // scatter for a grain that resolves only on approach. Still the two finest
-  // generations only: the budget note above is why, and it has not changed.
   if (o.depth <= 1) {
     for (let b = 1; b < STEPS; b++) {
       if (rnd(o.seed + b * 17 + 3) > 0.46) continue;
       const p = pts[b];
-      out.push(
-        <circle
-          key={`${k}b${b}`}
-          cx={p[0].toFixed(1)}
-          cy={p[1].toFixed(1)}
-          r={Math.max(0.26, o.width * 0.6)}
-          fill="currentColor"
-          opacity={Math.min(1, o.opacity * 1.2)}
-        />
-      );
+      mark.beads.push({
+        x: p[0],
+        y: p[1],
+        r: Math.max(0.26, o.width * 0.6),
+        opacity: Math.min(1, o.opacity * 1.2)
+      });
     }
   }
 
@@ -197,28 +228,31 @@ function growDendrite(o: DendriteSeg, out: React.ReactNode[], k: string): void {
       const side = rnd(o.seed + i * 7 + 2) > 0.5 ? 1 : -1;
       const sa = a2 + side * (1.05 + rnd(o.seed + i * 3) * 0.55);
       const sl = 1.5 + rnd(o.seed + i * 11) * 1.6;
-      const hx = bx + Math.cos(sa) * sl;
-      const hy = by + Math.sin(sa) * sl;
-      out.push(
-        <path key={`${k}n${i}`} d={arcSegment(bx, by, hx, hy, sl * 0.32)} fill="none"
-          stroke="currentColor" strokeWidth={0.22} strokeLinecap="round"
-          opacity={o.opacity * 0.85} />,
-        <circle key={`${k}h${i}`} cx={hx.toFixed(1)} cy={hy.toFixed(1)} r={0.5}
-          fill="currentColor" opacity={Math.min(1, o.opacity * 1.3)} />
-      );
+      mark.spines.push({
+        x1: bx, y1: by,
+        x2: bx + Math.cos(sa) * sl,
+        y2: by + Math.sin(sa) * sl,
+        bow: sl * 0.32,
+        headR: 0.5,
+        stalkOpacity: o.opacity * 0.85,
+        headOpacity: Math.min(1, o.opacity * 1.3)
+      });
     }
   }
 
   if (o.depth === 1) {
-    // beaded terminal
-    out.push(<circle key={`${k}t`} cx={ex} cy={ey} r={Math.max(0.7, o.width * 1.5)} fill="currentColor" opacity={Math.min(1, o.opacity * 1.7)} />);
+    mark.terminal = {
+      x: ex, y: ey,
+      r: Math.max(0.7, o.width * 1.5),
+      opacity: Math.min(1, o.opacity * 1.7)
+    };
     return;
   }
 
   const forks = rnd(o.seed + 11) > 0.72 ? 3 : 2;
   for (let i = 0; i < forks; i++) {
     const off = (i - (forks - 1) / 2) * (0.42 + rnd(o.seed + i) * 0.3);
-    growDendrite(
+    growDendriteGeo(
       {
         x: ex, y: ey,
         angle: a2 + off,
@@ -229,10 +263,145 @@ function growDendrite(o: DendriteSeg, out: React.ReactNode[], k: string): void {
         opacity: o.opacity * 0.94,
         spines: o.spines
       },
-      out,
-      `${k}-${i}`
+      out
     );
   }
+}
+
+/** The parameters an arbor is grown from — shared by the drawing and the geometry. */
+export interface ArborSpec {
+  cx: number;
+  cy: number;
+  r: number;
+  arms?: number;
+  depth?: number;
+  seed?: number;
+  span?: number;
+  rotate?: number;
+  opacity?: number;
+  width?: number;
+  spines?: boolean;
+}
+
+/**
+ * A whole arbor, as marks.
+ *
+ * This is the single source of every dendrite in the app. `Dendrites` renders
+ * what it returns; anything that needs to know where the tissue runs — without
+ * drawing it — asks the same function and gets the same answer by construction.
+ *
+ * Density is applied here, at the one place every arbor in the app is grown, so
+ * no call site has to know about it and none can forget. Arms scale linearly;
+ * depth is the expensive axis, because each generation multiplies the element
+ * count by the fork factor — dropping one level on a weak device removes more
+ * than half the nodes while leaving the silhouette and the branching character
+ * intact. It is the same drawing, drawn sparsely.
+ */
+export function dendriteMarks(spec: ArborSpec): DendriteMark[] {
+  const {
+    cx, cy, r, arms = 14, depth = 4, seed = 1,
+    span = 1, rotate = 0, opacity = 1, width = 0.85, spines = false
+  } = spec;
+
+  const out: DendriteMark[] = [];
+  const armCount = arms === 1 ? 1 : scaleCount(arms, 3);
+  const growDepth = DEVICE_TIER === 'low' ? Math.max(2, depth - 1) : depth;
+
+  for (let i = 0; i < armCount; i++) {
+    const t = armCount === 1 ? 0 : i / armCount;
+    const a = (rotate + t * span) * TAU + (rnd(seed + i) - 0.5) * 0.18;
+    growDendriteGeo(
+      {
+        x: cx + Math.cos(a) * r * 0.1,
+        y: cy + Math.sin(a) * r * 0.1,
+        angle: a,
+        length: r * (0.3 + rnd(seed + i + 3) * 0.14),
+        depth: growDepth,
+        seed: seed + i * 13 + 1,
+        width,
+        // near-white: the references are saturated line on black, and the
+        // glow in them is density of bright line rather than a soft wash
+        opacity: Math.min(1, 0.86 * opacity),
+        spines
+      },
+      out
+    );
+  }
+  return out;
+}
+
+/**
+ * The courses of an arbor, with nothing else on them.
+ *
+ * What a sampler wants: polylines and the weight each was drawn at, in the same
+ * shape `formation.ts` already walks for the map's edges. The spine stalks come
+ * through as courses of their own — they are tissue, two points long — and the
+ * beads and terminals do not, because a sampler laying points along a line has
+ * no use for the points that were already there.
+ */
+export function dendriteStrands(spec: ArborSpec): Array<{ pts: Array<[number, number]>; width: number; opacity: number }> {
+  const out: Array<{ pts: Array<[number, number]>; width: number; opacity: number }> = [];
+  for (const m of dendriteMarks(spec)) {
+    out.push({ pts: m.pts, width: m.width, opacity: m.opacity });
+    for (const s of m.spines) {
+      out.push({ pts: [[s.x1, s.y1], [s.x2, s.y2]], width: 0.22, opacity: s.stalkOpacity });
+    }
+  }
+  return out;
+}
+
+/**
+ * Marks to elements.
+ *
+ * The one place an arbor becomes SVG, shared by the two things that grow one —
+ * `Dendrites` and the vortex's own strands. Emission order is the order the
+ * recursion produced (segment, beads, spines, terminal, then children) because
+ * SVG has no z-index and that order is part of the drawing.
+ */
+function renderDendriteMarks(marks: DendriteMark[], kb: string): React.ReactNode[] {
+  const out: React.ReactNode[] = [];
+  marks.forEach((m, i) => {
+    out.push(
+      <path
+        key={`${kb}${i}`}
+        d={smoothPolyline(m.pts)}
+        fill="none"
+        stroke="currentColor"
+        strokeWidth={m.width}
+        strokeLinecap="round"
+        opacity={m.opacity}
+      />
+    );
+    m.beads.forEach((b, j) => {
+      out.push(
+        <circle key={`${kb}${i}b${j}`} cx={b.x.toFixed(1)} cy={b.y.toFixed(1)} r={b.r}
+          fill="currentColor" opacity={b.opacity} />
+      );
+    });
+    m.spines.forEach((s, j) => {
+      out.push(
+        <path key={`${kb}${i}n${j}`} d={arcSegment(s.x1, s.y1, s.x2, s.y2, s.bow)} fill="none"
+          stroke="currentColor" strokeWidth={0.22} strokeLinecap="round"
+          opacity={s.stalkOpacity} />,
+        <circle key={`${kb}${i}h${j}`} cx={s.x2.toFixed(1)} cy={s.y2.toFixed(1)} r={s.headR}
+          fill="currentColor" opacity={s.headOpacity} />
+      );
+    });
+    if (m.terminal) {
+      out.push(
+        <circle key={`${kb}${i}t`} cx={m.terminal.x} cy={m.terminal.y} r={m.terminal.r}
+          fill="currentColor" opacity={m.terminal.opacity} />
+      );
+    }
+  });
+  return out;
+}
+
+/** Grow one arbor's worth of marks without the `Dendrites` wrapper — for the vortex. */
+function growArborMarks(o: DendriteSeg): DendriteMark[] {
+  const out: DendriteMark[] = [];
+  growDendriteGeo(o, out);
+  return out;
 }
 
 /** A neuron-like branching burst: recursive dendrites radiating from a soma. */
@@ -255,42 +424,18 @@ export const Dendrites: React.FC<{
    *  element count of an arbor, so it belongs on the large somas only. */
   spines?: boolean;
 }> = ({ id, cx, cy, r, arms = 14, depth = 4, seed = 1, span = 1, rotate = 0, opacity = 1, width = 0.85, glow = false, spines = false }) => {
-  const out: React.ReactNode[] = [];
+  /* Rendering is a dumb walk over the marks: every number was decided in
+     `dendriteMarks`. The walk itself is shared with the vortex, which grows
+     arbors of its own — one generator, one renderer, no second opinion. */
+  const out = renderDendriteMarks(
+    dendriteMarks({ cx, cy, r, arms, depth, seed, span, rotate, opacity, width, spines }),
+    `d`
+  );
 
-  /*
-   * Density is applied here, at the one place every arbor in the app is grown,
-   * so no call site has to know about it and none can forget.
-   *
-   * Arms scale linearly; depth is the expensive axis, because each generation
-   * multiplies the element count by the fork factor — dropping one level on a
-   * weak device removes more than half the nodes while leaving the silhouette
-   * and the branching character intact. It is the same drawing, drawn sparsely.
-   */
-  const armCount = arms === 1 ? 1 : scaleCount(arms, 3);
-  const growDepth = DEVICE_TIER === 'low' ? Math.max(2, depth - 1) : depth;
-
-  for (let i = 0; i < armCount; i++) {
-    const t = armCount === 1 ? 0 : i / armCount;
-    const a = (rotate + t * span) * TAU + (rnd(seed + i) - 0.5) * 0.18;
-    growDendrite(
-      {
-        x: cx + Math.cos(a) * r * 0.1,
-        y: cy + Math.sin(a) * r * 0.1,
-        angle: a,
-        length: r * (0.3 + rnd(seed + i + 3) * 0.14),
-        depth: growDepth,
-        seed: seed + i * 13 + 1,
-        width,
-        // near-white: the references are saturated line on black, and the
-        // glow in them is density of bright line rather than a soft wash
-        opacity: Math.min(1, 0.86 * opacity),
-        spines
-      },
-      out,
-      `d${i}`
-    );
-  }
-  return <g filter={glow ? `url(#${id}-glow)` : undefined}>{out}</g>;
+  /* `arbor-ink` marks this as tissue rather than a light source, so the
+     particle map can retire the drawn arbors and keep the somas. Harmless
+     everywhere else: only the map root ever carries the mode class. */
+  return <g className="arbor-ink" filter={glow ? `url(#${id}-glow)` : undefined}>{out}</g>;
 };
 
 /* ------------------------------------------------------------- growth cone */
@@ -420,8 +565,7 @@ export const VortexSphere: React.FC<{
     const reach = 0.46 + Math.pow(rnd(seed + i + 700), 0.7) * 0.6;
     const op = Math.min(1, (0.72 + rnd(seed + i + 55) * 0.28) * intensity);
 
-    const strandOut: React.ReactNode[] = [];
-    growDendrite(
+    const strandOut = renderDendriteMarks(growArborMarks(
       {
         // starts just off the receptacle so the arbors converge to a point
         x: cx + Math.cos(ang) * r * 0.08,
@@ -433,10 +577,8 @@ export const VortexSphere: React.FC<{
         width: 0.44,
         opacity: op,
         spines: false
-      },
-      strandOut,
-      `vx${i}`
-    );
+      }
+    ), `vx${i}`);
 
     const band = Math.min(BANDS - 1, Math.max(0, Math.floor(((reach - 0.46) / 0.6) * BANDS)));
     bands[band].push(<g key={i}>{strandOut}</g>);
@@ -634,7 +776,7 @@ export const FigureFrame: React.FC<{
           {caption}
         </span>
       </div>
-      <span className="text-[9px] uppercase font-light tracking-[0.2em] opacity-50 flex-shrink-0 hidden sm:inline">
+      <span className="text-[9px] uppercase font-light tracking-[0.2em] opacity-45 flex-shrink-0 hidden sm:inline">
         {tag}
       </span>
     </div>
@@ -653,7 +795,7 @@ export const FigureFrame: React.FC<{
     </div>
     )}
     {foot && (
-    <div className="mt-1.5 text-[9px] font-light flex items-center justify-between gap-3 opacity-55">
+    <div className="mt-1.5 text-[9px] font-light flex items-center justify-between gap-3 opacity-45">
       <span className="truncate">{footLeft}</span>
       <span className="font-light tracking-[0.2em] uppercase flex-shrink-0 hidden sm:inline">{footRight}</span>
     </div>

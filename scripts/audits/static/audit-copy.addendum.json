@@ -1,0 +1,6 @@
+{
+  "note": "The trendwatch addendum is a SECOND corpus that audit-copy accepts, and it is pinned so it cannot grow silently. Adding a sentence to src/data/trendwatch.ts fails the build until this is regenerated deliberately: npm run audit:copy -- --pin-addendum. Re-pin only when the addition was asked for.",
+  "generated": "2026-09-15",
+  "count": 113,
+  "hash": "4931b9208798e6d0"
+}
