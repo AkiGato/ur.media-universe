@@ -17,7 +17,7 @@
  * Nothing outside `projects/mediauniverse/` is touched, and nothing is
  * committed — the diff is left for a person to look at.
  */
-import { cpSync, existsSync, rmSync, statSync, readdirSync } from 'node:fs';
+import { cpSync, existsSync, rmSync, statSync, readdirSync, unlinkSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join, resolve } from 'node:path';
 
@@ -47,6 +47,16 @@ const dest = join(repo, DEST_SUBPATH);
 if (existsSync(dest)) rmSync(dest, { recursive: true, force: true });
 cpSync(SRC, dest, { recursive: true });
 
+/* The cache policy cannot travel inside the directory. Cloudflare reads one
+   `_headers`, at the root of what it serves, and a copy in a subdirectory is
+   not read — it is just another static file sitting there, publicly fetchable
+   and doing nothing. The rules are stamped under the mount point by the build
+   and they live in the portfolio's own root `_headers`; the paths have no
+   hashes in them, so they are written once and do not go stale. Dropping the
+   copy here means a rebuild cannot quietly put the dead file back. */
+const strayHeaders = join(dest, '_headers');
+if (existsSync(strayHeaders)) unlinkSync(strayHeaders);
+
 const bytes = (function size(dir) {
   return readdirSync(dir, { withFileTypes: true }).reduce((total, entry) => {
     const p = join(dir, entry.name);
@@ -55,4 +65,5 @@ const bytes = (function size(dir) {
 })(dest);
 
 console.log(`to-portfolio: ${DEST_SUBPATH} written in ${repo} (${(bytes / 1e6).toFixed(1)} MB)`);
-console.log('to-portfolio: review it with `git status` there, then commit.');
+console.log("to-portfolio: _headers dropped — the cache policy lives in the portfolio's root _headers.");
+console.log("to-portfolio: review it with `git status` there, then commit.");

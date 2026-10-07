@@ -229,6 +229,12 @@ and commits nothing — the diff is left for a person. The portfolio is static
 with no build step of its own, so whatever lands in that directory is what the
 domain serves.
 
+It also deletes the `_headers` it just copied. Cloudflare reads exactly one
+`_headers`, at the root of what it serves; a copy in a subdirectory is not read
+and is simply a public file doing nothing. The stamped rules belong in the
+portfolio's own root `_headers`, and since none of those paths carries a hash
+they are written once and do not go stale.
+
 **Nothing in the source names the subpath.** Every absolute reference goes
 through `import.meta.env.BASE_URL`, and the mount point is read once, from
 `BASE_PATH`, by [scripts/basePath.mjs](scripts/basePath.mjs). Four things have
