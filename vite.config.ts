@@ -2,6 +2,7 @@ import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
 import {defineConfig, loadEnv} from 'vite';
 import {reportRoute} from './server/reportPlugin.mjs';
+import {basePath} from './scripts/basePath.mjs';
 
 export default defineConfig(({ mode }) => {
   /* THE SERVER-SIDE VARIABLES, LOADED WITHOUT BEING EXPOSED.
@@ -20,6 +21,16 @@ export default defineConfig(({ mode }) => {
   }
 
   return {
+    /* WHERE THIS COPY OF THE APP IS MOUNTED.
+
+       `/` on its own domain, `/projects/mediauniverse/` inside the portfolio.
+       Nothing in the source names the subpath: every absolute reference goes
+       through `import.meta.env.BASE_URL`, which Vite derives from this, and
+       the two files Vite does not process — public/sw.js and public/_headers —
+       are rewritten from the same value by scripts/stamp-sw.mjs.
+
+       Set it with BASE_PATH; scripts/basePath.mjs normalises it. */
+    base: basePath(),
     plugins: [react(), tailwindcss(), reportRoute()],
     build: {
       // Everything this app needs (ResizeObserver, CSS custom properties, SVG

@@ -6,7 +6,12 @@ import './index.css';
 // Register Service Worker for offline capability
 if ('serviceWorker' in navigator && process.env.NODE_ENV === 'production') {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js').catch((err) => {
+    // Mounted under BASE_URL, not at the origin root: inside the portfolio the
+    // worker lives at /projects/mediauniverse/sw.js, and a worker registered
+    // from there with the default scope may only control that subtree anyway.
+    // Naming the scope says so rather than relying on the default.
+    const base = import.meta.env.BASE_URL;
+    navigator.serviceWorker.register(`${base}sw.js`, { scope: base }).catch((err) => {
       console.log('SW registration failed: ', err);
     });
   });

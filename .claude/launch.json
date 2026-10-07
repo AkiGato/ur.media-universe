@@ -34,6 +34,15 @@
       "autoPort": false
     },
     {
+      "name": "mediauniverse-subpath",
+      "runtimeExecutable": "node",
+      "runtimeArgs": [
+        "scripts/preview-portfolio.mjs"
+      ],
+      "port": 4175,
+      "autoPort": false
+    },
+    {
       "name": "web",
       "runtimeExecutable": "node",
       "runtimeArgs": [

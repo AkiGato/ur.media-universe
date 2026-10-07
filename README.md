@@ -31,6 +31,8 @@ documented in `.env.example`; copy it to `.env.local` if you want one.
 | `npm run preview` | Serve the built output |
 | `npm run build:web` | The online export — same build, written to `build/` and stamped there. This is what gets uploaded. |
 | `npm run preview:web` | Serve `build/` on :4174, to check the export before it goes up |
+| `npm run build:portfolio` | The same build mounted at `/projects/mediauniverse/`, written to `build/portfolio/` — the copy that goes inside the portfolio site |
+| `npm run preview:portfolio` | Serve `build/portfolio/` on :4175 **at that subpath**, which is the only way a base fault shows up |
 | `npm run clean` | Delete `dist/` |
 | `npm run lint` | `tsc --noEmit`, then the four static design audits below |
 | `npm run audit:lines` | DG-01, *Never a Straight Line* — fails on any `<line>` or `L`-only path (`scripts/audits/static/audit-lines.mjs`) |
@@ -120,7 +122,9 @@ the browser console rather than run from npm. See
 │   └── presentationdesign.md   the design decisions behind the deck, and their measurements
 │
 ├── dist/                       local build output (git-ignored)
-└── build/                      the online export (git-ignored) — `npm run build:web`
+└── build/                      build outputs (git-ignored)
+    ├── buildU01/                the online export — `npm run build:web`
+    └── portfolio/               mounted at /projects/mediauniverse/ — `npm run build:portfolio`
 ```
 
 ## Documentation map
@@ -207,6 +211,56 @@ is actually there — it pointed at a deleted subset for a while, which spent a
 request on a 404 every cold load. The ambient audio in
 `public/audio` is deliberately left out of the precache; its provenance and
 licences are in [public/audio/CREDITS.md](public/audio/CREDITS.md).
+
+## Where it is served from
+
+The reader runs at the root of its own domain (Netlify, today) and inside the
+portfolio at `https://akigato.com/projects/mediauniverse/`. Those are the same
+build with a different `base`, not two versions of the app.
+
+```bash
+npm run build:portfolio                      # → build/portfolio, base /projects/mediauniverse/
+npm run preview:portfolio                    # → http://localhost:4175/projects/mediauniverse/
+node scripts/to-portfolio.mjs ../portfolio20267
+```
+
+The last step replaces `projects/mediauniverse/` in the portfolio repository
+and commits nothing — the diff is left for a person. The portfolio is static
+with no build step of its own, so whatever lands in that directory is what the
+domain serves.
+
+**Nothing in the source names the subpath.** Every absolute reference goes
+through `import.meta.env.BASE_URL`, and the mount point is read once, from
+`BASE_PATH`, by [scripts/basePath.mjs](scripts/basePath.mjs). Four things have
+to agree about it and Vite only handles the first:
+
+| What | Who sets it |
+| --- | --- |
+| Asset URLs in the shell and the stylesheet | Vite, from `base` |
+| The audio tracks and the report endpoint | the source, via `import.meta.env.BASE_URL` |
+| The worker's scope, shell URL and audio skip | `public/sw.js`, from its own URL — `new URL('./', self.location.href)` |
+| The precache list, the modulepreload hints, the `_headers` rules | `scripts/stamp-sw.mjs`, from `BASE_PATH` |
+
+The worker reads its own location rather than being stamped, so the same file
+is correct under either mount with nothing to keep in sync. The `_headers`
+rules are stamped because they are matched against the request path, and a rule
+that matches nothing **fails silently**: the deploy succeeds, the pages work,
+and the year-long immutable caching on the hashed assets is simply absent.
+Cloudflare Workers reads `_headers` the same way Netlify does, so the policy
+survives the move.
+
+A base fault is invisible at the root — `/assets/index.js` is correct there
+whatever the base was meant to be. That is what `preview:portfolio` is for: it
+serves the output at the subpath, which is the only place the fault appears.
+
+### What does not come across
+
+`/api/report` has no handler on a static host. It has none on Netlify either —
+the route is a Vite plugin that exists in `dev` and `preview` only, documented
+in [server/reportPlugin.mjs](server/reportPlugin.mjs) — so the report panel
+behaves inside the portfolio exactly as it does today: the POST fails and the
+panel says so. Giving it a handler means a Cloudflare Worker function, and
+`handleReport` in `server/brevoReport.mjs` is the half that would be kept.
 
 ## Presentation
 

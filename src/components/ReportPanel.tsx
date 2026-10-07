@@ -52,7 +52,11 @@ export const ReportPanel: React.FC = () => {
     setSending(true);
     setError(null);
     try {
-      const res = await fetch('/api/report', {
+      // Under the mount point: on the portfolio this is
+      // /projects/mediauniverse/api/report, which is where a handler for this
+      // app would have to live. There is none on a static host — the POST
+      // fails and the panel says so, which is also what happens today.
+      const res = await fetch(`${import.meta.env.BASE_URL}api/report`, {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify({

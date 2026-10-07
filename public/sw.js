@@ -7,8 +7,16 @@
 // CACHE_VERSION is rewritten at build time by scripts/stamp-sw.mjs.
 const CACHE_VERSION = 'dev';
 const CACHE_NAME = `media-as-universe-${CACHE_VERSION}`;
-const SHELL_URL = '/index.html';
-const ASSETS_TO_CACHE = ['/', SHELL_URL];
+// WHERE THIS COPY IS MOUNTED, read off the worker's own URL rather than
+// stamped in: a worker at /projects/mediauniverse/sw.js resolves './' to
+// /projects/mediauniverse/, and at the root of its own domain to '/'. The
+// same file is therefore correct under either, with nothing to keep in sync.
+// (ASSETS_TO_CACHE below is a different matter — the hashed filenames are not
+// knowable here, so scripts/stamp-sw.mjs writes the whole list, already
+// prefixed with the base the build was given.)
+const BASE = new URL('./', self.location.href).pathname;
+const SHELL_URL = `${BASE}index.html`;
+const ASSETS_TO_CACHE = [BASE, SHELL_URL];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
@@ -62,13 +70,13 @@ self.addEventListener('fetch', (event) => {
   // works with no network, the music does not. (Range requests come back 206
   // and putInCache already refuses those, but a browser that asks for a whole
   // file gets a 200, so the skip has to be explicit.)
-  if (url.pathname.startsWith('/audio/')) return;
+  if (url.pathname.startsWith(`${BASE}audio/`)) return;
 
   if (request.mode === 'navigate') {
     event.respondWith(
       fetch(request)
         .then((res) => putInCache(request, res))
-        .catch(() => fromCache(SHELL_URL).then((r) => r || fromCache('/')))
+        .catch(() => fromCache(SHELL_URL).then((r) => r || fromCache(BASE)))
     );
     return;
   }

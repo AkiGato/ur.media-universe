@@ -42,14 +42,16 @@ const FADE_BETWEEN_MS = 1800;
 const SETTLE_MS = 4000;
 
 /* Order as given. Named `artist--title.mp3`; provenance and licences are in
-   `public/audio/CREDITS.md`. Files live in `public/audio`, so they are served verbatim at
-   these paths and are never hashed into `assets/` — which also keeps them out
-   of the service worker's precache (see `public/sw.js`). */
+   `public/audio/CREDITS.md`. Files live in `public/audio`, so they are served
+   verbatim under the mount point and are never hashed into `assets/` — which
+   also keeps them out of the service worker's precache (see `public/sw.js`).
+   Written relative and joined to BASE_URL: an absolute `/audio/...` would ask
+   the portfolio's own root for a file that lives three directories down. */
 const TRACKS = [
-  '/audio/vilnius-hang--what-is-that.mp3',
-  '/audio/hang-massive--luminous-emptiness.mp3',
-  '/audio/aaron-ximm--blue-moon-gold-sun.mp3',
-] as const;
+  'audio/vilnius-hang--what-is-that.mp3',
+  'audio/hang-massive--luminous-emptiness.mp3',
+  'audio/aaron-ximm--blue-moon-gold-sun.mp3',
+].map((name) => import.meta.env.BASE_URL + name);
 
 type Ramp = { raf: number; backstop: number; to: number; start: number; ms: number };
 

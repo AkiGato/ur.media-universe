@@ -15,6 +15,8 @@
     "audit:figures": "node scripts/audits/static/audit-figures.mjs",
     "audit:definitions": "node scripts/audits/static/audit-definitions.mjs",
     "build:web": "node node_modules/vite/bin/vite.js build --outDir build/buildU01 --emptyOutDir && node scripts/stamp-sw.mjs build/buildU01",
+    "build:portfolio": "node scripts/build-portfolio.mjs",
+    "preview:portfolio": "node scripts/preview-portfolio.mjs",
     "preview:web": "node node_modules/vite/bin/vite.js preview --outDir build/buildU01 --port 4174 --strictPort",
     "audit:copy": "node scripts/audits/static/audit-copy.mjs",
     "build:talk": "node node_modules/vite/bin/vite.js build --config vite.talk.config.ts && node scripts/stamp-talk.mjs",
