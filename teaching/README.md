@@ -7,6 +7,12 @@
 > rebuilt as a card deck, and where `references.html` was added. Nothing
 > copies this folder over that one, and nothing should: edit them there.
 > This folder is where they were drafted, kept because that is worth having.
+>
+> **The kits and the handbooks are not published at all yet.** They sit in
+> `facilitator-kits/` and `student-handbooks/` here, in revision; the
+> portfolio carries the eight documents that are finished and nothing else.
+> Each is self-contained — no document in either folder links to any other —
+> so they moved into subfolders without a single path needing to change.
 
 
 Three four-week studio courses on what communication design does to the people
@@ -22,18 +28,14 @@ filesystem.
 | File | What it is |
 | :-- | :-- |
 | `index.html` | Contents page for the folder. Start here. |
-| `placement-test.html` | Nine cards on attention, persuasion and play. No score, no right answers, every card skippable; each hands over the idea behind it either way. |
+| `placement-test.html` | Ten cards on attention, persuasion and play. No score, no right answers, every card skippable. The published copy adds the answers to a public count; this draft does not. |
 | `programme.html` | The programme page — three courses folded into sections, with the problem they share, timetabling and the shared instruments. |
 | `sheet-0-programme.html` | A4 sheet: all three courses on one page. |
 | `sheet-1-media-as-universe.html` | A4 sheet: course one. |
 | `sheet-2-neuroethical-design.html` | A4 sheet: course two. |
 | `sheet-3-alternative-storytelling.html` | A4 sheet: course three. |
-| `kit-1-media-as-universe.html` | Facilitator's kit, course one. |
-| `handbook-1-media-as-universe.html` | Student handbook, course one. |
-| `kit-2-neuroethical-design.html` | Facilitator's kit, course two. |
-| `handbook-2-neuroethical-design.html` | Student handbook, course two. |
-| `kit-3-alternative-storytelling.html` | Facilitator's kit, course three. |
-| `handbook-3-alternative-storytelling.html` | Student handbook, course three. |
+| `facilitator-kits/` | One kit per course. **In revision, not published.** |
+| `student-handbooks/` | One handbook per course. **In revision, not published.** |
 
 ## The three courses
 
