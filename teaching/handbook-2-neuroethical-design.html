@@ -1,0 +1,511 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Design Review Papers</title>
+<style>
+  /* Layout: a column of working papers separated by hairlines, never cards.
+     Nothing a filled area, nothing a straight segment, monochrome throughout.
+     Same system as the rest of the programme. */
+  :root {
+    --ground: #ececeb; --ink: #15161a; --ink-soft: #55575d; --ink-faint: #8b8d93;
+    --hair: #c6c7c4; --hair-faint: #d9dad7; --field: #e3e3e1;
+    --display: "Newsreader", "Iowan Old Style", Georgia, serif;
+    --body: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+    --ease: cubic-bezier(0.33, 0.01, 0.2, 1);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground: #0b0c0d; --ink: #e7e6e2; --ink-soft: #a0a09c; --ink-faint: #6e6f6c;
+      --hair: #35373a; --hair-faint: #25272a; --field: #16181a; color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --ground: #0b0c0d; --ink: #e7e6e2; --ink-soft: #a0a09c; --ink-faint: #6e6f6c;
+    --hair: #35373a; --hair-faint: #25272a; --field: #16181a; color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--ground); color: var(--ink); font-family: var(--body);
+    font-weight: 300; font-size: 15px; line-height: 1.68; -webkit-font-smoothing: antialiased; }
+  h1,h2,h3,h4,p,ul,ol,dl,dd { margin: 0; }
+  ul, ol { padding-left: 1.1em; } li { margin-block: 0.32em; }
+  strong { font-weight: 300; border-bottom: 1px solid var(--hair); }
+  i, em { font-style: italic; }
+  .wrap { max-width: 920px; margin: 0 auto; padding-inline: 20px; }
+  .index { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 10;
+    background: var(--ground); border-bottom: 1px solid var(--hair); }
+  .index-row { display: flex; flex-wrap: wrap; gap: 4px 20px; align-items: baseline; padding-block: 11px; }
+  .index a { font-size: 11px; text-transform: uppercase; letter-spacing: 0.2em; color: var(--ink-faint);
+    text-decoration: none; padding-bottom: 2px; border-bottom: 1px solid transparent;
+    transition: color 0.3s var(--ease), border-color 0.3s var(--ease); }
+  .index a:hover, .index a:focus-visible { color: var(--ink); border-bottom-color: var(--hair); }
+  .mast { padding-block: 56px 40px; border-bottom: 1px solid var(--hair); }
+  .eyebrow { font-size: 11px; text-transform: uppercase; letter-spacing: 0.2em; color: var(--ink-faint); }
+  h1 { font-family: var(--display); font-weight: 300; font-size: clamp(30px, 6.4vw, 44px);
+    line-height: 1.12; letter-spacing: -0.012em; text-wrap: balance; margin-top: 14px; max-width: 24ch; }
+  .standfirst { margin-top: 20px; max-width: 64ch; color: var(--ink-soft); }
+  .mast-meta { display: flex; flex-wrap: wrap; gap: 0 32px; margin-top: 28px; font-size: 11px;
+    text-transform: uppercase; letter-spacing: 0.2em; color: var(--ink-faint); }
+  section { padding-block: 52px; border-bottom: 1px solid var(--hair); }
+  .sec-head { display: flex; gap: 14px; align-items: baseline; margin-bottom: 26px; }
+  .sec-no { font-size: 11px; letter-spacing: 0.2em; color: var(--ink-faint);
+    font-variant-numeric: tabular-nums; flex: none; }
+  h2 { font-family: var(--display); font-weight: 300; font-size: clamp(22px, 4vw, 30px);
+    line-height: 1.2; letter-spacing: -0.008em; text-wrap: balance; }
+  .lede { max-width: 64ch; color: var(--ink-soft); margin-bottom: 30px; }
+  h3 { font-family: var(--display); font-weight: 300; font-size: 19px; line-height: 1.3;
+    margin-bottom: 8px; text-wrap: balance; }
+  h4 { font-size: 11px; text-transform: uppercase; letter-spacing: 0.2em; color: var(--ink-faint); margin-bottom: 10px; }
+  .prose { max-width: 66ch; } .prose p + p { margin-top: 14px; } .prose h3 { margin-top: 26px; }
+  .terms { display: grid; gap: 1px; background: var(--hair-faint); }
+  @media (min-width: 720px) { .terms { grid-template-columns: 1fr 1fr; } }
+  .term { background: var(--ground); padding: 22px 20px 24px; min-width: 0; }
+  .term span { font-size: 11px; text-transform: uppercase; letter-spacing: 0.2em;
+    color: var(--ink-faint); display: block; margin-bottom: 10px; }
+  .term .claim { font-family: var(--display); font-size: 19px; line-height: 1.3; }
+  .term p { font-size: 14px; color: var(--ink-soft); margin-top: 8px; }
+  .arc-step { display: grid; gap: 4px 20px; padding-block: 20px; border-bottom: 1px solid var(--hair-faint); }
+  @media (min-width: 680px) { .arc-step { grid-template-columns: 7em 1fr 1fr; } }
+  .arc-step .wk { font-size: 11px; text-transform: uppercase; letter-spacing: 0.2em; color: var(--ink-faint); }
+  .arc-step h3 { margin-bottom: 4px; }
+  .arc-step .d { font-size: 14px; color: var(--ink-soft); }
+  .arc-step .have { font-size: 14px; min-width: 0; }
+  .arc-step .have span { font-size: 11px; text-transform: uppercase; letter-spacing: 0.2em;
+    color: var(--ink-faint); display: block; margin-bottom: 4px; }
+  .paper { padding-block: 34px; border-top: 1px solid var(--hair); }
+  .paper:first-of-type { border-top: none; padding-top: 0; }
+  .paper-head { display: flex; flex-wrap: wrap; gap: 6px 18px; align-items: baseline; }
+  .paper-head .ref { font-size: 11px; text-transform: uppercase; letter-spacing: 0.2em;
+    color: var(--ink-faint); font-variant-numeric: tabular-nums; }
+  .paper > .prose { margin-top: 10px; }
+  .fields { margin-top: 20px; }
+  .field { padding-block: 12px; border-bottom: 1px solid var(--hair-faint); }
+  .field label { display: block; font-size: 11px; text-transform: uppercase; letter-spacing: 0.2em;
+    color: var(--ink-faint); margin-bottom: 7px; }
+  .field .hint { font-size: 13px; color: var(--ink-faint); margin-bottom: 8px; max-width: 62ch; }
+  input[type="text"], textarea { width: 100%; font-family: var(--body); font-weight: 300;
+    font-size: 14px; line-height: 1.6; color: var(--ink); background: var(--field); border: none;
+    border-bottom: 1px solid var(--hair); border-radius: 0; padding: 9px 10px; resize: vertical; }
+  input[type="text"]:focus, textarea:focus { outline: none; border-bottom-color: var(--ink); }
+  input::placeholder, textarea::placeholder { color: var(--ink-faint); opacity: 1; }
+  textarea { min-height: 76px; }
+  button { font-family: var(--body); font-weight: 300; font-size: 11px; text-transform: uppercase;
+    letter-spacing: 0.2em; color: var(--ink); background: none; border: none;
+    border-bottom: 1px solid var(--hair); padding: 6px 0; cursor: pointer; border-radius: 0;
+    transition: border-color 0.3s var(--ease); }
+  button:hover, button:focus-visible { border-bottom-color: var(--ink); }
+  button:focus-visible { outline: none; }
+  .btn-row { display: flex; flex-wrap: wrap; gap: 0 26px; align-items: baseline; margin-top: 18px; }
+  .status { font-size: 11px; text-transform: uppercase; letter-spacing: 0.2em; color: var(--ink-faint);
+    font-variant-numeric: tabular-nums; }
+  .wordcount { font-size: 11px; text-transform: uppercase; letter-spacing: 0.2em;
+    font-variant-numeric: tabular-nums; margin-top: 8px; color: var(--ink-faint); }
+  .wordcount.over { color: var(--ink); }
+  .copyout { margin-top: 16px; }
+  .copyout p { font-size: 13px; color: var(--ink-faint); margin-bottom: 8px; }
+  .copyout textarea { min-height: 150px; font-size: 13px; }
+  .tablewrap { overflow-x: auto; margin-top: 20px; }
+  table { border-collapse: collapse; width: 100%; font-size: 14px; }
+  th, td { text-align: left; padding: 9px 14px 9px 0; border-bottom: 1px solid var(--hair-faint); vertical-align: top; }
+  th { font-size: 11px; text-transform: uppercase; letter-spacing: 0.2em; color: var(--ink-faint);
+    font-weight: 300; border-bottom-color: var(--hair); white-space: nowrap; }
+  td.num, th.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
+  table input[type="text"] { min-width: 8em; padding: 6px 8px; font-size: 13px; }
+  #reg-table { min-width: 740px; } #am-table { min-width: 680px; } #mech-table { min-width: 800px; }
+  #ref-t { min-width: 520px; } #as-t { min-width: 480px; }
+  .rowdrop { border-bottom: 1px solid transparent; padding: 4px 0; font-size: 11px; letter-spacing: 0.2em; }
+  .caution { margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--hair);
+    font-size: 13px; color: var(--ink-soft); max-width: 66ch; }
+  .caution span { font-size: 11px; text-transform: uppercase; letter-spacing: 0.2em;
+    color: var(--ink-faint); display: block; margin-bottom: 8px; }
+  .colophon { padding-block: 44px 64px; font-size: 13px; color: var(--ink-faint); max-width: 66ch; }
+  .colophon p + p { margin-top: 12px; }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition-duration: 0.01ms !important; } }
+</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300;1,6..72,300&family=IBM+Plex+Sans:ital,wght@0,300;1,300&display=swap">
+<style>[hidden]{display:none!important}img{max-width:100%}</style>
+</head>
+<body>
+
+<nav class="index">
+  <div class="wrap index-row">
+    <a href="#terms">The terms</a><a href="#arc">Four weeks</a><a href="#papers">Working papers</a>
+    <a href="#reference">Reference</a><a href="#assess">Assessment</a><a href="#reading">Reading</a>
+  </div>
+</nav>
+
+<header class="wrap mast">
+  <span class="eyebrow">Student handbook · course two</span>
+  <h1>Human-Centric and Neuroethical Design</h1>
+  <p class="standfirst">You will not build anything in this course. You will judge something real, write the judgement down, and then defend it to a room arguing the other side. These are the six papers that judgement is assembled from, and the things you are expected to use without looking them up.</p>
+  <div class="mast-meta">
+    <span>4 weeks · 16 sessions</span><span>48 contact hours</span><span>Seminar and review</span>
+  </div>
+</header>
+
+<main>
+
+<section id="terms" class="wrap">
+  <div class="sec-head"><span class="sec-no">01</span><h2>The terms</h2></div>
+  <p class="lede">Four of these are unusual enough to cost marks if you assume otherwise.</p>
+  <div class="terms">
+    <div class="term"><span>On the deliverable</span>
+      <p class="claim">A document, not an artifact.</p>
+      <p>You will want to make something. Several students ask every year. The answer is no, and the reason is that a practitioner who can make but cannot judge is the person this course exists to stop producing.</p></div>
+    <div class="term"><span>On conviction rates</span>
+      <p class="claim">Finding a product defensible is worth as much as condemning it.</p>
+      <p>A review that clears a mechanism, with the evidence to support it, scores identically to one that condemns it. A cohort that only ever convicts has learned a posture, not a method.</p></div>
+    <div class="term"><span>On the law</span>
+      <p class="claim">Write questions for counsel, never conclusions.</p>
+      <p>You are not qualified to say whether a provision applies, and neither is this course. A regulatory section written as questions scores above one written as findings, every time. Stating a legal conclusion loses marks on its own.</p></div>
+    <div class="term"><span>On amendment</span>
+      <p class="claim">Conceding cleanly scores above holding stubbornly.</p>
+      <p>You will be opposed in week four by people arguing the real business case. An honest amendment after that scores above a weak finding defended to the end — and above one that was never tested at all.</p></div>
+  </div>
+</section>
+
+<section id="arc" class="wrap">
+  <div class="sec-head"><span class="sec-no">02</span><h2>Four weeks</h2></div>
+  <p class="lede">You are assigned one shipping product in session 1.1 and you keep it for the whole course.</p>
+  <div>
+    <div class="arc-step"><span class="wk">Week one</span>
+      <div><h3>Design is a neurological act</h3><p class="d">Every colour, typeface, spatial and motion decision activating or suppressing a cognitive system. Neuroplasticity and scale. Why not having known stops being a defence once the mechanism is named.</p></div>
+      <div class="have"><span>You will hold</span>A mechanism register for your product: every mechanism, its cognitive target, the exposed population, the frequency of exposure.</div></div>
+    <div class="arc-step"><span class="wk">Week two</span>
+      <div><h3>The person, not the profile</h3><p class="d">What behavioural data captures and what it structurally cannot. The three postures. Vulnerability as a state anyone enters rather than a category of person.</p></div>
+      <div class="have"><span>You will hold</span>A vulnerability analysis, and two lists: mechanisms you can defend and mechanisms you cannot.</div></div>
+    <div class="arc-step"><span class="wk">Week three</span>
+      <div><h3>Neuroethics in practice</h3><p class="d">Consent where there is no consent form. Manipulation as influence that does not sufficiently engage reflection. The shift from objectionable to actionable.</p></div>
+      <div class="have"><span>You will hold</span>A consent dialogue under 120 words, a regulatory exposure note, and a remediation schedule.</div></div>
+    <div class="arc-step"><span class="wk">Week four</span>
+      <div><h3>The review</h3><p class="d">Assembling it, pre-conceding what you cannot defend, and then holding the rest against a team arguing in good faith for the thing you condemned.</p></div>
+      <div class="have"><span>You will hold</span>The review document, the record of what you amended, and the experience of having argued the other side.</div></div>
+  </div>
+</section>
+
+<section id="papers" class="wrap">
+  <div class="sec-head"><span class="sec-no">03</span><h2>Working papers</h2></div>
+  <p class="lede">Six papers, in the order you need them. Each copies out as plain text and keeps a draft in this browser only — nothing typed here is transmitted, stored elsewhere or visible to anyone, including the instructor.</p>
+
+  <div class="paper" id="paper-mech">
+    <div class="paper-head"><h3>Mechanism register</h3><span class="ref">Paper one · session 1.3</span></div>
+    <div class="prose"><p>One row per mechanism. A row is incomplete until the target, the exposed population and the frequency are all filled, because a mechanism named without its target is a description and will not support a finding. Frequency matters more than it looks: a mechanism encountered once is a nuisance, and the same mechanism encountered eleven times a day for three years is the subject of this course.</p></div>
+    <div class="tablewrap">
+      <table id="mech-table">
+        <thead><tr><th>Mechanism</th><th>Where it appears</th><th>Cognitive target</th><th>Most exposed population</th><th>Frequency</th><th>Defensible?</th><th></th></tr></thead>
+        <tbody id="mech-body"></tbody>
+      </table>
+    </div>
+    <div class="btn-row"><button type="button" data-addrow="mech">Add a row</button><button type="button" data-copy="mech">Copy out</button><span class="status" id="st-mech"></span></div>
+  </div>
+
+  <div class="paper" id="paper-vuln">
+    <div class="paper-head"><h3>Vulnerability analysis</h3><span class="ref">Paper two · session 2.3</span></div>
+    <div class="prose">
+      <p>Name the state in which your product becomes harmful rather than merely annoying. Be specific: not <i>a vulnerable user</i> but depleted, grieving, in debt, fourteen, in pain, newly diagnosed. Then name who is routinely in that state and estimate the share of sessions it accounts for.</p>
+      <p>You will be challenged on the number at the hearing. A share you cannot support must be widened or withdrawn, and withdrawing costs nothing.</p>
+    </div>
+    <div class="fields" data-paper="vuln">
+      <div class="field"><label for="v-prod">The product</label><input type="text" id="v-prod" data-f="Product"></div>
+      <div class="field"><label for="v-state">The state</label><div class="hint">Precisely. One condition, named as a person would recognise it.</div><textarea id="v-state" data-f="State"></textarea></div>
+      <div class="field"><label for="v-pop">Who is routinely in it</label><textarea id="v-pop" data-f="Population"></textarea></div>
+      <div class="field"><label for="v-share">Estimated share of sessions, and how you estimated it</label><div class="hint">If the product does not measure this, say so — that the design cannot detect the state it harms is itself a finding.</div><textarea id="v-share" data-f="Share and method"></textarea></div>
+      <div class="field"><label for="v-harm">The harm, concretely</label><div class="hint">Described well enough that someone could go and check whether it happens.</div><textarea id="v-harm" data-f="Harm"></textarea></div>
+      <div class="field"><label for="v-targ">Is the product actively seeking people in this state?</label><div class="hint">If yes, this is the strongest finding available and the verdict should turn on it.</div><textarea id="v-targ" data-f="Active targeting"></textarea></div>
+    </div>
+    <div class="btn-row"><button type="button" data-copy="vuln">Copy out</button><span class="status" id="st-vuln"></span></div>
+  </div>
+
+  <div class="paper" id="paper-consent">
+    <div class="paper-head"><h3>Consent dialogue</h3><span class="ref">Paper three · session 3.1 · 120 words maximum</span></div>
+    <div class="prose">
+      <p>Write the disclosure this interface would have to show, on first open, for its actual mechanics to be genuinely agreed to. Plain language, second person, no euphemism. Name the mechanism and say what it is designed to produce in the reader.</p>
+      <p>The limit is 120 words and it is not arbitrary — a disclosure nobody would read is not a disclosure, so a dialogue that needs a thousand words has already answered the question. You will read this aloud. The room then answers one thing: would the company ship this screen?</p>
+    </div>
+    <div class="fields" data-paper="consent">
+      <div class="field"><label for="c-mech">The mechanics being disclosed</label><input type="text" id="c-mech" data-f="Mechanics"></div>
+      <div class="field"><label for="c-text">The dialogue</label><div class="hint">As it would appear on screen.</div>
+        <textarea id="c-text" data-f="Dialogue" style="min-height:150px"></textarea>
+        <p class="wordcount" id="c-count">0 words</p></div>
+      <div class="field"><label for="c-ship">Would they ship it?</label><div class="hint">Your own answer, and the room's. Where they differ, say why.</div><textarea id="c-ship" data-f="Would they ship it"></textarea></div>
+    </div>
+    <div class="btn-row"><button type="button" data-copy="consent">Copy out</button><span class="status" id="st-consent"></span></div>
+  </div>
+
+  <div class="paper" id="paper-reg">
+    <div class="paper-head"><h3>Regulatory exposure note</h3><span class="ref">Paper four · session 3.2</span></div>
+    <div class="prose"><p>One row per mechanism that may touch a regime. The right-hand column is the one that is assessed, and it holds what you would need to establish before anyone could answer — not what you think the answer is.</p></div>
+    <div class="tablewrap">
+      <table id="reg-table">
+        <thead><tr><th>Mechanism</th><th>What it does</th><th>Regime to ask about</th><th>Establish first</th><th></th></tr></thead>
+        <tbody id="reg-body"></tbody>
+      </table>
+    </div>
+    <div class="btn-row"><button type="button" data-addrow="reg">Add a row</button><button type="button" data-copy="reg">Copy out</button><span class="status" id="st-reg"></span></div>
+    <div class="caution"><span>Required wording</span>
+      Head this section of your review <i>Questions for counsel</i>. Neither you nor this course is qualified to say whether a provision applies to a given product, jurisdictions differ, and a review that states a legal conclusion is marked down for stating it — however likely the conclusion is to be correct.</div>
+  </div>
+
+  <div class="paper" id="paper-review">
+    <div class="paper-head"><h3>The review</h3><span class="ref">Paper five · session 3.4 · the deliverable</span></div>
+    <div class="prose">
+      <p>The document a company would have to answer. The order matters: findings come before the verdict, because a verdict written first and evidenced afterwards is what this course is about and the room will be able to tell.</p>
+      <p>A finding without a remediation is a complaint. A remediation that would destroy the product is not a remediation. Where the honest answer is that removing the harm removes the business model, write that — it is a legitimate finding and the strongest one available, but only if you say it plainly rather than implying it.</p>
+    </div>
+    <div class="fields" data-paper="review">
+      <div class="field"><label for="r-prod">Product under review</label><input type="text" id="r-prod" data-f="Product"></div>
+      <div class="field"><label for="r-scope">Scope, and what you did not look at</label><div class="hint">Stated up front. An unstated limit is the first thing the opposition will find.</div><textarea id="r-scope" data-f="Scope and limits"></textarea></div>
+      <div class="field"><label for="r-method">Method</label><div class="hint">How you examined it, over how long, on what devices, in what states.</div><textarea id="r-method" data-f="Method"></textarea></div>
+      <div class="field"><label for="r-find">Findings</label><div class="hint">Numbered. Each one specific, supported, and attached to a named mechanism from paper one.</div><textarea id="r-find" data-f="Findings" style="min-height:170px"></textarea></div>
+      <div class="field"><label for="r-def">Mechanisms examined and found defensible</label><div class="hint">Not optional. A review with this section empty will be asked why.</div><textarea id="r-def" data-f="Found defensible"></textarea></div>
+      <div class="field"><label for="r-rem">Remediation schedule</label><div class="hint">For each finding: the smallest change that removes the harm, and what it plausibly costs.</div><textarea id="r-rem" data-f="Remediations" style="min-height:140px"></textarea></div>
+      <div class="field"><label for="r-verd">Verdict</label><div class="hint">One paragraph, following from the findings above and adding nothing to them.</div><textarea id="r-verd" data-f="Verdict" style="min-height:120px"></textarea></div>
+      <div class="field"><label for="r-obj">The three strongest objections, answered</label><div class="hint">Written in session 4.1. Any objection you cannot answer is conceded here, before the hearing. Conceding here costs nothing; conceding under questioning costs the finding.</div><textarea id="r-obj" data-f="Objections answered" style="min-height:140px"></textarea></div>
+    </div>
+    <div class="btn-row"><button type="button" data-copy="review">Copy out</button><span class="status" id="st-review"></span></div>
+  </div>
+
+  <div class="paper" id="paper-amend">
+    <div class="paper-head"><h3>Amendment record</h3><span class="ref">Paper six · session 4.4</span></div>
+    <div class="prose"><p>After the hearing. One row per finding that was contested, with the objection recorded accurately whether or not you accepted it. A finding held must carry the objection beside it; a finding amended needs no defence.</p></div>
+    <div class="tablewrap">
+      <table id="am-table">
+        <thead><tr><th class="num">Finding</th><th>The objection, stated fairly</th><th>Held or amended</th><th>Why</th><th></th></tr></thead>
+        <tbody id="am-body"></tbody>
+      </table>
+    </div>
+    <div class="btn-row"><button type="button" data-addrow="am">Add a row</button><button type="button" data-copy="am">Copy out</button><span class="status" id="st-am"></span></div>
+  </div>
+
+  <div class="copyout" id="copyout" hidden>
+    <p id="copyout-msg"></p>
+    <textarea id="copyout-text" readonly></textarea>
+  </div>
+</section>
+
+<section id="reference" class="wrap">
+  <div class="sec-head"><span class="sec-no">04</span><h2>Without looking it up</h2></div>
+  <p class="lede">Used in the room, at speed, without a screen.</p>
+
+  <div style="margin-top:0">
+    <h4>Three cognitive postures</h4>
+    <div class="tablewrap"><table id="ref-t">
+      <thead><tr><th>Posture</th><th>The state</th><th>What it must not be offered</th></tr></thead>
+      <tbody>
+        <tr><td>Restoration-seeking</td><td>System 1 running everything. Present, but nothing landing with weight. Reaching for relief, not information.</td><td>Anything with urgency in it. The most exploited state in the field and the most indefensible to target.</td></tr>
+        <tr><td>Agency-seeking</td><td>System 2 engaged, directed attention recovered enough for deliberate action. Arrived with an intention.</td><td>Urgency deployed before the assessment can finish; social proof at the moment of consideration.</td></tr>
+        <tr><td>Meaning-seeking</td><td>Testing whether what you stand for is consistent with who they are trying to become.</td><td>Anything inauthentic. The most sophisticated detector of inauthenticity in existence.</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+
+  <div style="margin-top:30px">
+    <h4>The two criteria that decide a contested mechanism</h4>
+    <ul>
+      <li><strong>The manipulation criterion.</strong> Influence that does not sufficiently engage a person's capacity for reflection and deliberation. The question is not whether it worked but whether it worked by engaging thought or by routing around it.</li>
+      <li><strong>The publicity principle.</strong> A practice is suspect when those who use it would not defend it openly to the people it is used on. This is what the consent dialogue tests, and why an unshippable dialogue is a finding rather than a writing failure.</li>
+    </ul>
+  </div>
+
+  <div style="margin-top:30px">
+    <h4>Vulnerability as a state, not a category</h4>
+    <p class="prose" style="font-size:14px;color:var(--ink-soft)">Depleted. Grieving. Under financial pressure. Under eighteen. In pain or acutely unwell. Operating in a second language. Newly diagnosed or seeking health information. Everyone passes through several of these, which is why a design is not safe merely because most users tolerate it, and why the finding belongs in the main review rather than an accessibility appendix.</p>
+  </div>
+
+  <div style="margin-top:30px">
+    <h4>A profile is an accuracy problem before it is an ethical one</h4>
+    <p class="prose" style="font-size:14px;color:var(--ink-soft)">The categories used to describe an audience are usually fine as descriptions of motivation and wrong as descriptions of a person. The clearest statement of this comes from game design rather than marketing: the player archetypes — Achievers, Explorers, Socializers, Killers — were drawn up partly for audience segmentation and product tailoring, and were never meant to define identities. When they harden into labels they foster misunderstanding, exclusion and subtle forms of discrimination. Someone may be an Achiever at work, an Explorer at home, a Socializer among friends and a Killer in debate. Make the same objection to the targeting model you are reviewing, in the same form, and you will find it holds.</p>
+  </div>
+
+  <div style="margin-top:30px">
+    <h4>The claim the whole course rests on</h4>
+    <p class="prose" style="font-size:14px">Design is a neurological act. Every colour, typeface, spatial decision and motion sequence activates or suppresses cognitive systems with the reliability of a pharmaceutical compound and considerably less regulatory oversight. Someone who understands this and deploys high-arousal design without justification is making a public health decision on behalf of an unconsenting population — and producing the same effect by default is the same failure, because the ignorance defence does not survive the mechanism being named.</p>
+  </div>
+</section>
+
+<section id="assess" class="wrap">
+  <div class="sec-head"><span class="sec-no">05</span><h2>How you are assessed</h2></div>
+  <div class="tablewrap"><table id="as-t">
+    <thead><tr><th>Piece</th><th class="num">Weight</th><th>What earns the mark</th></tr></thead>
+    <tbody>
+      <tr><td>The review document</td><td class="num">40%</td><td>Findings specific, supported and remediable; the verdict following from them rather than preceding them.</td></tr>
+      <tr><td>The hearing</td><td class="num">25%</td><td>Both roles. Holding a sound finding under pressure, and arguing the opposing case in good faith rather than as a straw man.</td></tr>
+      <tr><td>The amendment record</td><td class="num">20%</td><td>Honest revision, with the objection recorded fairly.</td></tr>
+      <tr><td>The consent dialogue</td><td class="num">15%</td><td>Naming the mechanism without euphemism, inside 120 words.</td></tr>
+    </tbody>
+  </table></div>
+  <div class="prose" style="margin-top:26px"><p>No exam. Nothing is submitted that has not been argued out loud. If you are unsure whether something counts as a concession, a defensible finding or a limit worth stating, bring it — all three carry marks and none of them is an admission of failure.</p></div>
+</section>
+
+<section id="reading" class="wrap">
+  <div class="sec-head"><span class="sec-no">06</span><h2>Reading</h2></div>
+  <p class="lede">The first three do the structural work. Read Williams and the two Sunstein pieces before week three.</p>
+  <div class="prose"><ul>
+    <li>Williams, J. (2018). <i>Stand Out of Our Light.</i> — The attentional environment as structural rather than conspiratorial; impulsive against reflective will; agency as the measure of a technology.</li>
+    <li>Sunstein, C.R. (2016). <i>Fifty Shades of Manipulation</i>; <i>The Ethics of Influence.</i> — The manipulation criterion and the publicity principle. Short, and the two criteria you will use most.</li>
+    <li>Doidge, N. (2007). <i>The Brain That Changes Itself.</i> — Neuroplasticity, and why a design decision is also a decision about the architecture a person will bring to everything afterwards.</li>
+    <li>Kahneman, D. (2011). <i>Thinking, Fast and Slow.</i> — The two systems; loss aversion; why a statistical profile collapses on a named individual.</li>
+    <li>Eagleman, D. (2011). <i>Incognito.</i> — The unconscious architecture, and what behavioural data can therefore never capture.</li>
+    <li>Kaplan, S. &amp; Kaplan, R. (1989). <i>The Experience of Nature.</i> — Attention restoration, directed attention fatigue, and the four properties.</li>
+    <li>Cialdini, R.B. (2016). <i>Pre-Suasion.</i> — The engineering of the moment before the message, which is what notification timing is.</li>
+  </ul></div>
+</section>
+
+</main>
+
+<footer class="wrap colophon">
+  <p>Assembled from material underlying <i>Media as Universe: An Antifragile Framework for Communication Design in the Attention Economy</i>. The five questions and the three postures are the manuscript's own and are quoted rather than paraphrased, so that work done here is comparable with work done in the other courses of the programme.</p>
+  <p>Drafts you type into the papers above are kept in this browser and nowhere else. They are not transmitted, not stored on a server and not visible to the instructor. Clearing your browser data clears them.</p>
+</footer>
+
+<script>
+(function () {
+  "use strict";
+  var el = function (id) { return document.getElementById(id); };
+
+  var KEY = "nhd-handbook-v1";
+  var draft = {};
+  try { var raw = window.localStorage.getItem(KEY); if (raw) { draft = JSON.parse(raw) || {}; } } catch (e) { draft = {}; }
+  var t = null;
+  function save() {
+    if (t) { window.clearTimeout(t); }
+    t = window.setTimeout(function () {
+      try { window.localStorage.setItem(KEY, JSON.stringify(draft)); } catch (e) { /* blocked storage */ }
+    }, 400);
+  }
+
+  /* ---------- field papers ---------- */
+  var PAPERS = ["vuln", "consent", "review"];
+  PAPERS.forEach(function (name) {
+    var host = document.querySelector('[data-paper="' + name + '"]');
+    if (!host) { return; }
+    Array.prototype.forEach.call(host.querySelectorAll("input[data-f], textarea[data-f]"), function (node) {
+      var k = name + ":" + node.id;
+      if (typeof draft[k] === "string") { node.value = draft[k]; }
+      node.addEventListener("input", function () { draft[k] = node.value; save(); });
+    });
+  });
+
+  function paperText(name) {
+    var host = document.querySelector('[data-paper="' + name + '"]');
+    var title = document.querySelector("#paper-" + name + " h3");
+    var lines = [(title ? title.textContent : name).toUpperCase(), ""];
+    Array.prototype.forEach.call(host.querySelectorAll("input[data-f], textarea[data-f]"), function (node) {
+      lines.push(node.getAttribute("data-f") + ": " + (node.value.trim() || "—"));
+    });
+    return lines.join("\n");
+  }
+
+  /* ---------- 120-word limit on the consent dialogue ---------- */
+  (function () {
+    var ta = el("c-text"), out = el("c-count");
+    function up() {
+      var w = ta.value.trim() ? ta.value.trim().split(/\s+/).length : 0;
+      out.textContent = w + (w === 1 ? " word" : " words") + (w > 120 ? " · " + (w - 120) + " over the limit" : " · limit 120");
+      if (w > 120) { out.classList.add("over"); } else { out.classList.remove("over"); }
+    }
+    ta.addEventListener("input", up); up();
+  })();
+
+  /* ---------- row tables ---------- */
+  var TABLES = {
+    mech: { cols: ["mechanism", "where", "target", "population", "frequency", "defensible"],
+      head: ["Mechanism", "Where it appears", "Cognitive target", "Most exposed population", "Frequency", "Defensible?"],
+      place: { mechanism: "as a person meets it", where: "screen, flow", target: "the system it acts on",
+        population: "who, specifically", frequency: "times a day", defensible: "yes / no / contested" },
+      title: "MECHANISM REGISTER" },
+    reg: { cols: ["mechanism", "does", "regime", "establish"],
+      head: ["Mechanism", "What it does", "Regime to ask about", "Establish first"],
+      place: { mechanism: "from paper one", does: "the behaviour, not the law", regime: "which area", establish: "the question for counsel" },
+      title: "REGULATORY EXPOSURE NOTE — QUESTIONS FOR COUNSEL" },
+    am: { cols: ["finding", "objection", "outcome", "why"],
+      head: ["Finding", "The objection, stated fairly", "Held or amended", "Why"],
+      place: { finding: "number", objection: "in their words", outcome: "held / amended", why: "briefly" },
+      title: "AMENDMENT RECORD" }
+  };
+
+  Object.keys(TABLES).forEach(function (key) {
+    var spec = TABLES[key];
+    var rows = Array.isArray(draft[key + "Rows"]) ? draft[key + "Rows"] : [];
+
+    function render() {
+      var body = el(key + "-body");
+      body.innerHTML = "";
+      rows.forEach(function (row, i) {
+        var tr = document.createElement("tr");
+        spec.cols.forEach(function (c) {
+          var td = document.createElement("td");
+          var inp = document.createElement("input");
+          inp.type = "text"; inp.value = row[c] || ""; inp.placeholder = spec.place[c];
+          inp.setAttribute("aria-label", c + ", row " + (i + 1));
+          inp.addEventListener("input", function () { rows[i][c] = inp.value; draft[key + "Rows"] = rows; save(); });
+          td.appendChild(inp); tr.appendChild(td);
+        });
+        var tdx = document.createElement("td");
+        var b = document.createElement("button");
+        b.type = "button"; b.className = "rowdrop"; b.textContent = "Drop";
+        b.addEventListener("click", function () { rows.splice(i, 1); draft[key + "Rows"] = rows; save(); render(); });
+        tdx.appendChild(b); tr.appendChild(tdx);
+        body.appendChild(tr);
+      });
+    }
+
+    spec.render = render;
+    spec.rows = rows;
+    spec.add = function () { rows.push({}); draft[key + "Rows"] = rows; save(); render(); };
+    spec.text = function () {
+      var out = [spec.title, "", spec.head.join("\t")];
+      rows.forEach(function (r) {
+        out.push(spec.cols.map(function (c) { return (r[c] || "").replace(/\t/g, " "); }).join("\t"));
+      });
+      return out.join("\n");
+    };
+
+    if (!rows.length) { rows.push({}, {}, {}); draft[key + "Rows"] = rows; }
+    render();
+  });
+
+  /* ---------- copy out ---------- */
+  function textFor(name) {
+    if (TABLES[name]) { return TABLES[name].text(); }
+    return paperText(name);
+  }
+  function fallback(text, msg) {
+    el("copyout-msg").textContent = msg;
+    el("copyout-text").value = text;
+    el("copyout").hidden = false;
+    var ta = el("copyout-text");
+    ta.focus(); ta.setSelectionRange(0, ta.value.length);
+    el("copyout").scrollIntoView({ block: "nearest" });
+  }
+  function flash(name, msg) {
+    var s = el("st-" + name);
+    if (!s) { return; }
+    s.textContent = msg;
+    window.setTimeout(function () { if (s.textContent === msg) { s.textContent = ""; } }, 2600);
+  }
+  Array.prototype.forEach.call(document.querySelectorAll("[data-copy]"), function (btn) {
+    btn.addEventListener("click", function () {
+      var name = btn.getAttribute("data-copy");
+      var text = textFor(name);
+      el("copyout").hidden = true;
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(
+          function () { flash(name, "Copied"); },
+          function () { fallback(text, "Copying was refused here. Select the text below and copy it manually."); }
+        );
+      } else {
+        fallback(text, "Select the text below and copy it manually.");
+      }
+    });
+  });
+  Array.prototype.forEach.call(document.querySelectorAll("[data-addrow]"), function (btn) {
+    btn.addEventListener("click", function () { TABLES[btn.getAttribute("data-addrow")].add(); });
+  });
+})();
+</script>
+</body>
+</html>

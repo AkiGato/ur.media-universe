@@ -1,0 +1,1051 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Antifragile Studio Kit</title>
+<style>
+  /* Layout: one column of sheets, separated by hairlines rather than cards.
+     Nothing is a filled area except a light source, and nothing is a straight
+     segment — the readings are drawn as bowed filaments. Monochrome; state is
+     encoded in the direction a filament bows, never in hue. */
+  :root {
+    --ground: #ececeb;
+    --ink: #15161a;
+    --ink-soft: #55575d;
+    --ink-faint: #8b8d93;
+    --hair: #c6c7c4;
+    --hair-faint: #d9dad7;
+    --display: "Newsreader", "Iowan Old Style", Georgia, serif;
+    --body: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+    --ease: cubic-bezier(0.33, 0.01, 0.2, 1);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground: #0b0c0d;
+      --ink: #e7e6e2;
+      --ink-soft: #a0a09c;
+      --ink-faint: #6e6f6c;
+      --hair: #35373a;
+      --hair-faint: #25272a;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --ground: #0b0c0d;
+    --ink: #e7e6e2;
+    --ink-soft: #a0a09c;
+    --ink-faint: #6e6f6c;
+    --hair: #35373a;
+    --hair-faint: #25272a;
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--ink);
+    font-family: var(--body);
+    font-weight: 300;
+    font-size: 15px;
+    line-height: 1.68;
+    -webkit-font-smoothing: antialiased;
+  }
+  h1, h2, h3, h4, p, ul, ol, dl, dd, figure { margin: 0; }
+  ul, ol { padding-left: 1.1em; }
+  li { margin-block: 0.3em; }
+  strong { font-weight: 300; color: var(--ink); border-bottom: 1px solid var(--hair); }
+
+  .wrap { max-width: 920px; margin: 0 auto; padding-inline: 20px; padding-block: 0; }
+
+  /* ---- index bar ---- */
+  .index {
+    position: sticky;
+    top: env(safe-area-inset-top, 0px);
+    z-index: 10;
+    background: var(--ground);
+    border-bottom: 1px solid var(--hair);
+  }
+  .index-row {
+    display: flex; flex-wrap: wrap; gap: 4px 20px;
+    align-items: baseline;
+    padding-block: 11px;
+  }
+  .index a {
+    font-size: 11px; text-transform: uppercase; letter-spacing: 0.2em;
+    color: var(--ink-faint); text-decoration: none;
+    padding-bottom: 2px; border-bottom: 1px solid transparent;
+    transition: color 0.3s var(--ease), border-color 0.3s var(--ease);
+  }
+  .index a:hover, .index a:focus-visible { color: var(--ink); border-bottom-color: var(--hair); }
+
+  /* ---- masthead ---- */
+  .mast { padding-block: 56px 40px; border-bottom: 1px solid var(--hair); }
+  .eyebrow {
+    font-size: 11px; text-transform: uppercase; letter-spacing: 0.2em;
+    color: var(--ink-faint);
+  }
+  h1 {
+    font-family: var(--display); font-weight: 300;
+    font-size: clamp(30px, 6.4vw, 44px); line-height: 1.12;
+    letter-spacing: -0.012em; text-wrap: balance;
+    margin-top: 14px; max-width: 24ch;
+  }
+  .standfirst { margin-top: 20px; max-width: 64ch; color: var(--ink-soft); }
+  .mast-meta {
+    display: flex; flex-wrap: wrap; gap: 0 32px;
+    margin-top: 28px;
+    font-size: 11px; text-transform: uppercase; letter-spacing: 0.2em;
+    color: var(--ink-faint);
+  }
+
+  /* ---- sections ---- */
+  section { padding-block: 52px; border-bottom: 1px solid var(--hair); }
+  .sec-head { display: flex; gap: 14px; align-items: baseline; margin-bottom: 26px; }
+  .sec-no {
+    font-size: 11px; letter-spacing: 0.2em; color: var(--ink-faint);
+    font-variant-numeric: tabular-nums; flex: none;
+  }
+  h2 {
+    font-family: var(--display); font-weight: 300;
+    font-size: clamp(22px, 4vw, 30px); line-height: 1.2;
+    letter-spacing: -0.008em; text-wrap: balance;
+  }
+  .lede { max-width: 64ch; color: var(--ink-soft); margin-bottom: 30px; }
+  h3 {
+    font-family: var(--display); font-weight: 300;
+    font-size: 19px; line-height: 1.3; margin-bottom: 8px; text-wrap: balance;
+  }
+  h4 {
+    font-size: 11px; text-transform: uppercase; letter-spacing: 0.2em;
+    color: var(--ink-faint); margin-bottom: 10px;
+  }
+  .prose { max-width: 66ch; }
+  .prose p + p { margin-top: 14px; }
+
+  /* ---- week grid ---- */
+  .weeks { display: grid; gap: 1px; background: var(--hair-faint); }
+  @media (min-width: 760px) { .weeks { grid-template-columns: repeat(4, 1fr); } }
+  .week { background: var(--ground); padding: 20px 18px 24px; min-width: 0; }
+  .week .no {
+    font-size: 11px; text-transform: uppercase; letter-spacing: 0.2em;
+    color: var(--ink-faint); display: block; margin-bottom: 10px;
+  }
+  .week h3 { font-size: 19px; margin-bottom: 10px; }
+  .week p { font-size: 13px; color: var(--ink-soft); line-height: 1.6; }
+  .week .out {
+    margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--hair-faint);
+    font-size: 13px;
+  }
+  .week .out span {
+    font-size: 11px; text-transform: uppercase; letter-spacing: 0.2em;
+    color: var(--ink-faint); display: block; margin-bottom: 4px;
+  }
+
+  /* ---- run sheets ---- */
+  .runs { display: grid; gap: 34px; }
+  .run-week > h3 { padding-bottom: 10px; border-bottom: 1px solid var(--hair); margin-bottom: 0; }
+  .sess { padding-block: 16px; border-bottom: 1px solid var(--hair-faint); }
+  .sess-top { display: flex; gap: 14px; align-items: baseline; }
+  .sess-no {
+    font-size: 11px; letter-spacing: 0.2em; color: var(--ink-faint);
+    font-variant-numeric: tabular-nums; flex: none; min-width: 2.6em;
+  }
+  .sess-q { font-family: var(--display); font-size: 19px; line-height: 1.3; min-width: 0; }
+  .sess-body { margin-top: 10px; padding-left: 0; display: grid; gap: 10px; }
+  @media (min-width: 680px) { .sess-body { padding-left: calc(2.6em + 14px); } }
+  .pair { display: grid; gap: 2px; }
+  @media (min-width: 560px) { .pair { grid-template-columns: 7.5em 1fr; gap: 0 18px; } }
+  .pair dt {
+    font-size: 11px; text-transform: uppercase; letter-spacing: 0.2em;
+    color: var(--ink-faint);
+  }
+  .pair dd { font-size: 14px; min-width: 0; }
+
+  /* ---- games ---- */
+  .games { display: grid; gap: 1px; background: var(--hair-faint); }
+  @media (min-width: 720px) { .games { grid-template-columns: 1fr 1fr; } }
+  .game { background: var(--ground); padding: 24px 20px 26px; min-width: 0; }
+  .game .tag {
+    font-size: 11px; text-transform: uppercase; letter-spacing: 0.2em;
+    color: var(--ink-faint); display: block; margin-bottom: 10px;
+  }
+  .game ol { font-size: 14px; margin-top: 10px; }
+  .game .why {
+    margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--hair-faint);
+    font-size: 13px; color: var(--ink-soft);
+  }
+
+  /* ---- instruments ---- */
+  .inst { padding-block: 30px; border-top: 1px solid var(--hair); }
+  .inst:first-of-type { border-top: none; padding-top: 0; }
+  button {
+    font-family: var(--body); font-weight: 300; font-size: 11px;
+    text-transform: uppercase; letter-spacing: 0.2em;
+    color: var(--ink); background: none;
+    border: none; border-bottom: 1px solid var(--hair);
+    padding: 6px 0; cursor: pointer; border-radius: 0;
+    transition: border-color 0.3s var(--ease), color 0.3s var(--ease);
+  }
+  button:hover, button:focus-visible { border-bottom-color: var(--ink); }
+  button:focus-visible { outline: none; color: var(--ink); }
+  .btn-row { display: flex; flex-wrap: wrap; gap: 0 26px; margin-top: 20px; }
+
+  /* deck */
+  .card-face { padding-block: 22px; min-height: 160px; }
+  .card-face .kicker {
+    font-size: 11px; text-transform: uppercase; letter-spacing: 0.2em;
+    color: var(--ink-faint); display: block; margin-bottom: 12px;
+  }
+  .card-face .mech {
+    font-family: var(--display); font-size: clamp(19px, 3.4vw, 26px);
+    line-height: 1.25; max-width: 40ch; text-wrap: balance;
+  }
+  .card-answer { margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--hair); }
+  .card-answer .pair dd { font-size: 14px; }
+  .deck-count {
+    font-size: 11px; letter-spacing: 0.2em; color: var(--ink-faint);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* roulette */
+  .draw { display: grid; gap: 1px; background: var(--hair-faint); margin-top: 20px; }
+  @media (min-width: 680px) { .draw { grid-template-columns: repeat(3, 1fr); } }
+  .draw-cell { background: var(--ground); padding: 18px; min-width: 0; }
+  .draw-cell span {
+    font-size: 11px; text-transform: uppercase; letter-spacing: 0.2em;
+    color: var(--ink-faint); display: block; margin-bottom: 8px;
+  }
+  .draw-cell p { font-family: var(--display); font-size: 19px; line-height: 1.3; }
+
+  /* delta */
+  .delta-grid { display: grid; gap: 28px; margin-top: 6px; }
+  @media (min-width: 780px) { .delta-grid { grid-template-columns: 1fr 1fr; gap: 40px; } }
+  fieldset { border: none; padding: 0; margin: 0; min-width: 0; }
+  legend {
+    font-size: 11px; text-transform: uppercase; letter-spacing: 0.2em;
+    color: var(--ink-faint); padding: 0; margin-bottom: 14px;
+  }
+  .q { padding-block: 12px; border-top: 1px solid var(--hair-faint); }
+  .q label { display: block; font-size: 14px; line-height: 1.5; }
+  .q .anchors {
+    display: flex; justify-content: space-between; gap: 12px;
+    font-size: 11px; color: var(--ink-faint); margin-top: 8px;
+  }
+  input[type="range"] {
+    -webkit-appearance: none; appearance: none;
+    width: 100%; margin: 10px 0 0; background: none; cursor: pointer;
+  }
+  input[type="range"]::-webkit-slider-runnable-track {
+    height: 1px; background: var(--hair);
+  }
+  input[type="range"]::-moz-range-track { height: 1px; background: var(--hair); }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none; appearance: none;
+    width: 9px; height: 9px; border-radius: 50%;
+    background: var(--ink); border: none; margin-top: -4px;
+  }
+  input[type="range"]::-moz-range-thumb {
+    width: 9px; height: 9px; border-radius: 50%;
+    background: var(--ink); border: none;
+  }
+  input[type="range"]:focus-visible { outline: 1px solid var(--ink); outline-offset: 6px; }
+  .reading { margin-top: 30px; padding-top: 22px; border-top: 1px solid var(--hair); }
+  .reading-top { display: flex; flex-wrap: wrap; gap: 12px 40px; align-items: baseline; }
+  .big {
+    font-family: var(--display); font-size: clamp(38px, 8vw, 54px); line-height: 1;
+    font-variant-numeric: tabular-nums; letter-spacing: -0.02em;
+  }
+  .band { font-size: 11px; text-transform: uppercase; letter-spacing: 0.2em; }
+  .avg { font-size: 13px; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+  .plot { margin-top: 20px; overflow-x: auto; }
+  .plot svg { display: block; max-width: 100%; height: auto; }
+  .verdict { margin-top: 18px; max-width: 62ch; font-size: 14px; }
+  .caveat { margin-top: 12px; max-width: 62ch; font-size: 13px; color: var(--ink-faint); }
+
+  /* gate */
+  .gate-q { padding-block: 16px; border-top: 1px solid var(--hair-faint); }
+  .gate-q .n {
+    font-size: 11px; letter-spacing: 0.2em; color: var(--ink-faint);
+    font-variant-numeric: tabular-nums;
+  }
+  .gate-q p { font-size: 15px; max-width: 58ch; margin-top: 4px; }
+  .gate-q .note { font-size: 13px; color: var(--ink-faint); margin-top: 4px; }
+  .choices { display: flex; gap: 22px; margin-top: 12px; }
+  .choices label { font-size: 13px; display: flex; align-items: center; gap: 7px; cursor: pointer; }
+  input[type="radio"] { accent-color: var(--ink); margin: 0; }
+  .gate-out { margin-top: 26px; padding-top: 20px; border-top: 1px solid var(--hair); }
+  .gate-out .big { font-family: var(--display); font-size: clamp(24px, 5vw, 34px); }
+
+  /* ---- tables ---- */
+  .tablewrap { overflow-x: auto; margin-top: 18px; }
+  table { border-collapse: collapse; width: 100%; min-width: 440px; font-size: 14px; }
+  th, td { text-align: left; padding: 11px 16px 11px 0; border-bottom: 1px solid var(--hair-faint); vertical-align: top; }
+  th {
+    font-size: 11px; text-transform: uppercase; letter-spacing: 0.2em;
+    color: var(--ink-faint); font-weight: 300; border-bottom-color: var(--hair);
+  }
+  td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+  .colophon { padding-block: 44px 64px; font-size: 13px; color: var(--ink-faint); max-width: 66ch; }
+  .colophon p + p { margin-top: 12px; }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { transition-duration: 0.01ms !important; }
+  }
+</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300;1,6..72,300&family=IBM+Plex+Sans:ital,wght@0,300;1,300&display=swap">
+<style>[hidden]{display:none!important}img{max-width:100%}</style>
+</head>
+<body>
+
+<nav class="index">
+  <div class="wrap index-row">
+    <a href="#map">Map</a>
+    <a href="#runs">Run sheets</a>
+    <a href="#games">Games</a>
+    <a href="#instruments">Instruments</a>
+    <a href="#loop">The loop back</a>
+    <a href="#assess">Assessment</a>
+    <a href="#teaching">Teaching notes</a>
+  </div>
+</nav>
+
+<header class="wrap mast">
+  <span class="eyebrow">Facilitator's kit</span>
+  <h1>Antifragile Communication Design</h1>
+  <p class="standfirst">A four-week studio course on attention, persuasion mechanics and the cost of what we build. Students name the mechanics operating on them, design one artifact against a stated standard, measure what it does to the people who receive it, and report the number whether or not it flatters them.</p>
+  <div class="mast-meta">
+    <span>4 weeks · 16 sessions</span>
+    <span>48 contact hours</span>
+    <span>Studio format</span>
+  </div>
+</header>
+
+<main>
+
+<section id="map" class="wrap">
+  <div class="sec-head"><span class="sec-no">01</span><h2>The map</h2></div>
+  <p class="lede">Four weeks, four sessions each, three hours a session. Each week ends with something made, not something covered. The seminar beat is never longer than forty minutes, because a course about directed attention cannot be delivered as a two-hour slide performance.</p>
+  <div class="weeks">
+    <div class="week">
+      <span class="no">Week one</span>
+      <h3>The mechanics and the market</h3>
+      <p>How the attention economy extracts. Dual-process cognition under high-arousal design. The four fractures of the Fragility Index — monopoly, finite attention, closing regulatory lag, borrowed trust.</p>
+      <div class="out"><span>Output</span>A named mechanics inventory, and a structural fragility verdict on a real brand.</div>
+    </div>
+    <div class="week">
+      <span class="no">Week two</span>
+      <h3>Reading the person</h3>
+      <p>Why statistical profiles collapse on individuals. Directed attention fatigue. Pre-suasion. The three cognitive postures as an operational replacement for psychographic segments.</p>
+      <div class="out"><span>Output</span>One campaign rewritten three times, one version discarded at the gate.</div>
+    </div>
+    <div class="week">
+      <span class="no">Week three</span>
+      <h3>Reading the claim</h3>
+      <p>Surface against structure. The Causal Taxonomy: decomposing a commercial claim into its economic, historical and neuro-psychological roots. Build phase opens.</p>
+      <div class="out"><span>Output</span>A root-node analysis, and the thing the claim did not disclose.</div>
+    </div>
+    <div class="week">
+      <span class="no">Week four</span>
+      <h3>Build, measure, defend</h3>
+      <p>The four properties of restorative environments as design criteria. The anti-engagement metrics. One artifact, built under the production ruleset, measured on live subjects.</p>
+      <div class="out"><span>Output</span>The artifact, its Restoration Delta, and a public defence.</div>
+    </div>
+  </div>
+</section>
+
+<section id="runs" class="wrap">
+  <div class="sec-head"><span class="sec-no">02</span><h2>Run sheets</h2></div>
+  <p class="lede">One sheet per session, written to be read standing up. The question is what the session answers. The move is what the room does for the remaining two hours.</p>
+
+  <div class="runs">
+
+    <div class="run-week">
+      <h3>Week one — The mechanics and the market</h3>
+
+      <div class="sess">
+        <div class="sess-top"><span class="sess-no">1.1</span><p class="sess-q">Why were we never built for this?</p></div>
+        <div class="sess-body">
+          <dl class="pair"><dt>Beat</dt><dd>The scale mismatch. A nervous system calibrated for a village receiving a planet. System 1 and System 2, and what happens when one is knocked off the rails.</dd></dl>
+          <dl class="pair"><dt>Move</dt><dd>Each student writes down, from memory, the last three things they bought or watched without deciding to. Read aloud, no commentary, no analysis yet. The list is the course's first dataset.</dd></dl>
+          <dl class="pair"><dt>Output</dt><dd>A wall of unchosen actions.</dd></dl>
+        </div>
+      </div>
+
+      <div class="sess">
+        <div class="sess-top"><span class="sess-no">1.2</span><p class="sess-q">What are the actual weapons?</p></div>
+        <div class="sess-body">
+          <dl class="pair"><dt>Beat</dt><dd>Cialdini's principles inverted. Scarcity as manufactured cortisol. Social proof as a tether. Variable reward, where the unpredictability is the mechanism and the content does not need to be good.</dd></dl>
+          <dl class="pair"><dt>Move</dt><dd><strong>The Weapons Deck</strong>, two rounds.</dd></dl>
+          <dl class="pair"><dt>Output</dt><dd>A shared vocabulary. From here on a mechanic gets named, not described.</dd></dl>
+        </div>
+      </div>
+
+      <div class="sess">
+        <div class="sess-top"><span class="sess-no">1.3</span><p class="sess-q">What does the engine actually select for?</p></div>
+        <div class="sess-body">
+          <dl class="pair"><dt>Beat</dt><dd>The high-arousal filter. The viral quadrant. Why the system cannot monetise calm, and why the blind spot — a reaction is a reaction — makes outrage the optimal output rather than a failure.</dd></dl>
+          <dl class="pair"><dt>Move</dt><dd>Teams audit one assigned product and produce the mechanics inventory: every scarcity cue, social-proof counter and variable-reward surface, each with a screenshot and the principle it inverts.</dd></dl>
+          <dl class="pair"><dt>Output</dt><dd>The mechanics inventory. This is assessed.</dd></dl>
+        </div>
+      </div>
+
+      <div class="sess">
+        <div class="sess-top"><span class="sess-no">1.4</span><p class="sess-q">Where is this model structurally weak?</p></div>
+        <div class="sess-body">
+          <dl class="pair"><dt>Beat</dt><dd>Fragility as dependence on a counterparty's stability. The four fractures. The landlord, not the infrastructure.</dd></dl>
+          <dl class="pair"><dt>Move</dt><dd>Teach the Meta boycott and the Patagonia contrast as the worked example, then teams score a brand of their own choosing against all four fractures.</dd></dl>
+          <dl class="pair"><dt>Output</dt><dd>A one-page structural verdict, written in the register of the case studies.</dd></dl>
+        </div>
+      </div>
+    </div>
+
+    <div class="run-week">
+      <h3>Week two — Reading the person</h3>
+
+      <div class="sess">
+        <div class="sess-top"><span class="sess-no">2.1</span><p class="sess-q">Why does the profile not work?</p></div>
+        <div class="sess-body">
+          <dl class="pair"><dt>Beat</dt><dd>Demographics to psychographics to predictive modelling, each transition felt like precision and was a deeper dehumanisation. Why statistical probability collapses into noise on a named individual. Behavioural data as the shadow a person left behind.</dd></dl>
+          <dl class="pair"><dt>Move</dt><dd>Hand each team a real audience segment from a real media kit. They write the person it claims to describe, then write the three people it would describe equally well who would need opposite communication.</dd></dl>
+          <dl class="pair"><dt>Output</dt><dd>Three counter-examples per segment.</dd></dl>
+        </div>
+      </div>
+
+      <div class="sess">
+        <div class="sess-top"><span class="sess-no">2.2</span><p class="sess-q">What state is the person in?</p></div>
+        <div class="sess-body">
+          <dl class="pair"><dt>Beat</dt><dd>Directed attention as a finite resource that depletes with use. What happens at the ceiling: System 2 steps down, System 1 takes over. Soft fascination as the opposite condition. Pre-suasion, and the feed as pre-suasive architecture.</dd></dl>
+          <dl class="pair"><dt>Move</dt><dd>Run the Restoration Delta on the room, cold, before anyone has been taught the instrument. Record the readings. Then teach what was just measured.</dd></dl>
+          <dl class="pair"><dt>Output</dt><dd>A baseline reading for the cohort, kept for week four.</dd></dl>
+        </div>
+      </div>
+
+      <div class="sess">
+        <div class="sess-top"><span class="sess-no">2.3</span><p class="sess-q">Can you write for a state instead of a profile?</p></div>
+        <div class="sess-body">
+          <dl class="pair"><dt>Beat</dt><dd>The three postures — restoration-seeking, agency-seeking, meaning-seeking. Designed analytical categories, not discovered psychological types and not personas. What each posture can actually receive.</dd></dl>
+          <dl class="pair"><dt>Move</dt><dd><strong>Posture Roulette</strong>, three rounds, then the same brief written properly for all three postures.</dd></dl>
+          <dl class="pair"><dt>Output</dt><dd>Three posture-specific treatments of one brief.</dd></dl>
+        </div>
+      </div>
+
+      <div class="sess">
+        <div class="sess-top"><span class="sess-no">2.4</span><p class="sess-q">Would it survive being explained?</p></div>
+        <div class="sess-body">
+          <dl class="pair"><dt>Beat</dt><dd>The five questions as an operational standard rather than a checklist. Questions three and four restate Sunstein's criterion for manipulation and the publicity principle behind it; what the dossier adds is the operationalisation, at production scale.</dd></dl>
+          <dl class="pair"><dt>Move</dt><dd><strong>Build the Worst Thing.</strong> Then every team runs its own three treatments through the gate and discards whichever fails.</dd></dl>
+          <dl class="pair"><dt>Output</dt><dd>Two surviving treatments and a written defence of the discard. The discard is assessed.</dd></dl>
+        </div>
+      </div>
+    </div>
+
+    <div class="run-week">
+      <h3>Week three — Reading the claim</h3>
+
+      <div class="sess">
+        <div class="sess-top"><span class="sess-no">3.1</span><p class="sess-q">What has the headline already done?</p></div>
+        <div class="sess-body">
+          <dl class="pair"><dt>Beat</dt><dd>The availability heuristic: vivid information surfaces faster, feels more true, and carries disproportionate weight afterwards. Confirmation bias compounding it. The outrage headline as a product that installs a lens, not a journalistic failure.</dd></dl>
+          <dl class="pair"><dt>Move</dt><dd>Students bring a commercial claim that made them feel something before they had finished reading it. The room identifies what was installed.</dd></dl>
+          <dl class="pair"><dt>Output</dt><dd>A set of live claims to work on for the rest of the week.</dd></dl>
+        </div>
+      </div>
+
+      <div class="sess">
+        <div class="sess-top"><span class="sess-no">3.2</span><p class="sess-q">Who benefits from this framing continuing?</p></div>
+        <div class="sess-body">
+          <dl class="pair"><dt>Beat</dt><dd>Surface against structure. The economic root: every narrative has a budget, and some framings are more promotable than others without anyone being corrupt.</dd></dl>
+          <dl class="pair"><dt>Move</dt><dd><strong>The Root Hunt</strong>, economic register only. Evidence required, cleverness not scored.</dd></dl>
+          <dl class="pair"><dt>Output</dt><dd>The economic branch of each team's root-node diagram.</dd></dl>
+        </div>
+      </div>
+
+      <div class="sess">
+        <div class="sess-top"><span class="sess-no">3.3</span><p class="sess-q">What does this extend, and what does it activate?</p></div>
+        <div class="sess-body">
+          <dl class="pair"><dt>Beat</dt><dd>The historical root: context as the load-bearing architecture of the present, and the facts being accurate while the framing still lies. The neuro-psychological root: loss aversion, belonging anxiety, status competition. Triangulated reading.</dd></dl>
+          <dl class="pair"><dt>Move</dt><dd>The Root Hunt completed across both remaining registers, then each diagram presented in four minutes.</dd></dl>
+          <dl class="pair"><dt>Output</dt><dd>The full root-node diagram, and one sentence naming what the claim did not disclose. This is assessed.</dd></dl>
+        </div>
+      </div>
+
+      <div class="sess">
+        <div class="sess-top"><span class="sess-no">3.4</span><p class="sess-q">What are you going to build?</p></div>
+        <div class="sess-body">
+          <dl class="pair"><dt>Beat</dt><dd>The four properties of restorative environments as design criteria: being away, extent, fascination, compatibility. Compatibility is the one extractive design violates most aggressively.</dd></dl>
+          <dl class="pair"><dt>Move</dt><dd>Briefs issued. Each team takes one branch of the production ruleset and writes down, before building, the three mechanics it is forbidding itself and what it will do instead.</dd></dl>
+          <dl class="pair"><dt>Output</dt><dd>A signed constraint sheet. It cannot be revised after this session.</dd></dl>
+        </div>
+      </div>
+    </div>
+
+    <div class="run-week">
+      <h3>Week four — Build, measure, defend</h3>
+
+      <div class="sess">
+        <div class="sess-top"><span class="sess-no">4.1</span><p class="sess-q">What gets measured instead?</p></div>
+        <div class="sess-body">
+          <dl class="pair"><dt>Beat</dt><dd>What gets measured gets built. The five anti-engagement metrics: cognitive clarity, agency index, restoration delta, trust compounding rate, meaning alignment. Not replacements for commercial measurement — the layer beneath it.</dd></dl>
+          <dl class="pair"><dt>Move</dt><dd>Build, supervised. Facilitator circulates and asks one question only: which mechanic did you just reach for, and why did you stop.</dd></dl>
+          <dl class="pair"><dt>Output</dt><dd>Working drafts.</dd></dl>
+        </div>
+      </div>
+
+      <div class="sess">
+        <div class="sess-top"><span class="sess-no">4.2</span><p class="sess-q">How much of a person's week is it fair to claim?</p></div>
+        <div class="sess-body">
+          <dl class="pair"><dt>Beat</dt><dd>Content minimisation. A budget, not a target: a campaign spends a budget and then owes a silence. A plan that decays without constant presence is a dependency, not a strategy.</dd></dl>
+          <dl class="pair"><dt>Move</dt><dd>Build continues. Each team must cut one piece from its own plan and say what the cut buys.</dd></dl>
+          <dl class="pair"><dt>Output</dt><dd>The artifact, finished, plus a stated budget.</dd></dl>
+        </div>
+      </div>
+
+      <div class="sess">
+        <div class="sess-top"><span class="sess-no">4.3</span><p class="sess-q">What did it cost the person who received it?</p></div>
+        <div class="sess-body">
+          <dl class="pair"><dt>Beat</dt><dd>The Restoration Delta: three questions before, three after, averaged, banded at plus or minus a half point. It is self-report, and self-report is what the standard asks for.</dd></dl>
+          <dl class="pair"><dt>Move</dt><dd><strong>The Delta Duel</strong>, run on volunteer subjects from another studio under the consent protocol.</dd></dl>
+          <dl class="pair"><dt>Output</dt><dd>Paired readings, written down before anyone discusses them.</dd></dl>
+        </div>
+      </div>
+
+      <div class="sess">
+        <div class="sess-top"><span class="sess-no">4.4</span><p class="sess-q">Would you be comfortable if they could see all of it?</p></div>
+        <div class="sess-body">
+          <dl class="pair"><dt>Beat</dt><dd>None. The facilitator does not speak for the first hour.</dd></dl>
+          <dl class="pair"><dt>Move</dt><dd><strong>The Fifth Question.</strong> Each team presents the artifact, the delta, the constraint sheet it signed in 3.4, and an answer to question five. The room may ask, but not congratulate.</dd></dl>
+          <dl class="pair"><dt>Output</dt><dd>The defence. Assessed.</dd></dl>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<section id="games" class="wrap">
+  <div class="sec-head"><span class="sec-no">03</span><h2>Six moves</h2></div>
+  <p class="lede">Five of these are games and the sixth deliberately is not. None of them awards points that persist, keeps a leaderboard, or records a streak. A course arguing that engagement mechanics are a design failure cannot run on them, and students notice the inconsistency faster than faculty do.</p>
+
+  <div class="games">
+
+    <div class="game">
+      <span class="tag">Session 1.2 · 25 minutes · teams of three</span>
+      <h3>The Weapons Deck</h3>
+      <p>A card describes a mechanic as a person actually meets it. Teams have sixty seconds to name three things: the principle it inverts, the cognitive system it targets, and where the production ruleset forbids it.</p>
+      <ol>
+        <li>Draw a card. Read it aloud. No screen, no search.</li>
+        <li>Teams write their three answers face down.</li>
+        <li>Reveal. A team scores only on all three being right.</li>
+        <li>Any team may challenge the answer on the card. A successful challenge is worth more than a correct answer, and the card gets rewritten.</li>
+      </ol>
+      <p class="why">The challenge rule is the point. The deck is a draft, not an authority, and the mechanics students bring from their own market are usually the ones missing from it. The most common challenge is also the most legitimate: a student will argue that the streak or the badge on the card is the same mechanic their own learning app uses to help them. They are right, and the answer is the one in the teaching notes below.</p>
+    </div>
+
+    <div class="game">
+      <span class="tag">Session 2.4 · 70 minutes · teams of four</span>
+      <h3>Build the Worst Thing</h3>
+      <p>Each team gets a legitimate product and twenty minutes to design the most extractive campaign for it they can. Every mechanic permitted. Nothing held back.</p>
+      <ol>
+        <li>Twenty minutes to build it. Encourage the room to compete on ruthlessness.</li>
+        <li>Then the condition is revealed: you will present it alongside a full, honest narration of every mechanism you used and the state it was designed to exploit.</li>
+        <li>Present both together, out loud, to the room.</li>
+        <li>The room votes on one question: would this still work?</li>
+      </ol>
+      <p class="why">This is the most important exercise in the course. Question three — would these mechanics still work if the person could see them clearly — is an argument when it is asserted and an experience when the room watches a campaign collapse under its own narration. Nobody forgets it, and no later session needs to re-argue it.</p>
+    </div>
+
+    <div class="game">
+      <span class="tag">Session 2.3 · 30 minutes · individual</span>
+      <h3>Posture Roulette</h3>
+      <p>Draw a posture, a product and a moment. Write the opening line, and write the one thing you will refuse to do.</p>
+      <ol>
+        <li>Draw three. The combination is often awkward; that is the exercise.</li>
+        <li>Four minutes to write the opening line and the refusal.</li>
+        <li>Read the line only. Withhold the posture.</li>
+        <li>The room guesses which posture it was written for.</li>
+      </ol>
+      <p class="why">If the room cannot tell, the line was written for nobody. This converts the postures from three paragraphs students can recite into a constraint they can feel the absence of.</p>
+    </div>
+
+    <div class="game">
+      <span class="tag">Sessions 3.2–3.3 · across two sessions · teams of four</span>
+      <h3>The Root Hunt</h3>
+      <p>Every team works the same commercial claim and digs for the deepest defensible root in each of the three registers.</p>
+      <ol>
+        <li>Each root must arrive with a source the room can check.</li>
+        <li>A root with no source scores nothing, however good it sounds.</li>
+        <li>Depth beats quantity: one root traced three steps back outranks five roots named once.</li>
+        <li>Any team may retire a root it can no longer defend. Retiring costs nothing. Defending something indefensible costs the round.</li>
+      </ol>
+      <p class="why">Scoring evidence rather than ingenuity is what separates the taxonomy from a conspiracy framework, and the distinction has to be enforced by the rules, not stated in the lecture.</p>
+    </div>
+
+    <div class="game">
+      <span class="tag">Session 4.3 · 90 minutes · pairs of teams</span>
+      <h3>The Delta Duel</h3>
+      <p>Two teams build two versions of the same thing. Both get measured on the same volunteer subjects, and both numbers get read out.</p>
+      <ol>
+        <li>One version is built under the ruleset. The other is built to convert, with the mechanics permitted.</li>
+        <li>Volunteers from another studio, briefed and consenting, give three readings before and three after.</li>
+        <li>Record the delta and, separately, whatever conversion proxy the brief allows.</li>
+        <li>Read both numbers. Do not reconcile them.</li>
+      </ol>
+      <p class="why">The extractive version frequently wins on conversion and loses on delta. That split is the dossier's own worked example, and watching it happen with their own numbers is the moment students stop treating the ethical argument as a preference.</p>
+    </div>
+
+    <div class="game">
+      <span class="tag">Session 4.4 · 90 minutes · whole cohort</span>
+      <h3>The Fifth Question</h3>
+      <p>Not a game. No teams, no scoring, no winner. Each student reads their artifact's delta aloud, then answers question five in their own words.</p>
+      <ol>
+        <li>The number is read before the explanation, not after.</li>
+        <li>A bad number is read in the same tone as a good one.</li>
+        <li>The room may ask questions. The room may not congratulate.</li>
+        <li>The facilitator says nothing until everyone has finished.</li>
+      </ol>
+      <p class="why">The course spends three weeks arguing that measurement is only worth something if the measurer reports it honestly when it goes against them. This session is where that gets practised rather than asserted, which is why it is deliberately the one session with nothing enjoyable about it.</p>
+    </div>
+
+  </div>
+</section>
+
+<section id="instruments" class="wrap">
+  <div class="sec-head"><span class="sec-no">04</span><h2>Instruments</h2></div>
+  <p class="lede">Four working instruments for use in the room. They keep nothing: no reading is stored, transmitted or counted, here or anywhere. An instrument built to teach the cost of silent collection cannot collect silently, and the research protocol is in the next section for that reason.</p>
+
+  <div class="inst">
+    <h4>Instrument one</h4>
+    <h3>The Weapons Deck</h3>
+    <p class="prose">Draw, answer, then reveal. Sixteen cards drawn from real commercial practice, deliberately mixed across markets.</p>
+    <div class="card-face">
+      <span class="kicker" id="deck-kicker">Card — not yet drawn</span>
+      <p class="mech" id="deck-mech">Press draw to begin. Read the card aloud; the room answers before anyone reveals.</p>
+      <div class="card-answer" id="deck-answer" hidden>
+        <dl class="pair"><dt>Inverts</dt><dd id="deck-principle"></dd></dl>
+        <dl class="pair"><dt>Targets</dt><dd id="deck-system"></dd></dl>
+        <dl class="pair"><dt>Forbidden by</dt><dd id="deck-rule"></dd></dl>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button type="button" id="deck-draw">Draw a card</button>
+      <button type="button" id="deck-reveal">Reveal the answer</button>
+      <button type="button" id="deck-shuffle">Shuffle the deck</button>
+      <span class="deck-count" id="deck-count">16 cards remaining</span>
+    </div>
+  </div>
+
+  <div class="inst">
+    <h4>Instrument two</h4>
+    <h3>Posture Roulette</h3>
+    <p class="prose">Three decks drawn at once. Write the opening line and the refusal; withhold the posture when you read it out.</p>
+    <div class="draw">
+      <div class="draw-cell"><span>Posture</span><p id="rl-posture">—</p></div>
+      <div class="draw-cell"><span>Product</span><p id="rl-product">—</p></div>
+      <div class="draw-cell"><span>Moment</span><p id="rl-moment">—</p></div>
+    </div>
+    <div class="btn-row">
+      <button type="button" id="rl-draw">Draw a brief</button>
+    </div>
+  </div>
+
+  <div class="inst">
+    <h4>Instrument three</h4>
+    <h3>Restoration Delta</h3>
+    <p class="prose">The three questions, verbatim, asked immediately before the interaction and immediately after. Each answered from one to five. The delta is the after-reading minus the before, averaged across the three.</p>
+    <div class="delta-grid">
+      <fieldset>
+        <legend>Before</legend>
+        <div class="q">
+          <label for="b1">Right now, how easily could you concentrate on something that requires effort?</label>
+          <input type="range" id="b1" class="d-before" min="1" max="5" step="1" value="3">
+          <div class="anchors"><span>1 · not at all</span><span>5 · easily</span></div>
+        </div>
+        <div class="q">
+          <label for="b2">Right now, how much does anything feel urgent or demanding of you?</label>
+          <input type="range" id="b2" class="d-before" min="1" max="5" step="1" value="3">
+          <div class="anchors"><span>1 · everything</span><span>5 · nothing</span></div>
+        </div>
+        <div class="q">
+          <label for="b3">Right now, could you make a considered decision, or only react?</label>
+          <input type="range" id="b3" class="d-before" min="1" max="5" step="1" value="3">
+          <div class="anchors"><span>1 · only react</span><span>5 · a considered decision</span></div>
+        </div>
+      </fieldset>
+      <fieldset>
+        <legend>After</legend>
+        <div class="q">
+          <label for="a1">Right now, how easily could you concentrate on something that requires effort?</label>
+          <input type="range" id="a1" class="d-after" min="1" max="5" step="1" value="4">
+          <div class="anchors"><span>1 · not at all</span><span>5 · easily</span></div>
+        </div>
+        <div class="q">
+          <label for="a2">Right now, how much does anything feel urgent or demanding of you?</label>
+          <input type="range" id="a2" class="d-after" min="1" max="5" step="1" value="4">
+          <div class="anchors"><span>1 · everything</span><span>5 · nothing</span></div>
+        </div>
+        <div class="q">
+          <label for="a3">Right now, could you make a considered decision, or only react?</label>
+          <input type="range" id="a3" class="d-after" min="1" max="5" step="1" value="4">
+          <div class="anchors"><span>1 · only react</span><span>5 · a considered decision</span></div>
+        </div>
+      </fieldset>
+    </div>
+    <div class="reading">
+      <div class="reading-top">
+        <span class="big" id="dl-delta">+1.00</span>
+        <span class="band" id="dl-band">Restorative</span>
+        <span class="avg" id="dl-avg">Before 3.00 · After 4.00</span>
+      </div>
+      <div class="plot" id="dl-plot"></div>
+      <p class="verdict" id="dl-verdict"></p>
+      <p class="caveat">It is self-report: not attention measured, but the person's own account of their state, which is what the standard asks.</p>
+    </div>
+  </div>
+
+  <div class="inst">
+    <h4>Instrument four</h4>
+    <h3>The five-question gate</h3>
+    <p class="prose">Run before anything ships. Questions three and four are not weighted alongside the others. A failure on either ends the run, because a mechanic that cannot be disclosed is not improved by the other answers being good.</p>
+    <div id="gate"></div>
+    <div class="gate-out">
+      <p class="big" id="gate-verdict">Answer the five to get a verdict.</p>
+      <p class="verdict" id="gate-detail"></p>
+    </div>
+    <div class="btn-row">
+      <button type="button" id="gate-reset">Clear the gate</button>
+    </div>
+  </div>
+</section>
+
+<section id="loop" class="wrap">
+  <div class="sec-head"><span class="sec-no">05</span><h2>The loop back</h2></div>
+  <p class="lede">The course is also the research instrument. Each cohort produces five things the dossier currently does not have, and every one of them improves the framework rather than merely transmitting it.</p>
+  <div class="prose">
+    <h3>One — the delta register</h3>
+    <p>The dossier states plainly that it holds no research figure for what a restorative interaction is worth, and that a calculator producing one without showing its arithmetic would fail its own third and fourth questions. A cohort of twenty students, two artifacts each, eight subjects apiece, produces roughly three hundred paired readings. Three cohorts is a dataset. A dataset is the paper, and the paper is the thing that moves this from a well-argued master's thesis to a citable instrument.</p>
+
+    <h3>Two — the bait taxonomy grows</h3>
+    <p>Every mechanics inventory names mechanics the dossier did not. This matters most where the thesis is weakest: it is built on Meta, Patagonia and a largely Western case base, and the mechanics students bring from their own markets are exactly what is missing. The challenge rule in the Weapons Deck exists to capture them.</p>
+
+    <h3>Three — the ruleset gets stress-tested</h3>
+    <p>Twenty students taking eight branches into real briefs will find the branches that cannot actually be worked with. Those findings are amendments, not complaints. Run the course twice and the production ruleset is no longer eight blocks of prose written by one person — it is eight blocks that survived contact with sixty people trying to use them under deadline.</p>
+
+    <h3>Four — the trade-off curve</h3>
+    <p>The Delta Duel produces paired conversion and delta figures on the same subjects. The dossier asserts the trade-off and does not quantify it. Quantifying it is the single most useful thing this course could contribute to practice, because it replaces an ethical appeal with a price: this is what that conversion rate cost, in the recipient's own account of their state.</p>
+
+    <h3>Five — the counter-examples</h3>
+    <p>Set one standing assignment: break the framework. Find the case where a restorative design loses on every measure, or where the taxonomy produces a reading that is clearly wrong. Record what the students find in the open-questions document rather than defending the framework against it. A framework with a published list of the places it fails is harder to dismiss than one without.</p>
+
+    <h3>The consent protocol</h3>
+    <p>Readings are self-report from volunteers, so the protocol is not optional and students should be made to write it out before the duel, not handed it. Subjects volunteer and may stop at any point. No names, no student identifiers, no demographic fields beyond what the analysis actually requires. Readings go on paper or into a form the instructor controls. Aggregate figures only leave the room. Any student may withhold their own readings from the register without affecting their grade, and the facilitator says this out loud in session 4.3 rather than putting it in a document nobody reads.</p>
+  </div>
+</section>
+
+<section id="assess" class="wrap">
+  <div class="sec-head"><span class="sec-no">06</span><h2>Assessment</h2></div>
+  <p class="lede">No exam. Four pieces, all produced in the room, all defended out loud.</p>
+  <div class="tablewrap">
+    <table>
+      <thead>
+        <tr><th>Piece</th><th class="num">Weight</th><th>Graded on</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>The artifact</td>
+          <td class="num">40%</td>
+          <td>Whether it holds the constraint sheet signed in session 3.4, and whether the four restorative properties are visible in the thing rather than claimed about it.</td>
+        </tr>
+        <tr>
+          <td>The delta study and report</td>
+          <td class="num">25%</td>
+          <td>Method and honesty, not score. A student who measures −1.3 and explains the mechanism earns more than one who reports +2.0 without a protocol.</td>
+        </tr>
+        <tr>
+          <td>The five-question defence</td>
+          <td class="num">20%</td>
+          <td>The quality of the discard. What was rejected and why carries the mark, not what survived.</td>
+        </tr>
+        <tr>
+          <td>The causal decomposition</td>
+          <td class="num">15%</td>
+          <td>Whether each root is sourced and traceable, and whether the undisclosed element is correctly identified.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="prose" style="margin-top:28px">
+    <p>Two grading rules worth stating to the cohort in session 1.1, because they change how students work from the first week. The first: a poor measured result, honestly obtained and correctly interpreted, scores above a good one with no method behind it. The second: there are no marks for participation, attendance or volume of work, and one artifact is the deliverable rather than a portfolio of them. Content minimisation applies to coursework or it does not apply to anything.</p>
+  </div>
+</section>
+
+<section id="teaching" class="wrap">
+  <div class="sec-head"><span class="sec-no">07</span><h2>Teaching notes</h2></div>
+  <p class="lede">Ways this course can quietly contradict itself, and what to do instead.</p>
+  <div class="prose">
+    <p><strong>End on time, every time.</strong> An overrunning seminar is a claim on directed attention made by someone who has just finished explaining why such claims need justifying. Stopping mid-sentence at the hour is a better lesson than finishing the thought.</p>
+    <p><strong>Do not gamify attendance.</strong> No participation points, no streaks, no public progress. The games have winners announced in the room and recorded nowhere, which is the distinction the course is about.</p>
+    <p><strong>Teach from the drawings, not from slides.</strong> The diagrams, the postures, the fragility index and the root-node figure already exist as working figures. A deck rebuilt in a presentation tool will drift from them and will be denser than the original. Open the figure itself.</p>
+    <p><strong>Let the room challenge the framework.</strong> The Weapons Deck has a challenge rule, the Root Hunt has a retirement rule and the standing assignment is to break the thing. A course that treats a master's thesis as settled teaches students to defer, which is the opposite of what the five questions ask them to do.</p>
+    <p><strong>On the fourth chapter in a sensitive setting.</strong> The Causal Taxonomy works identically on a commercial claim, a category narrative or a product launch as it does on a news event, and the learning outcome does not depend on the political application. Run it on commercial material. The method is the thing being taught, and it transfers without being announced.</p>
+    <p><strong>When a student says their learning app uses the same mechanic.</strong> This comes up in week one, every time, and it is not an objection to be deflected. The answer is that the mechanic is not the unit of judgement — the consent is. A streak serving a habit someone chose supports their own intention; the identical streak serving a subscription they are trying to cancel extracts from them. Same code, opposite direction of agency. Three questions settle it: does the person hold the goal or did the system supply it, would the mechanic still work if they could see exactly how it was built to affect them, and does leaving cost them nothing. This course is about the case where all three fail, which is most commercial deployment. The third course of this programme is about the case where they can be made to hold, and it is where a student who raises this should be sent.</p>
+    <p><strong>Keep your own numbers.</strong> Run the Restoration Delta on your own sessions, in both directions, and publish the results to the cohort including the sessions that deplete them. A facilitator who has never shown the room a bad reading of their own teaching has not actually taught the instrument.</p>
+  </div>
+</section>
+
+</main>
+
+<footer class="wrap colophon">
+  <p>Built from <i>Media as Universe: An Antifragile Framework for Communication Design in the Attention Economy</i>. The three Restoration Delta questions, the band thresholds at plus and minus a half point, and the consequence attached to a depleting reading are the manuscript's own and are quoted rather than paraphrased.</p>
+  <p>This page stores nothing and counts nothing. There is no analytics, no persistence, and no record of any reading taken on it.</p>
+</footer>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ---------- Weapons Deck ---------- */
+  var DECK = [
+    { mech: "A story that disappears in twenty-four hours.", principle: "Scarcity — applied to a condition that is not genuinely scarce.", system: "System 1. A manufactured cortisol spike, before System 2 can ask whether you wanted to watch.", rule: "Global Rule — manufactured urgency." },
+    { mech: "“Twelve people are looking at this room right now.”", principle: "Social proof, weaponised — a need for belonging turned into a tether.", system: "System 1, via competitive loss aversion.", rule: "Global Rule — weaponised social proof; unverifiable claim." },
+    { mech: "Pull down to refresh, and something new may or may not appear.", principle: "Variable reward. The unpredictability is the mechanism; the content does not need to be good.", system: "System 1. The same schedule that makes gambling persistent and extinction-resistant.", rule: "Branch 7 — interface and UX microcopy." },
+    { mech: "“No thanks, I don't want to save money.”", principle: "Confirmshaming — the opt-out written to cost something to choose.", system: "System 1, via status and self-image.", rule: "Global Rule — dark patterns; Branch 7." },
+    { mech: "A red badge on the icon with nothing behind it.", principle: "Variable reward plus manufactured obligation, with no information content at all.", system: "System 1 — compulsive checking as a conditioned loop.", rule: "Branch 7 — compulsive-checking badges." },
+    { mech: "The feed continues for as long as you keep moving your thumb.", principle: "Removal of the stopping cue the attention system was looking for.", system: "Directed attention, depleted past the ceiling until System 1 takes over.", rule: "Branch 7 — stopping-cue-free scroll." },
+    { mech: "A countdown timer that starts again when you reload the page.", principle: "Scarcity that is not merely unverified but demonstrably false.", system: "System 1 — urgency arriving as a bodily state, not a judgement.", rule: "Global Rule — claims must be verifiable by the recipient." },
+    { mech: "Ask one more friend and it's free. Then one more.", principle: "Reciprocity and commitment inverted, with the recruitment cost pushed onto the user's own relationships.", system: "System 1, via social obligation and the sunk cost of the friends already asked.", rule: "Branch 8 — community, growth and social mechanics." },
+    { mech: "Pay the deposit now; the balance opens in eleven days.", principle: "Commitment and consistency — a small irreversible act that makes the larger one feel already decided.", system: "System 2 bypassed by sequencing rather than by arousal.", rule: "Branch 1 — strategy and positioning." },
+    { mech: "You have kept this up for forty-one days. Do not lose it now.", principle: "Loss aversion, with guilt doing the work a reason would normally do.", system: "System 1 — the strongest and most replicated asymmetry in the literature.", rule: "Branch 4 — CRM, lifecycle and retention." },
+    { mech: "A testimonial carousel on a page someone opened to compare prices.", principle: "Social proof deployed at the precise moment of a System 2 assessment.", system: "System 2, interrupted mid-evaluation — pre-suasion in its extractive form.", rule: "Branch 3 — copywriting, headlines and CTAs." },
+    { mech: "Thirteen cuts in the first eight seconds.", principle: "Pacing built to outrun deliberation rather than to carry meaning.", system: "System 1 — arousal maintained above the threshold at which reflection can start.", rule: "Branch 6 — video, motion and sound." },
+    { mech: "A ticking clock under the voiceover.", principle: "Arousal introduced through the sound bed, where the viewer will not attribute it to the message.", system: "System 1, below conscious awareness of the source.", rule: "Branch 6 — ticking-clock sound design." },
+    { mech: "Her, before. Her, after. Same lighting, different posture.", principle: "Comparison-based shaming against an idealised self the person did not choose.", system: "System 1 — status competition and body-directed loss aversion.", rule: "Branch 5 — image generation." },
+    { mech: "This month's top twenty contributors, ranked.", principle: "Status competition dressed as recognition; a vanity metric made tribal.", system: "System 1 — relative position, which the brain reads faster than absolute value.", rule: "Branch 8 — vanity metrics and tribal leaderboards." },
+    { mech: "One tap to subscribe. Six screens, and a phone call, to leave.", principle: "Friction asymmetry — the exit priced deliberately above the entrance.", system: "Directed attention as the toll. Most people pay by not leaving.", rule: "Global Rule — dark patterns; forced continuity." }
+  ];
+
+  var deckOrder = [], deckPos = 0, current = null;
+
+  function shuffle(n) {
+    var a = [];
+    for (var i = 0; i < n; i++) { a.push(i); }
+    for (var j = a.length - 1; j > 0; j--) {
+      var k = Math.floor(Math.random() * (j + 1));
+      var t = a[j]; a[j] = a[k]; a[k] = t;
+    }
+    return a;
+  }
+
+  var el = function (id) { return document.getElementById(id); };
+
+  function deckCount() {
+    var left = DECK.length - deckPos;
+    el("deck-count").textContent = left === 1 ? "1 card remaining" : left + " cards remaining";
+  }
+
+  function resetDeck() {
+    deckOrder = shuffle(DECK.length);
+    deckPos = 0;
+    current = null;
+    el("deck-kicker").textContent = "Card — not yet drawn";
+    el("deck-mech").textContent = "Press draw to begin. Read the card aloud; the room answers before anyone reveals.";
+    el("deck-answer").hidden = true;
+    deckCount();
+  }
+
+  function drawCard() {
+    if (deckPos >= DECK.length) { resetDeck(); }
+    current = DECK[deckOrder[deckPos]];
+    deckPos++;
+    el("deck-kicker").textContent = "Card " + deckPos + " of " + DECK.length;
+    el("deck-mech").textContent = current.mech;
+    el("deck-answer").hidden = true;
+    deckCount();
+  }
+
+  function revealCard() {
+    if (!current) { return; }
+    el("deck-principle").textContent = current.principle;
+    el("deck-system").textContent = current.system;
+    el("deck-rule").textContent = current.rule;
+    el("deck-answer").hidden = false;
+  }
+
+  el("deck-draw").addEventListener("click", drawCard);
+  el("deck-reveal").addEventListener("click", revealCard);
+  el("deck-shuffle").addEventListener("click", resetDeck);
+  resetDeck();
+
+  /* ---------- Posture Roulette ---------- */
+  var POSTURES = ["Restoration-seeking", "Agency-seeking", "Meaning-seeking"];
+  var PRODUCTS = [
+    "A budget airline seat",
+    "A mortgage comparison service",
+    "A meditation subscription",
+    "A second-hand electric car",
+    "An insurance renewal",
+    "A bubble tea chain's new flavour",
+    "A graduate design programme",
+    "A home water filter",
+    "A language-learning app",
+    "An independent bookshop's membership",
+    "A hospital's appointment booking page",
+    "A payroll system, sold to a finance director"
+  ];
+  var MOMENTS = [
+    "Eleven at night, after a double shift",
+    "Monday morning, tab opened deliberately",
+    "Standing on a crowded train, one hand free",
+    "Waiting for a medical result",
+    "Three minutes before a meeting they are chairing",
+    "Sunday morning, nothing scheduled",
+    "Immediately after reading three competitors' pages",
+    "Immediately after a refund was refused",
+    "Halfway through cancelling something else",
+    "On the fourth visit, having not bought on the first three"
+  ];
+
+  function pick(a) { return a[Math.floor(Math.random() * a.length)]; }
+
+  el("rl-draw").addEventListener("click", function () {
+    el("rl-posture").textContent = pick(POSTURES);
+    el("rl-product").textContent = pick(PRODUCTS);
+    el("rl-moment").textContent = pick(MOMENTS);
+  });
+
+  /* ---------- Restoration Delta ---------- */
+  var BEFORE_IDS = ["b1", "b2", "b3"], AFTER_IDS = ["a1", "a2", "a3"];
+
+  function mean(ids) {
+    var s = 0;
+    for (var i = 0; i < ids.length; i++) { s += Number(el(ids[i]).value); }
+    return s / ids.length;
+  }
+
+  function band(d) {
+    if (d >= 0.5) { return "Restorative"; }
+    if (d > -0.5) { return "Neutral"; }
+    return "Depleting";
+  }
+
+  function signed(n) { return (n > 0 ? "+" : n < 0 ? "−" : "") + Math.abs(n).toFixed(2); }
+
+  /* A reading is drawn as a bowed filament between the two averages. The
+     project forbids a straight segment, so the bow is never zero — and the
+     direction it bows is how the band reads at a glance, since the drawing
+     is monochrome. */
+  function plot(before, after, d) {
+    var W = 520, H = 170, L = 92, R = 452;
+    var y = function (v) { return 142 - (v - 1) * 28; };
+    var bow = d === 0 ? 9 : -Math.max(9, Math.min(34, Math.abs(d) * 16)) * (d > 0 ? 1 : -1);
+    var yb = y(before), ya = y(after);
+    var cx = (L + R) / 2, cy = (yb + ya) / 2 + bow;
+    var g = [];
+
+    g.push('<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="Reading of ' + signed(d) + ', ' + band(d).toLowerCase() + '">');
+    // bowed guides at 1, 3, 5 — nothing is a straight segment
+    [1, 3, 5].forEach(function (v) {
+      var gy = y(v);
+      g.push('<path d="M 64 ' + (gy + 1.2) + ' Q ' + cx + ' ' + (gy - 1.4) + ' 476 ' + (gy + 1.2) + '" fill="none" stroke="currentColor" stroke-width="0.6" opacity="0.26"/>');
+      g.push('<text x="52" y="' + (gy + 4) + '" font-size="10" text-anchor="end" fill="currentColor" opacity="0.5">' + v + '</text>');
+    });
+    // the filament
+    g.push('<path d="M ' + L + ' ' + yb + ' Q ' + cx + ' ' + cy + ' ' + R + ' ' + ya + '" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.95"/>');
+    // the two readings — a light source is the one thing allowed to be a fill
+    g.push('<circle cx="' + L + '" cy="' + yb + '" r="2.6" fill="currentColor" opacity="0.45"/>');
+    g.push('<circle cx="' + R + '" cy="' + ya + '" r="4" fill="currentColor"/>');
+    g.push('<text x="' + L + '" y="' + (H - 8) + '" font-size="10" text-anchor="middle" fill="currentColor" opacity="0.5">BEFORE ' + before.toFixed(2) + '</text>');
+    g.push('<text x="' + R + '" y="' + (H - 8) + '" font-size="10" text-anchor="middle" fill="currentColor" opacity="0.5">AFTER ' + after.toFixed(2) + '</text>');
+    g.push('</svg>');
+    el("dl-plot").innerHTML = g.join("");
+  }
+
+  function updateDelta() {
+    var before = mean(BEFORE_IDS), after = mean(AFTER_IDS);
+    var d = after - before;
+    var b = band(d);
+    el("dl-delta").textContent = signed(d);
+    el("dl-band").textContent = b;
+    el("dl-avg").textContent = "Before " + before.toFixed(2) + " · After " + after.toFixed(2);
+    el("dl-verdict").textContent = b === "Depleting"
+      ? "A depleting score fails the fifth question of the Chapter III standard, whatever the conversion rate."
+      : b === "Restorative"
+        ? "At or above +0.5 the interaction is restorative: it returned more directed attention than it took."
+        : "Between −0.5 and +0.5 the reading is neutral. The interaction neither restored nor depleted; it is not evidence of a restorative design.";
+    plot(before, after, d);
+  }
+
+  BEFORE_IDS.concat(AFTER_IDS).forEach(function (id) {
+    el(id).addEventListener("input", updateDelta);
+  });
+  updateDelta();
+
+  /* ---------- Five-question gate ---------- */
+  var GATE = [
+    { q: "What state is this person actually in when my message arrives?", note: "Not their demographic. Not their purchase history. Their probable neurological condition at the moment of reception.", yes: "I can name it", no: "I am assuming it", hard: false },
+    { q: "Is what I am about to deliver appropriate for that state, or designed to exploit it?", note: "There is a difference between meeting a person where they are and ambushing them there.", yes: "Appropriate", no: "Exploits it", hard: false },
+    { q: "Would these mechanics still work if the person could see them clearly?", note: "Sunstein's criterion for manipulation: influence that does not sufficiently engage the capacity for reflection.", yes: "Yes, they hold", no: "No, they collapse", hard: true },
+    { q: "Would I be comfortable if this person could see exactly what I am doing and why?", note: "Not the polished campaign rationale. The actual mechanism, the pre-suasive sequence, the emotional trigger.", yes: "Comfortable", no: "Not comfortable", hard: true },
+    { q: "How would you feel, being treated the way you treat the other?", note: "As a member of society. As a human being.", yes: "I would accept it", no: "I would not", hard: false }
+  ];
+
+  var gateHost = el("gate");
+  GATE.forEach(function (g, i) {
+    var d = document.createElement("div");
+    d.className = "gate-q";
+    d.innerHTML =
+      '<span class="n">' + (i + 1) + (g.hard ? " · hard gate" : "") + '</span>' +
+      "<p>" + g.q + "</p>" +
+      '<p class="note">' + g.note + "</p>" +
+      '<div class="choices">' +
+        '<label><input type="radio" name="g' + i + '" value="pass"> ' + g.yes + "</label>" +
+        '<label><input type="radio" name="g' + i + '" value="fail"> ' + g.no + "</label>" +
+      "</div>";
+    gateHost.appendChild(d);
+  });
+
+  function gateUpdate() {
+    var answered = 0, failed = [], hardFail = [];
+    GATE.forEach(function (g, i) {
+      var sel = gateHost.querySelector('input[name="g' + i + '"]:checked');
+      if (!sel) { return; }
+      answered++;
+      if (sel.value === "fail") {
+        failed.push(i + 1);
+        if (g.hard) { hardFail.push(i + 1); }
+      }
+    });
+
+    if (answered < GATE.length) {
+      el("gate-verdict").textContent = "Answer the five to get a verdict.";
+      el("gate-detail").textContent = answered === 0 ? "" : answered + " of 5 answered.";
+      return;
+    }
+    if (hardFail.length) {
+      el("gate-verdict").textContent = "Does not ship.";
+      el("gate-detail").textContent = "Question " + hardFail.join(" and ") + " failed. Redesign the approach rather than softening the language; a mechanic that cannot be disclosed is not improved by the other answers being good.";
+      return;
+    }
+    if (failed.length) {
+      el("gate-verdict").textContent = "Not yet.";
+      el("gate-detail").textContent = "Question " + failed.join(", ") + " failed. The disclosable mechanics hold, so the work is recoverable — but it does not pass the standard as it stands.";
+      return;
+    }
+    el("gate-verdict").textContent = "Passes the gate.";
+    el("gate-detail").textContent = "Record the answers alongside the artifact. The defence in session 4.4 is on the reasoning, not the verdict.";
+  }
+
+  gateHost.addEventListener("change", gateUpdate);
+  el("gate-reset").addEventListener("click", function () {
+    gateHost.querySelectorAll("input[type=radio]").forEach(function (r) { r.checked = false; });
+    gateUpdate();
+  });
+  gateUpdate();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,612 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Where You're Starting</title>
+<style>
+  /* Layout: disclosure first, then the test, then a result that teaches.
+     Hairlines instead of cards, nothing a filled area except the nodes on the
+     reading, nothing a straight segment. Monochrome; the one solid rule is on
+     the result. Same system as the rest of the programme. */
+  :root {
+    --ground: #ececeb;
+    --ink: #15161a;
+    --ink-soft: #55575d;
+    --ink-faint: #8b8d93;
+    --hair: #c6c7c4;
+    --hair-faint: #d9dad7;
+    --field: #e3e3e1;
+    --display: "Newsreader", "Iowan Old Style", Georgia, serif;
+    --body: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+    --ease: cubic-bezier(0.33, 0.01, 0.2, 1);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground: #0b0c0d; --ink: #e7e6e2; --ink-soft: #a0a09c; --ink-faint: #6e6f6c;
+      --hair: #35373a; --hair-faint: #25272a; --field: #16181a; color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --ground: #0b0c0d; --ink: #e7e6e2; --ink-soft: #a0a09c; --ink-faint: #6e6f6c;
+    --hair: #35373a; --hair-faint: #25272a; --field: #16181a; color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--ground); color: var(--ink);
+    font-family: var(--body); font-weight: 300; font-size: 15px; line-height: 1.68;
+    -webkit-font-smoothing: antialiased;
+  }
+  h1, h2, h3, h4, p, ul, ol, fieldset, legend, figure { margin: 0; }
+  ul, ol { padding-left: 1.1em; } li { margin-block: 0.3em; }
+  strong { font-weight: 300; border-bottom: 1px solid var(--hair); }
+  i, em { font-style: italic; }
+
+  .wrap { max-width: 760px; margin: 0 auto; padding-inline: 20px; }
+
+  .mast { padding-block: 54px 32px; }
+  .eyebrow { font-size: 11px; text-transform: uppercase; letter-spacing: 0.2em; color: var(--ink-faint); }
+  h1 {
+    font-family: var(--display); font-weight: 300;
+    font-size: clamp(30px, 6.6vw, 44px); line-height: 1.1; letter-spacing: -0.014em;
+    text-wrap: balance; margin-top: 15px; max-width: 22ch;
+  }
+  .standfirst { margin-top: 20px; max-width: 60ch; color: var(--ink-soft); }
+
+  /* disclosure, before anything is asked */
+  .disclose { padding-block: 26px 30px; border-block: 1px solid var(--hair); }
+  .disclose h4 { font-size: 11px; text-transform: uppercase; letter-spacing: 0.2em;
+    color: var(--ink-faint); margin-bottom: 12px; }
+  .disclose ul { max-width: 62ch; font-size: 14px; list-style: none; padding: 0; }
+  .disclose li { padding-left: 17px; position: relative; margin-block: 7px; }
+  .disclose li::before { content: "—"; position: absolute; left: 0; color: var(--ink-faint); }
+
+  section { padding-block: 38px; border-bottom: 1px solid var(--hair); }
+  .sec-head { display: flex; gap: 14px; align-items: baseline; margin-bottom: 8px; }
+  .sec-no { font-size: 11px; letter-spacing: 0.2em; color: var(--ink-faint);
+    font-variant-numeric: tabular-nums; flex: none; }
+  h2 { font-family: var(--display); font-weight: 300; font-size: clamp(21px, 4vw, 27px);
+    line-height: 1.2; letter-spacing: -0.008em; }
+  .lede { max-width: 60ch; color: var(--ink-soft); margin-bottom: 4px; }
+
+  .item { padding-block: 22px; border-bottom: 1px solid var(--hair-faint); }
+  .item:last-of-type { border-bottom: none; }
+  .item .n { font-size: 11px; letter-spacing: 0.2em; color: var(--ink-faint); font-variant-numeric: tabular-nums; }
+  .item .q { font-family: var(--display); font-size: 18px; line-height: 1.34; margin-top: 5px; max-width: 54ch; }
+  .opts { margin-top: 13px; display: grid; gap: 1px; background: var(--hair-faint); }
+  .opts label {
+    background: var(--ground); padding: 11px 13px; cursor: pointer;
+    display: grid; grid-template-columns: 15px 1fr; gap: 0 11px; align-items: start;
+    font-size: 14px; line-height: 1.5;
+    transition: background 0.2s var(--ease);
+  }
+  .opts label:hover { background: var(--field); }
+  .opts input { accent-color: var(--ink); margin: 5px 0 0; }
+  .opts label:focus-within { background: var(--field); outline: 1px solid var(--ink); outline-offset: -1px; }
+
+  select, textarea, input[type="text"] {
+    width: 100%; font-family: var(--body); font-weight: 300; font-size: 14px; line-height: 1.6;
+    color: var(--ink); background: var(--field); border: none;
+    border-bottom: 1px solid var(--hair); border-radius: 0; padding: 10px 11px; resize: vertical;
+  }
+  select:focus, textarea:focus, input[type="text"]:focus { outline: none; border-bottom-color: var(--ink); }
+  textarea { min-height: 86px; }
+  label.fld { display: block; font-size: 11px; text-transform: uppercase; letter-spacing: 0.2em;
+    color: var(--ink-faint); margin-bottom: 8px; }
+  .fld-hint { font-size: 13px; color: var(--ink-faint); margin-bottom: 9px; max-width: 58ch; }
+  .fldwrap { padding-block: 16px; border-bottom: 1px solid var(--hair-faint); }
+  .fldwrap:last-of-type { border-bottom: none; }
+
+  .scale { margin-top: 11px; }
+  input[type="range"] { -webkit-appearance: none; appearance: none; width: 100%; margin: 0; background: none; cursor: pointer; }
+  input[type="range"]::-webkit-slider-runnable-track { height: 1px; background: var(--hair); }
+  input[type="range"]::-moz-range-track { height: 1px; background: var(--hair); }
+  input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none;
+    width: 9px; height: 9px; border-radius: 50%; background: var(--ink); border: none; margin-top: -4px; }
+  input[type="range"]::-moz-range-thumb { width: 9px; height: 9px; border-radius: 50%; background: var(--ink); border: none; }
+  input[type="range"]:focus-visible { outline: 1px solid var(--ink); outline-offset: 6px; }
+  .anchors { display: flex; justify-content: space-between; gap: 12px; font-size: 11px; color: var(--ink-faint); margin-top: 8px; }
+
+  button {
+    font-family: var(--body); font-weight: 300; font-size: 11px;
+    text-transform: uppercase; letter-spacing: 0.2em; color: var(--ink);
+    background: none; border: 1px solid var(--hair); border-radius: 0;
+    padding: 11px 16px; cursor: pointer; transition: border-color 0.3s var(--ease);
+  }
+  button:hover, button:focus-visible { border-color: var(--ink); }
+  button:focus-visible { outline: none; }
+  button.lead { border-color: var(--ink); }
+  button[disabled] { color: var(--ink-faint); border-color: var(--hair-faint); cursor: default; }
+  a.btn {
+    font-family: var(--body); font-weight: 300; font-size: 11px; text-transform: uppercase;
+    letter-spacing: 0.2em; color: var(--ink); text-decoration: none;
+    border: 1px solid var(--hair); padding: 11px 16px; display: inline-block;
+    transition: border-color 0.3s var(--ease);
+  }
+  a.btn:hover, a.btn:focus-visible { border-color: var(--ink); }
+  a.btn.lead { border-color: var(--ink); }
+  .btn-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-top: 26px; }
+  .status { font-size: 11px; text-transform: uppercase; letter-spacing: 0.2em; color: var(--ink-faint); }
+
+  /* result */
+  .result { padding-block: 40px 44px; border-top: 1px solid var(--ink); }
+  .score-row { display: flex; flex-wrap: wrap; gap: 12px 36px; align-items: baseline; }
+  .big { font-family: var(--display); font-size: clamp(40px, 9vw, 60px); line-height: 1;
+    font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
+  .band { font-size: 11px; text-transform: uppercase; letter-spacing: 0.2em; }
+  .verdict { margin-top: 20px; font-family: var(--display); font-size: clamp(19px, 3.6vw, 24px);
+    line-height: 1.32; max-width: 44ch; text-wrap: balance; }
+  .plot { margin-top: 24px; overflow-x: auto; }
+  .plot svg { display: block; max-width: 100%; height: auto; }
+  .review { margin-top: 30px; }
+  .rev { padding-block: 15px; border-top: 1px solid var(--hair-faint); }
+  .rev .tag { font-size: 11px; text-transform: uppercase; letter-spacing: 0.2em; color: var(--ink-faint); }
+  .rev p { font-size: 14px; margin-top: 4px; max-width: 60ch; }
+  .rec { margin-top: 30px; padding-top: 24px; border-top: 1px solid var(--hair); }
+  .consent { margin-top: 30px; padding-top: 24px; border-top: 1px solid var(--hair); }
+  .consent label.tick {
+    display: grid; grid-template-columns: 16px 1fr; gap: 0 11px; align-items: start;
+    font-size: 14px; line-height: 1.5; cursor: pointer; max-width: 60ch;
+  }
+  .consent input[type="checkbox"] { accent-color: var(--ink); margin: 5px 0 0; }
+  .consent .note { font-size: 13px; color: var(--ink-faint); margin-top: 12px; max-width: 60ch; }
+  .copyout { margin-top: 18px; }
+  .copyout p { font-size: 12px; color: var(--ink-faint); margin-bottom: 7px; }
+  .copyout textarea { min-height: 150px; font-size: 13px; }
+
+  .colophon { padding-block: 32px 60px; font-size: 13px; color: var(--ink-faint); max-width: 62ch; }
+  .colophon p + p { margin-top: 11px; }
+
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition-duration: 0.01ms !important; } }
+</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300;1,6..72,300&family=IBM+Plex+Sans:ital,wght@0,300;1,300&display=swap">
+<style>[hidden]{display:none!important}img{max-width:100%}</style>
+</head>
+<body>
+
+<header class="wrap mast">
+  <span class="eyebrow">Before the programme</span>
+  <h1>Where you're starting</h1>
+  <p class="standfirst">Six questions that test whether you can already do what these courses teach, and three about what you want from them. It takes about five minutes and it tells you which course to start with.</p>
+</header>
+
+<div class="wrap disclose">
+  <h4>What this does with your answers</h4>
+  <ul>
+    <li>You get your result either way. Nothing is sent anywhere unless you ask for it to be, at the end, with a tick.</li>
+    <li>If you do contribute it: your answers, your score and the time are stored. No name, no email, nothing that identifies you — unless you type it yourself in the last box.</li>
+    <li>Stored answers can be read by anyone who can open this page. Leave the written box blank if that is not acceptable to you.</li>
+    <li>Why it is collected: to find out which ideas are hardest to arrive with, and whether people want this taught at all. That is the only use.</li>
+    <li>You can take the test, read your result and contribute nothing. That is a normal outcome and the button to do it is right beside the other one.</li>
+  </ul>
+</div>
+
+<main>
+
+<section class="wrap">
+  <div class="sec-head"><span class="sec-no">01</span><h2>Six questions with right answers</h2></div>
+  <p class="lede">Pick the best answer. You will see what each one was testing, and why, as soon as you finish.</p>
+  <div id="items"></div>
+</section>
+
+<section class="wrap">
+  <div class="sec-head"><span class="sec-no">02</span><h2>Three with no right answer</h2></div>
+  <p class="lede">These decide which course is pointed at you, not whether you pass anything.</p>
+
+  <div class="fldwrap">
+    <label class="fld" for="role">What do you make?</label>
+    <select id="role">
+      <option value="">—</option>
+      <option value="campaigns">Campaigns, brand or content</option>
+      <option value="interfaces">Interfaces, products or software</option>
+      <option value="learning">Learning things — courses, games, materials</option>
+      <option value="health">Anything in health, wellbeing or care</option>
+      <option value="research">Research or policy</option>
+      <option value="teaching">I teach</option>
+      <option value="nothing">Nothing yet — I'm studying</option>
+    </select>
+  </div>
+
+  <div class="fldwrap">
+    <label class="fld" for="motive">What brought you here?</label>
+    <select id="motive">
+      <option value="">—</option>
+      <option value="uneasy">I have built something I would rather not explain in full</option>
+      <option value="method">I want a method I can defend to a client or a committee</option>
+      <option value="teach">I want to teach this</option>
+      <option value="required">An ethics requirement I have to satisfy</option>
+      <option value="alternative">I want to build the alternative, not just criticise</option>
+      <option value="curious">Curiosity</option>
+    </select>
+  </div>
+
+  <div class="fldwrap">
+    <label class="fld" for="measure">How much do you want your own work measured?</label>
+    <p class="fld-hint">One of these courses asks you to run an instrument on real people and report the number even when it goes against you.</p>
+    <div class="scale">
+      <input type="range" id="measure" min="1" max="5" step="1" value="3">
+      <div class="anchors"><span>1 · I would rather discuss it</span><span>5 · give me numbers</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="wrap">
+  <div class="sec-head"><span class="sec-no">03</span><h2>One question with no comfortable answer</h2></div>
+  <p class="lede">Optional, and the only box where you could identify yourself. It is the fourth of the five questions these courses run on, asked of you instead of your work.</p>
+  <div class="fldwrap">
+    <label class="fld" for="note">What have you made that you would rather not explain in full to the person who received it?</label>
+    <p class="fld-hint">Leave it blank freely. If you contribute your result, this text is stored and readable by anyone who can open this page.</p>
+    <textarea id="note" placeholder=""></textarea>
+  </div>
+  <div class="btn-row">
+    <button class="lead" type="button" id="finish">See my result</button>
+    <span class="status" id="finish-status"></span>
+  </div>
+</section>
+
+<section class="wrap result" id="result" hidden>
+  <div class="score-row">
+    <span class="big" id="score">0 / 6</span>
+    <span class="band" id="band"></span>
+  </div>
+  <p class="verdict" id="verdict"></p>
+  <div class="plot" id="plot"></div>
+
+  <div class="review">
+    <h4>What each question was testing</h4>
+    <div id="review"></div>
+  </div>
+
+  <div class="rec">
+    <h4>Where to start</h4>
+    <p id="rec-text" style="max-width:56ch"></p>
+    <div class="btn-row" id="rec-links"></div>
+  </div>
+
+  <div class="consent">
+    <h4>Contributing this result</h4>
+    <label class="tick">
+      <input type="checkbox" id="consent-tick">
+      <span>Store my answers, my score and the time. I have read what happens to them above.</span>
+    </label>
+    <div class="btn-row">
+      <button type="button" id="contribute" disabled>Contribute it</button>
+      <button type="button" id="copy">Copy my result instead</button>
+      <span class="status" id="save-status"></span>
+    </div>
+    <p class="note" id="save-note"></p>
+    <div class="copyout" id="copyout" hidden>
+      <p id="copyout-msg"></p>
+      <textarea id="copyout-text" readonly></textarea>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="wrap colophon">
+  <p>The six questions test distinctions drawn from <i>Media as Universe: An Antifragile Framework for Communication Design in the Attention Economy</i> and from <i>New Technologies in Storytelling and Gamification for Education and Mental Health</i>. Nothing here is a validated instrument; it is a placement test and it says so.</p>
+  <p>This page asks before it stores, stores nothing on load, and works the same if you decline. That is the standard the courses teach, applied to their own front door.</p>
+</footer>
+
+<script>
+(function () {
+  "use strict";
+  var el = function (id) { return document.getElementById(id); };
+
+  var ITEMS = [
+    {
+      q: "A landing page shows a countdown timer. Reload the page and it starts again from the beginning. The clearest objection is:",
+      opts: [
+        "Countdown timers are visually aggressive and distract from the offer itself.",
+        "The scarcity it claims is not true, and the visitor could establish that for themselves.",
+        "Timers have become so common that audiences no longer respond to them.",
+        "The window is too short for a considered decision; it should count down from longer."
+      ],
+      a: 1,
+      tests: "Verifiability",
+      why: "Every claim of scarcity or urgency has to be literally true and independently checkable by the person receiving it. A timer that resets is not a persuasion technique in poor taste; it is a false statement."
+    },
+    {
+      q: "A language app awards points for lessons, keeps a visible daily streak, and ranks you in a weekly league. This is:",
+      opts: [
+        "A game — the player progresses through challenges and makes choices that shape the outcome.",
+        "Game-based learning — an actual game used as the medium through which the subject is taught.",
+        "Gamification — game elements layered onto an activity that is not itself a game.",
+        "Transmedia storytelling — one narrative distributed across several platforms."
+      ],
+      a: 2,
+      tests: "The three-way distinction",
+      why: "Gamification applies points, badges, leaderboards and progress bars to something that is not a game, to motivate behaviour. Game-based learning would make the game itself the instruction. Nearly every bad argument in this field — in both directions — comes from collapsing the three."
+    },
+    {
+      q: "Your message will reach someone at eleven at night, after a double shift. Which of these do you not do?",
+      opts: [
+        "Keep it short, because reading capacity is reduced.",
+        "Use plain language and name the thing you are offering.",
+        "Put a deadline on it, so there is a reason to act rather than defer.",
+        "State what it costs, in full, before anything else."
+      ],
+      a: 2,
+      tests: "Reading the state",
+      why: "That is the restoration-seeking state: System 1 running everything, reaching for relief rather than information. Urgency met with depletion is the most exploited combination in the field and the least defensible to target."
+    },
+    {
+      q: "A visitor opens a comparison page to decide between two plans. The page adds a rotating carousel of testimonials. The problem is:",
+      opts: [
+        "Testimonials are selected by the seller and are therefore not evidence of anything.",
+        "It interrupts a deliberate evaluation the person specifically came to make.",
+        "Carousels perform poorly on small screens and most of the content is never seen.",
+        "There is no problem. Social proof is a legitimate principle of influence."
+      ],
+      a: 1,
+      tests: "Pre-suasion",
+      why: "The visitor arrived agency-seeking, with deliberation engaged and an intention of their own. Social proof delivered at the moment of consideration substitutes a shortcut for the assessment they came to do. The same testimonials on a different surface might be perfectly honest."
+    },
+    {
+      q: "A report describes a regional conflict that “erupted overnight”. Your first question is:",
+      opts: [
+        "Who published it, and what is their editorial position?",
+        "Is “erupted” a fair characterisation of the events described?",
+        "What decision, made years or decades earlier, created the conditions this is living inside?",
+        "How many people are affected, and over what area?"
+      ],
+      a: 2,
+      tests: "The historical root",
+      why: "Events arrive from a chain of decisions that stretches back further than the news cycle has any incentive to follow. Presenting one as a sudden rupture is almost always a distortion in service of the platform rather than the reader — and the facts can all be accurate while the framing still lies."
+    },
+    {
+      q: "A habit app keeps a streak. A user misses a day, the streak breaks, and they feel guilty. Is the streak extractive?",
+      opts: [
+        "Yes. A mechanic that produces guilt is exploiting loss aversion, whatever it is attached to.",
+        "No. The user chose to build the habit, so the mechanic is serving a goal they brought themselves.",
+        "It depends: whether the user holds the goal, whether the mechanic survives being explained, and whether quitting costs them nothing.",
+        "Only if the app charges money. A free tool cannot be extracting anything of value."
+      ],
+      a: 2,
+      tests: "The unit of judgement",
+      why: "The mechanic is not the unit of judgement; the consent is. The identical streak can pass in one context and fail in another, and three tests decide which — who holds the goal, is it disclosable, does leaving cost nothing. Both the confident yes and the confident no get this wrong."
+    }
+  ];
+
+  var COURSES = {
+    one: { name: "Media as Universe", url: "sheet-1-media-as-universe.html",
+      line: "the attention economy — naming the mechanics, and finding where the model that uses them breaks" },
+    two: { name: "Neuroethical Design", url: "sheet-2-neuroethical-design.html",
+      line: "the designer's obligation — judging a real product and defending the judgement" },
+    three: { name: "Alternative Storytelling", url: "sheet-3-alternative-storytelling.html",
+      line: "narrative and play — building the alternative, and testing whether it holds" }
+  };
+
+  /* ---------- render the items ---------- */
+  var host = el("items");
+  ITEMS.forEach(function (it, i) {
+    var d = document.createElement("div");
+    d.className = "item";
+    var opts = it.opts.map(function (o, j) {
+      return '<label><input type="radio" name="q' + i + '" value="' + j + '"><span>' + o + "</span></label>";
+    }).join("");
+    d.innerHTML = '<span class="n">' + (i + 1) + " of " + ITEMS.length + "</span>" +
+      '<p class="q">' + it.q + "</p>" +
+      '<div class="opts">' + opts + "</div>";
+    host.appendChild(d);
+  });
+
+  /* ---------- scoring ---------- */
+  function answers() {
+    return ITEMS.map(function (it, i) {
+      var sel = document.querySelector('input[name="q' + i + '"]:checked');
+      return sel ? Number(sel.value) : null;
+    });
+  }
+
+  function band(score) {
+    if (score <= 2) { return "Starting from the vocabulary"; }
+    if (score <= 4) { return "Can name it, cannot yet rule on it"; }
+    return "Already reasoning this way";
+  }
+
+  function verdictFor(score) {
+    if (score <= 2) {
+      return "You would arrive without the vocabulary, which is the ordinary starting point and the one the first week is built for.";
+    }
+    if (score <= 4) {
+      return "You can name what is happening. What you do not yet have is a way to rule on a particular case and defend the ruling.";
+    }
+    return "You already reason this way. The first course would largely confirm what you know; the other two would not.";
+  }
+
+  function recommend(score, role, motive) {
+    var pick = "one";
+    if (role === "interfaces" || role === "research") { pick = "two"; }
+    else if (role === "learning" || role === "health") { pick = "three"; }
+    else if (role === "teaching") { pick = "two"; }
+    if (motive === "alternative") { pick = "three"; }
+    else if (motive === "required" || motive === "method") { pick = pick === "three" ? "three" : "two"; }
+    else if (motive === "uneasy") { pick = "one"; }
+    if (score >= 5 && pick === "one") { pick = "two"; }
+    if (score <= 2 && pick === "two" && motive !== "required") { pick = "one"; }
+    return pick;
+  }
+
+  /* The score drawn as a bowed filament across the six items — a filled node
+     where the answer was right, a hollow one where it was not. Nothing is a
+     straight segment, so the baseline bows too. */
+  function plot(ans) {
+    var W = 560, H = 96, L = 40, R = 520;
+    var step = (R - L) / (ITEMS.length - 1);
+    var g = ['<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="Six items, marked right or wrong.">'];
+    g.push('<path d="M ' + L + ' 50 Q ' + ((L + R) / 2) + ' 38 ' + R + ' 50" fill="none" stroke="currentColor" stroke-width="0.8" opacity="0.3"/>');
+    ans.forEach(function (a, i) {
+      var x = L + step * i;
+      var t = i / (ITEMS.length - 1);
+      var y = 50 - 12 * Math.sin(Math.PI * t);
+      var right = a === ITEMS[i].a;
+      if (right) {
+        g.push('<circle cx="' + x.toFixed(1) + '" cy="' + y.toFixed(1) + '" r="5" fill="currentColor"/>');
+      } else {
+        g.push('<circle cx="' + x.toFixed(1) + '" cy="' + y.toFixed(1) + '" r="4.4" fill="none" stroke="currentColor" stroke-width="1.2" opacity="0.5"/>');
+      }
+      g.push('<text x="' + x.toFixed(1) + '" y="' + (H - 16) + '" font-size="10" text-anchor="middle" fill="currentColor" opacity="0.45">' + (i + 1) + "</text>");
+      g.push('<text x="' + x.toFixed(1) + '" y="' + (H - 3) + '" font-size="9" text-anchor="middle" fill="currentColor" opacity="0.4" letter-spacing="1">' + (right ? "" : "MISSED") + "</text>");
+    });
+    g.push("</svg>");
+    el("plot").innerHTML = g.join("");
+  }
+
+  var state = null;
+
+  function responseText() {
+    if (!state) { return ""; }
+    var lines = ["WHERE YOU'RE STARTING — result", ""];
+    lines.push("Score: " + state.score + " of " + ITEMS.length + " · " + band(state.score));
+    lines.push("Suggested start: " + COURSES[state.pick].name);
+    lines.push("");
+    lines.push("Answers (item: chosen / correct)");
+    state.ans.forEach(function (a, i) {
+      lines.push("  " + (i + 1) + ": " + (a === null ? "—" : String.fromCharCode(97 + a)) + " / " + String.fromCharCode(97 + ITEMS[i].a) + (a === ITEMS[i].a ? "" : "   MISSED — " + ITEMS[i].tests));
+    });
+    lines.push("");
+    lines.push("What I make: " + (state.role || "—"));
+    lines.push("What brought me here: " + (state.motive || "—"));
+    lines.push("Appetite for measurement (1–5): " + state.measure);
+    lines.push("");
+    lines.push("The uncomfortable question: " + (state.note || "—"));
+    return lines.join("\n");
+  }
+
+  el("finish").addEventListener("click", function () {
+    var ans = answers();
+    var missing = ans.filter(function (a) { return a === null; }).length;
+    if (missing) {
+      el("finish-status").textContent = missing === 1 ? "One question unanswered" : missing + " questions unanswered";
+      return;
+    }
+    el("finish-status").textContent = "";
+
+    var score = 0;
+    ans.forEach(function (a, i) { if (a === ITEMS[i].a) { score++; } });
+    var role = el("role").value, motive = el("motive").value;
+    var pick = recommend(score, role, motive);
+
+    state = {
+      ans: ans, score: score, role: role, motive: motive,
+      measure: Number(el("measure").value),
+      note: el("note").value.trim(), pick: pick
+    };
+
+    el("score").textContent = score + " / " + ITEMS.length;
+    el("band").textContent = band(score);
+    el("verdict").textContent = verdictFor(score);
+    plot(ans);
+
+    var rev = el("review");
+    rev.innerHTML = "";
+    ITEMS.forEach(function (it, i) {
+      var right = ans[i] === it.a;
+      var d = document.createElement("div");
+      d.className = "rev";
+      d.innerHTML = '<span class="tag">' + (i + 1) + " · " + it.tests + " · " + (right ? "right" : "missed") + "</span>" +
+        "<p>" + it.why + "</p>";
+      rev.appendChild(d);
+    });
+
+    var c = COURSES[pick];
+    el("rec-text").textContent = "Start with " + c.name + " — " + c.line + ".";
+    el("rec-links").innerHTML = '<a class="btn lead" href="' + c.url + '">' + c.name + " — one-page sheet</a>";
+
+    el("result").hidden = false;
+    el("result").scrollIntoView({ behavior: "smooth", block: "start" });
+  });
+
+  el("consent-tick").addEventListener("change", function () {
+    el("contribute").disabled = !this.checked;
+  });
+
+  /* ---------- copy out ---------- */
+  function fallback(text, msg) {
+    el("copyout-msg").textContent = msg;
+    el("copyout-text").value = text;
+    el("copyout").hidden = false;
+    var ta = el("copyout-text");
+    ta.focus(); ta.setSelectionRange(0, ta.value.length);
+  }
+  el("copy").addEventListener("click", function () {
+    var text = responseText();
+    el("copyout").hidden = true;
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(
+        function () { el("save-status").textContent = "Copied"; },
+        function () { fallback(text, "Copying was refused here. Select the text below and copy it manually."); }
+      );
+    } else {
+      fallback(text, "Select the text below and copy it manually.");
+    }
+  });
+
+  /* ---------- storage, only on the tick and the click ---------- */
+  var db = null, canWrite = null;
+  if (window.claude && typeof window.claude.use === "function") {
+    window.claude.use("db").then(function (d) { db = d; }, function () { db = null; });
+    window.claude.use("user").then(function (u) {
+      if (!u) { return; }
+      try {
+        var r = u.can("data.write");
+        if (r && typeof r.then === "function") {
+          r.then(function (v) { canWrite = v; }, function () { canWrite = null; });
+        } else { canWrite = r; }
+      } catch (e) { canWrite = null; }
+    }, function () { /* absent */ });
+  }
+
+  el("contribute").addEventListener("click", function () {
+    if (!state) { return; }
+    var btn = this;
+    btn.disabled = true;
+    el("save-status").textContent = "Saving";
+    el("save-note").textContent = "";
+
+    if (!db) {
+      el("save-status").textContent = "Not stored";
+      el("save-note").textContent = "This view cannot write to the record — that happens when you are signed out, or opening a link that only grants reading. Your result is not lost: press Copy my result and send the text instead.";
+      btn.disabled = false;
+      return;
+    }
+
+    var body = {
+      ts: new Date().toISOString(),
+      score: state.score,
+      chosen: state.ans,
+      correct: ITEMS.map(function (it) { return it.a; }),
+      missed: ITEMS.filter(function (it, i) { return state.ans[i] !== it.a; }).map(function (it) { return it.tests; }),
+      role: state.role || "",
+      motive: state.motive || "",
+      measure: state.measure,
+      suggested: state.pick,
+      note: state.note
+    };
+
+    db.collection("responses").add(body).then(function () {
+      el("save-status").textContent = "Stored";
+      el("save-note").textContent = "Thank you. That is the whole of it — nothing further is collected, and nothing was collected before you pressed the button.";
+      el("consent-tick").disabled = true;
+    }, function (err) {
+      var code = err && err.code ? err.code : "unavailable";
+      el("save-status").textContent = "Not stored";
+      if (code === "invalid_argument" || code === "not_granted") {
+        el("save-note").textContent = "This view is allowed to read the page but not to add to the record. Press Copy my result and send the text instead.";
+      } else if (code === "quota_exceeded") {
+        el("save-note").textContent = "The record is full. Press Copy my result and send the text instead.";
+      } else {
+        el("save-note").textContent = "That did not go through. Try once more, or press Copy my result and send the text instead.";
+        btn.disabled = false;
+      }
+    });
+  });
+})();
+</script>
+</body>
+</html>

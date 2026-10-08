@@ -1,0 +1,708 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Neuroethical Review Kit</title>
+<style>
+  /* Layout: a column of sheets separated by hairlines, never cards. Nothing is a
+     filled area except a light source; nothing is a straight segment. Monochrome.
+     Same system as the other kits in this programme. */
+  :root {
+    --ground: #ececeb; --ink: #15161a; --ink-soft: #55575d; --ink-faint: #8b8d93;
+    --hair: #c6c7c4; --hair-faint: #d9dad7; --field: #e3e3e1;
+    --display: "Newsreader", "Iowan Old Style", Georgia, serif;
+    --body: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+    --ease: cubic-bezier(0.33, 0.01, 0.2, 1);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground: #0b0c0d; --ink: #e7e6e2; --ink-soft: #a0a09c; --ink-faint: #6e6f6c;
+      --hair: #35373a; --hair-faint: #25272a; --field: #16181a; color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --ground: #0b0c0d; --ink: #e7e6e2; --ink-soft: #a0a09c; --ink-faint: #6e6f6c;
+    --hair: #35373a; --hair-faint: #25272a; --field: #16181a; color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--ground); color: var(--ink); font-family: var(--body);
+    font-weight: 300; font-size: 15px; line-height: 1.68; -webkit-font-smoothing: antialiased; }
+  h1,h2,h3,h4,p,ul,ol,dl,dd,figure { margin: 0; }
+  ul, ol { padding-left: 1.1em; } li { margin-block: 0.32em; }
+  strong { font-weight: 300; border-bottom: 1px solid var(--hair); }
+  i, em { font-style: italic; }
+  .wrap { max-width: 920px; margin: 0 auto; padding-inline: 20px; }
+  .index { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 10;
+    background: var(--ground); border-bottom: 1px solid var(--hair); }
+  .index-row { display: flex; flex-wrap: wrap; gap: 4px 20px; align-items: baseline; padding-block: 11px; }
+  .index a { font-size: 11px; text-transform: uppercase; letter-spacing: 0.2em; color: var(--ink-faint);
+    text-decoration: none; padding-bottom: 2px; border-bottom: 1px solid transparent;
+    transition: color 0.3s var(--ease), border-color 0.3s var(--ease); }
+  .index a:hover, .index a:focus-visible { color: var(--ink); border-bottom-color: var(--hair); }
+  .mast { padding-block: 56px 40px; border-bottom: 1px solid var(--hair); }
+  .eyebrow { font-size: 11px; text-transform: uppercase; letter-spacing: 0.2em; color: var(--ink-faint); }
+  h1 { font-family: var(--display); font-weight: 300; font-size: clamp(30px, 6.4vw, 44px);
+    line-height: 1.12; letter-spacing: -0.012em; text-wrap: balance; margin-top: 14px; max-width: 24ch; }
+  .standfirst { margin-top: 20px; max-width: 64ch; color: var(--ink-soft); }
+  .mast-meta { display: flex; flex-wrap: wrap; gap: 0 32px; margin-top: 28px; font-size: 11px;
+    text-transform: uppercase; letter-spacing: 0.2em; color: var(--ink-faint); }
+  section { padding-block: 52px; border-bottom: 1px solid var(--hair); }
+  .sec-head { display: flex; gap: 14px; align-items: baseline; margin-bottom: 26px; }
+  .sec-no { font-size: 11px; letter-spacing: 0.2em; color: var(--ink-faint);
+    font-variant-numeric: tabular-nums; flex: none; }
+  h2 { font-family: var(--display); font-weight: 300; font-size: clamp(22px, 4vw, 30px);
+    line-height: 1.2; letter-spacing: -0.008em; text-wrap: balance; }
+  .lede { max-width: 64ch; color: var(--ink-soft); margin-bottom: 30px; }
+  h3 { font-family: var(--display); font-weight: 300; font-size: 19px; line-height: 1.3;
+    margin-bottom: 8px; text-wrap: balance; }
+  h4 { font-size: 11px; text-transform: uppercase; letter-spacing: 0.2em; color: var(--ink-faint); margin-bottom: 10px; }
+  .prose { max-width: 66ch; } .prose p + p { margin-top: 14px; } .prose h3 { margin-top: 26px; }
+  .weeks { display: grid; gap: 1px; background: var(--hair-faint); }
+  @media (min-width: 760px) { .weeks { grid-template-columns: repeat(4, 1fr); } }
+  .week { background: var(--ground); padding: 20px 18px 24px; min-width: 0; }
+  .week .no { font-size: 11px; text-transform: uppercase; letter-spacing: 0.2em;
+    color: var(--ink-faint); display: block; margin-bottom: 10px; }
+  .week p { font-size: 13px; color: var(--ink-soft); line-height: 1.6; }
+  .week .out { margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--hair-faint); font-size: 13px; }
+  .week .out span { font-size: 11px; text-transform: uppercase; letter-spacing: 0.2em;
+    color: var(--ink-faint); display: block; margin-bottom: 4px; }
+  .runs { display: grid; gap: 34px; }
+  .run-week > h3 { padding-bottom: 10px; border-bottom: 1px solid var(--hair); margin-bottom: 0; }
+  .sess { padding-block: 16px; border-bottom: 1px solid var(--hair-faint); }
+  .sess-top { display: flex; gap: 14px; align-items: baseline; }
+  .sess-no { font-size: 11px; letter-spacing: 0.2em; color: var(--ink-faint);
+    font-variant-numeric: tabular-nums; flex: none; min-width: 2.6em; }
+  .sess-q { font-family: var(--display); font-size: 19px; line-height: 1.3; min-width: 0; }
+  .sess-body { margin-top: 10px; display: grid; gap: 10px; }
+  @media (min-width: 680px) { .sess-body { padding-left: calc(2.6em + 14px); } }
+  .pair { display: grid; gap: 2px; }
+  @media (min-width: 560px) { .pair { grid-template-columns: 7.5em 1fr; gap: 0 18px; } }
+  .pair dt { font-size: 11px; text-transform: uppercase; letter-spacing: 0.2em; color: var(--ink-faint); }
+  .pair dd { font-size: 14px; min-width: 0; }
+  .games { display: grid; gap: 1px; background: var(--hair-faint); }
+  @media (min-width: 720px) { .games { grid-template-columns: 1fr 1fr; } }
+  .game { background: var(--ground); padding: 24px 20px 26px; min-width: 0; }
+  .game .tag { font-size: 11px; text-transform: uppercase; letter-spacing: 0.2em;
+    color: var(--ink-faint); display: block; margin-bottom: 10px; }
+  .game ol { font-size: 14px; margin-top: 10px; }
+  .game .why { margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--hair-faint);
+    font-size: 13px; color: var(--ink-soft); }
+  .inst { padding-block: 30px; border-top: 1px solid var(--hair); }
+  .inst:first-of-type { border-top: none; padding-top: 0; }
+  button { font-family: var(--body); font-weight: 300; font-size: 11px; text-transform: uppercase;
+    letter-spacing: 0.2em; color: var(--ink); background: none; border: none;
+    border-bottom: 1px solid var(--hair); padding: 6px 0; cursor: pointer; border-radius: 0;
+    transition: border-color 0.3s var(--ease); }
+  button:hover, button:focus-visible { border-bottom-color: var(--ink); }
+  button:focus-visible { outline: none; }
+  .btn-row { display: flex; flex-wrap: wrap; gap: 0 26px; align-items: baseline; margin-top: 20px; }
+  .status { font-size: 11px; text-transform: uppercase; letter-spacing: 0.2em; color: var(--ink-faint);
+    font-variant-numeric: tabular-nums; }
+  .card-face { padding-block: 22px; min-height: 150px; }
+  .card-face .kicker { font-size: 11px; text-transform: uppercase; letter-spacing: 0.2em;
+    color: var(--ink-faint); display: block; margin-bottom: 12px; }
+  .card-face .mech { font-family: var(--display); font-size: clamp(19px, 3.4vw, 26px);
+    line-height: 1.25; max-width: 40ch; text-wrap: balance; }
+  .card-answer { margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--hair); }
+  input[type="text"], textarea { width: 100%; font-family: var(--body); font-weight: 300;
+    font-size: 14px; line-height: 1.6; color: var(--ink); background: var(--field); border: none;
+    border-bottom: 1px solid var(--hair); border-radius: 0; padding: 9px 10px; resize: vertical; }
+  input[type="text"]:focus, textarea:focus { outline: none; border-bottom-color: var(--ink); }
+  input::placeholder, textarea::placeholder { color: var(--ink-faint); opacity: 1; }
+  textarea { min-height: 76px; }
+  .field { padding-block: 12px; border-bottom: 1px solid var(--hair-faint); }
+  .field label { display: block; font-size: 11px; text-transform: uppercase; letter-spacing: 0.2em;
+    color: var(--ink-faint); margin-bottom: 7px; }
+  .field .hint { font-size: 13px; color: var(--ink-faint); margin-bottom: 8px; max-width: 62ch; }
+  select { font-family: var(--body); font-weight: 300; font-size: 14px; color: var(--ink);
+    background: var(--field); border: none; border-bottom: 1px solid var(--hair); border-radius: 0;
+    padding: 9px 10px; width: 100%; max-width: 30ch; }
+  select:focus { outline: none; border-bottom-color: var(--ink); }
+  .picker { display: grid; gap: 18px; margin-top: 18px; }
+  @media (min-width: 640px) { .picker { grid-template-columns: 1fr 1fr; } }
+  .verdict-box { margin-top: 26px; padding-top: 20px; border-top: 1px solid var(--hair); }
+  .verdict-box .big { font-family: var(--display); font-size: clamp(21px, 4vw, 28px); line-height: 1.25;
+    max-width: 44ch; text-wrap: balance; }
+  .verdict-box ul { margin-top: 14px; font-size: 14px; max-width: 64ch; }
+  .tablewrap { overflow-x: auto; margin-top: 18px; }
+  table { border-collapse: collapse; width: 100%; font-size: 14px; }
+  th, td { text-align: left; padding: 11px 16px 11px 0; border-bottom: 1px solid var(--hair-faint); vertical-align: top; }
+  th { font-size: 11px; text-transform: uppercase; letter-spacing: 0.2em; color: var(--ink-faint);
+    font-weight: 300; border-bottom-color: var(--hair); }
+  td.num, th.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
+  #assess-t { min-width: 480px; } #matrix-t { min-width: 620px; }
+  .caution { margin-top: 20px; padding: 16px 0 0; border-top: 1px solid var(--hair);
+    font-size: 13px; color: var(--ink-soft); max-width: 66ch; }
+  .caution span { font-size: 11px; text-transform: uppercase; letter-spacing: 0.2em;
+    color: var(--ink-faint); display: block; margin-bottom: 8px; }
+  .colophon { padding-block: 44px 64px; font-size: 13px; color: var(--ink-faint); max-width: 66ch; }
+  .colophon p + p { margin-top: 12px; }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition-duration: 0.01ms !important; } }
+</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300;1,6..72,300&family=IBM+Plex+Sans:ital,wght@0,300;1,300&display=swap">
+<style>[hidden]{display:none!important}img{max-width:100%}</style>
+</head>
+<body>
+
+<nav class="index">
+  <div class="wrap index-row">
+    <a href="#map">Map</a><a href="#runs">Run sheets</a><a href="#games">Moves</a>
+    <a href="#instruments">Instruments</a><a href="#assess">Assessment</a><a href="#teaching">Teaching notes</a>
+  </div>
+</nav>
+
+<header class="wrap mast">
+  <span class="eyebrow">Facilitator's kit · course two</span>
+  <h1>Human-Centric and Neuroethical Design</h1>
+  <p class="standfirst">Four weeks on what a design decision does to a nervous system, and what follows from that. Students do not build an artifact in this course. They produce the neuroethical design review a company would have to answer, and then defend it against a room playing the team that shipped the thing.</p>
+  <div class="mast-meta">
+    <span>4 weeks · 16 sessions</span><span>48 contact hours</span><span>Seminar and review</span>
+  </div>
+</header>
+
+<main>
+
+<section id="map" class="wrap">
+  <div class="sec-head"><span class="sec-no">01</span><h2>The map</h2></div>
+  <p class="lede">This is the portable course. It needs no equipment, no studio brief and no commercial framing, and it runs unchanged as a faculty elective or as professional training. The pedagogy is adversarial rather than generative: students are not asked to make something good, they are asked to judge something real and hold the judgement under pressure.</p>
+  <div class="weeks">
+    <div class="week"><span class="no">Week one</span><h3>Design is a neurological act</h3>
+      <p>Every colour, typeface, spatial and motion decision activating or suppressing cognitive systems. Neuroplasticity and scale. Why the ignorance defence fails once the mechanism is named.</p>
+      <div class="out"><span>Output</span>A named mechanism register for one product, and a failed ignorance defence.</div></div>
+    <div class="week"><span class="no">Week two</span><h3>The person, not the profile</h3>
+      <p>What behavioural data captures and what it cannot. The three postures as working practice. Vulnerability as a design variable rather than an edge case.</p>
+      <div class="out"><span>Output</span>A vulnerability analysis: the state in which the design becomes harmful, and who is routinely in it.</div></div>
+    <div class="week"><span class="no">Week three</span><h3>Neuroethics in practice</h3>
+      <p>Consent where there is no consent form. Manipulation as influence that does not sufficiently engage reflection. What is now actionable rather than merely objectionable.</p>
+      <div class="out"><span>Output</span>The consent dialogue the interface would need, and a regulatory exposure note.</div></div>
+    <div class="week"><span class="no">Week four</span><h3>The review</h3>
+      <p>Assembling the findings into a document with a verdict and required remediations, then defending it against the people who would have to act on it.</p>
+      <div class="out"><span>Output</span>The review document, the hearing, and a public record of what was amended.</div></div>
+  </div>
+</section>
+
+<section id="runs" class="wrap">
+  <div class="sec-head"><span class="sec-no">02</span><h2>Run sheets</h2></div>
+  <p class="lede">Forty minutes of seminar, then the room works. Teams of four, each team assigned one shipping product in week one and keeping it for the whole four weeks.</p>
+  <div class="runs">
+
+    <div class="run-week">
+      <h3>Week one — Design is a neurological act</h3>
+      <div class="sess"><div class="sess-top"><span class="sess-no">1.1</span><p class="sess-q">Why did you leave that room?</p></div>
+        <div class="sess-body">
+          <dl class="pair"><dt>Beat</dt><dd>You have walked into a room and felt, before a single conscious thought formed, that something was wrong. That was a nervous system reading an environment and reporting before the prefrontal cortex had a chance to process it. Design, spatial or interactive, is never neutral.</dd></dl>
+          <dl class="pair"><dt>Move</dt><dd><strong>The Room You Left.</strong> Products assigned at the end of the session; teams keep them to week four.</dd></dl>
+          <dl class="pair"><dt>Output</dt><dd>A list of mechanisms the room identified without anyone having a vocabulary yet.</dd></dl>
+        </div></div>
+      <div class="sess"><div class="sess-top"><span class="sess-no">1.2</span><p class="sess-q">What is actually being activated?</p></div>
+        <div class="sess-body">
+          <dl class="pair"><dt>Beat</dt><dd>The named mechanisms and their cognitive targets. Notification badges, red dots, the removed stopping cue — neurological decisions made by designers who either understood the consequences or produced them by default. Both are failures.</dd></dl>
+          <dl class="pair"><dt>Move</dt><dd><strong>The Mechanism Deck</strong>, two rounds. Teams must name the target and the population most exposed, not just the mechanic.</dd></dl>
+          <dl class="pair"><dt>Output</dt><dd>A shared vocabulary, and the first rows of the mechanism register.</dd></dl>
+        </div></div>
+      <div class="sess"><div class="sess-top"><span class="sess-no">1.3</span><p class="sess-q">What does this do at scale, over years?</p></div>
+        <div class="sess-body">
+          <dl class="pair"><dt>Beat</dt><dd>The brain as a continuously restructuring system that rewires around repeated stimuli. An interface optimised for arousal and deployed daily to millions is not extracting attention in the moment; it is restructuring the attentional architecture of a population. At that timescale the anxiety passes from side effect to physical alteration.</dd></dl>
+          <dl class="pair"><dt>Move</dt><dd>Teams complete the mechanism register for their assigned product: every mechanism, its target, the exposed population, and the daily frequency of exposure.</dd></dl>
+          <dl class="pair"><dt>Output</dt><dd>The mechanism register. Assessed as part of the review.</dd></dl>
+        </div></div>
+      <div class="sess"><div class="sess-top"><span class="sess-no">1.4</span><p class="sess-q">Can you still say you did not know?</p></div>
+        <div class="sess-body">
+          <dl class="pair"><dt>Beat</dt><dd>Someone who understands the mechanism and deploys high-arousal design anyway is making a public health decision on behalf of an unconsenting population. The question the session settles is what happens to the defence of not having known.</dd></dl>
+          <dl class="pair"><dt>Move</dt><dd><strong>The Ignorance Defence.</strong></dd></dl>
+          <dl class="pair"><dt>Output</dt><dd>Nothing written. The room has watched a defence stop working, which is the premise the next three weeks stand on.</dd></dl>
+        </div></div>
+    </div>
+
+    <div class="run-week">
+      <h3>Week two — The person, not the profile</h3>
+      <div class="sess"><div class="sess-top"><span class="sess-no">2.1</span><p class="sess-q">What does the data actually know?</p></div>
+        <div class="sess-body">
+          <dl class="pair"><dt>Beat</dt><dd>A dataset records what someone did under specific conditions at a specific moment. It says nothing about the state they were in, are in, or will be in when the next thing arrives. Most behaviour is processed below conscious awareness by systems the person cannot report on, so behavioural data captures the output of processes the person has no access to.</dd></dl>
+          <dl class="pair"><dt>Beat</dt><dd>Where this argument comes from is worth saying, because students assume it is an ethics position and it is not — it is an accuracy position that happens to have ethical consequences. It appears in game design before it appears in marketing: the player archetypes used to map motivation were drawn up partly for audience segmentation and product tailoring, and the critique of them is that they were never meant to define identities. When archetypes harden into labels they foster misunderstanding, exclusion and subtle forms of discrimination. A person may be an Achiever at work, an Explorer at home, a Socializer among friends and a Killer in debate. The same objection, in the same form, is what this course makes of a targeting model.</dd></dl>
+          <dl class="pair"><dt>Move</dt><dd>Teams take their product's own stated targeting model and write the three people it describes equally well who would need opposite treatment.</dd></dl>
+          <dl class="pair"><dt>Output</dt><dd>Three counter-cases per model.</dd></dl>
+        </div></div>
+      <div class="sess"><div class="sess-top"><span class="sess-no">2.2</span><p class="sess-q">What can this person receive right now?</p></div>
+        <div class="sess-body">
+          <dl class="pair"><dt>Beat</dt><dd>The three cognitive postures, taught once and used thereafter. Directed attention as a finite resource; what happens past the ceiling. Soft fascination as the opposite condition.</dd></dl>
+          <dl class="pair"><dt>Move</dt><dd>Teams map which posture their product is designed for, which it actually receives most often, and what the gap costs the user.</dd></dl>
+          <dl class="pair"><dt>Output</dt><dd>A posture mismatch finding.</dd></dl>
+        </div></div>
+      <div class="sess"><div class="sess-top"><span class="sess-no">2.3</span><p class="sess-q">Who breaks first?</p></div>
+        <div class="sess-body">
+          <dl class="pair"><dt>Beat</dt><dd>Vulnerability as a design variable, not an accessibility afterthought: age, disability, economic circumstance, and the ordinary depletion that puts anybody into a vulnerable state by eleven at night. A design is not safe because most users tolerate it.</dd></dl>
+          <dl class="pair"><dt>Move</dt><dd><strong>The Vulnerable Case.</strong></dd></dl>
+          <dl class="pair"><dt>Output</dt><dd>The vulnerability analysis. Assessed.</dd></dl>
+        </div></div>
+      <div class="sess"><div class="sess-top"><span class="sess-no">2.4</span><p class="sess-q">Where is the line between influence and manipulation?</p></div>
+        <div class="sess-body">
+          <dl class="pair"><dt>Beat</dt><dd>Manipulation defined as influence that does not sufficiently engage a person's capacity for reflection and deliberation, and the publicity principle behind it: a practice is suspect when those who use it would not defend it openly to the people it is used on.</dd></dl>
+          <dl class="pair"><dt>Move</dt><dd>Each team argues that one mechanism in their own product falls on the legitimate side. The room tests it against both criteria. Most arguments fail; the ones that survive are the interesting result.</dd></dl>
+          <dl class="pair"><dt>Output</dt><dd>A defensible list and an indefensible list.</dd></dl>
+        </div></div>
+    </div>
+
+    <div class="run-week">
+      <h3>Week three — Neuroethics in practice</h3>
+      <div class="sess"><div class="sess-top"><span class="sess-no">3.1</span><p class="sess-q">What would consent even look like here?</p></div>
+        <div class="sess-body">
+          <dl class="pair"><dt>Beat</dt><dd>There is no consent form in an interface. There is a design that either engages the person's reflective will or routes around it. The question is what disclosure would have to say for the mechanics to be genuinely agreed to.</dd></dl>
+          <dl class="pair"><dt>Move</dt><dd><strong>Consent Without a Form.</strong></dd></dl>
+          <dl class="pair"><dt>Output</dt><dd>The consent dialogue. Assessed.</dd></dl>
+        </div></div>
+      <div class="sess"><div class="sess-top"><span class="sess-no">3.2</span><p class="sess-q">What is already actionable?</p></div>
+        <div class="sess-body">
+          <dl class="pair"><dt>Beat</dt><dd>The regulatory ground as it now stands: prohibitions on techniques that work outside conscious awareness or exploit vulnerabilities tied to age, disability or circumstance; duties attached to algorithmic recommendation, including provision to switch it off; protections for minors; and data protection regimes that bear on profiling. The point is the shift from <i>wrong</i> to <i>actionable</i>.</dd></dl>
+          <dl class="pair"><dt>Move</dt><dd>Teams produce a regulatory exposure note using the triage instrument: for each mechanism, which regime a lawyer would be asked about, and what the team would need to know to answer.</dd></dl>
+          <dl class="pair"><dt>Output</dt><dd>The exposure note, written as questions for counsel rather than as conclusions.</dd></dl>
+        </div></div>
+      <div class="sess"><div class="sess-top"><span class="sess-no">3.3</span><p class="sess-q">What would you require them to change?</p></div>
+        <div class="sess-body">
+          <dl class="pair"><dt>Beat</dt><dd>A finding without a remediation is a complaint. A remediation that would destroy the product is not a remediation. The craft of this session is proposing the smallest change that removes the harm.</dd></dl>
+          <dl class="pair"><dt>Move</dt><dd>For each indefensible mechanism, teams write the minimum viable remediation and estimate what it costs the business. Where the honest answer is that it costs the business model, they say so.</dd></dl>
+          <dl class="pair"><dt>Output</dt><dd>A remediation schedule.</dd></dl>
+        </div></div>
+      <div class="sess"><div class="sess-top"><span class="sess-no">3.4</span><p class="sess-q">Does the verdict hold together?</p></div>
+        <div class="sess-body">
+          <dl class="pair"><dt>Beat</dt><dd>None. Drafting session.</dd></dl>
+          <dl class="pair"><dt>Move</dt><dd>Teams assemble the review document and run it through the five-question gate. Cross-reading: every team reads another team's draft and marks every finding that could not be defended by someone who disagreed with it.</dd></dl>
+          <dl class="pair"><dt>Output</dt><dd>The review document, circulated to the team that will oppose it.</dd></dl>
+        </div></div>
+    </div>
+
+    <div class="run-week">
+      <h3>Week four — The review</h3>
+      <div class="sess"><div class="sess-top"><span class="sess-no">4.1</span><p class="sess-q">What is the strongest case against you?</p></div>
+        <div class="sess-body">
+          <dl class="pair"><dt>Beat</dt><dd>Teams are told who will oppose them and given the session to prepare that opposition's best argument rather than their own.</dd></dl>
+          <dl class="pair"><dt>Move</dt><dd>Each team writes the three strongest objections to its own review and answers them in writing. Unanswered objections must be conceded in the document before the hearing, not during it.</dd></dl>
+          <dl class="pair"><dt>Output</dt><dd>A pre-conceded list. Conceding here costs nothing; conceding under questioning costs the finding.</dd></dl>
+        </div></div>
+      <div class="sess"><div class="sess-top"><span class="sess-no">4.2</span><p class="sess-q">Can you hold it?</p></div>
+        <div class="sess-body">
+          <dl class="pair"><dt>Beat</dt><dd>None.</dd></dl>
+          <dl class="pair"><dt>Move</dt><dd><strong>The Hearing</strong>, first half of the cohort.</dd></dl>
+          <dl class="pair"><dt>Output</dt><dd>The defence, and findings marked held or amended.</dd></dl>
+        </div></div>
+      <div class="sess"><div class="sess-top"><span class="sess-no">4.3</span><p class="sess-q">Can you hold it?</p></div>
+        <div class="sess-body">
+          <dl class="pair"><dt>Beat</dt><dd>None.</dd></dl>
+          <dl class="pair"><dt>Move</dt><dd><strong>The Hearing</strong>, second half.</dd></dl>
+          <dl class="pair"><dt>Output</dt><dd>As above.</dd></dl>
+        </div></div>
+      <div class="sess"><div class="sess-top"><span class="sess-no">4.4</span><p class="sess-q">What are you amending?</p></div>
+        <div class="sess-body">
+          <dl class="pair"><dt>Beat</dt><dd>The facilitator does not speak for the first hour.</dd></dl>
+          <dl class="pair"><dt>Move</dt><dd><strong>Amend or Hold.</strong></dd></dl>
+          <dl class="pair"><dt>Output</dt><dd>The final review, with the amendment record attached. Assessed.</dd></dl>
+        </div></div>
+    </div>
+
+  </div>
+</section>
+
+<section id="games" class="wrap">
+  <div class="sec-head"><span class="sec-no">03</span><h2>Six moves</h2></div>
+  <p class="lede">This course is argued rather than built, so its moves are adversarial. Nothing here awards points that persist, keeps a leaderboard or records a streak.</p>
+  <div class="games">
+
+    <div class="game"><span class="tag">Session 1.1 · 40 minutes · whole cohort</span>
+      <h3>The Room You Left</h3>
+      <p>Each student describes a place or an interface they left sooner than they intended, without being able to say why. No analysis from the speaker.</p>
+      <ol>
+        <li>Describe only what was there. Colour, sound, density, movement, what was being asked of you.</li>
+        <li>The room proposes what the nervous system was reading.</li>
+        <li>The speaker says whether it rings true. They are not obliged to agree.</li>
+        <li>Keep a wall list of every mechanism proposed, in the room's own untrained words.</li>
+      </ol>
+      <p class="why">The list is referred back to in week three, by which point the room has the vocabulary. Watching their own untrained descriptions turn out to have been accurate is what establishes that this is readable, not speculative.</p>
+    </div>
+
+    <div class="game"><span class="tag">Session 1.4 · 55 minutes · one volunteer, then all</span>
+      <h3>The Ignorance Defence</h3>
+      <p>A mock hearing in two passes. The same defence is offered twice and works only once.</p>
+      <ol>
+        <li>A volunteer defends a real design decision on the ground that they did not know what it did. The room must accept it.</li>
+        <li>The facilitator then names the mechanism precisely, with the research behind it.</li>
+        <li>The volunteer offers the same defence again. The room now rules on it.</li>
+        <li>Every student writes one decision in their own past work that this just disqualified.</li>
+      </ol>
+      <p class="why">The course's central claim is that the ignorance defence does not survive the mechanism being named, and that both deploying it knowingly and producing it by default are failures. Asserting that produces nodding. Running it twenty minutes apart produces the uncomfortable private list in step four, which is the actual learning.</p>
+    </div>
+
+    <div class="game"><span class="tag">Session 2.3 · 60 minutes · teams of four</span>
+      <h3>The Vulnerable Case</h3>
+      <p>Teams work their own assigned product and find the state in which it becomes harmful rather than merely annoying.</p>
+      <ol>
+        <li>Name the state precisely. Not <i>a vulnerable user</i> but the specific condition — depleted, grieving, in debt, fourteen, in pain, newly diagnosed.</li>
+        <li>Name the population routinely in that state, and estimate what share of the user base it is.</li>
+        <li>Describe the harm concretely enough that someone could check whether it happens.</li>
+        <li>The room challenges the estimate. A team that cannot support a number must widen or withdraw it.</li>
+      </ol>
+      <p class="why">Vulnerability is normally taught as a category of person, which lets a designer treat it as someone else's problem. Teaching it as a state everybody enters forces the finding into the main design rather than the accessibility appendix.</p>
+    </div>
+
+    <div class="game"><span class="tag">Session 3.1 · 65 minutes · teams, then whole cohort</span>
+      <h3>Consent Without a Form</h3>
+      <p>Write the disclosure the interface would have to show for its actual mechanics to be genuinely agreed to. Then read it out.</p>
+      <ol>
+        <li>Plain language, second person, no euphemism. Name the mechanism and what it is designed to produce in the reader.</li>
+        <li>No more than 120 words. A disclosure nobody would read is not a disclosure.</li>
+        <li>Read it aloud as though it appeared on first open.</li>
+        <li>The room answers one question: would the company ship this screen?</li>
+      </ol>
+      <p class="why">Almost every dialogue the room writes is unshippable, and the reason is not that it is badly written. It is the same hard gate as the five-question standard arriving from a different direction: a mechanic that cannot survive its own disclosure was never disclosable. Students find this out by writing it rather than by being told.</p>
+    </div>
+
+    <div class="game"><span class="tag">Sessions 4.2–4.3 · 3 hours each · pairs of teams</span>
+      <h3>The Hearing</h3>
+      <p>Each team presents its review to another team, which plays the product team that shipped the thing and defends it in good faith.</p>
+      <ol>
+        <li>Twenty minutes to present the findings, the verdict and the remediations.</li>
+        <li>Twenty-five minutes of opposition. The defending team argues the real business case, not a caricature.</li>
+        <li>The reviewing team must respond to every objection on the spot: hold, amend, or concede.</li>
+        <li>Roles swap. Everyone does both.</li>
+      </ol>
+      <p class="why">The defending role is the one that teaches. Having to argue sincerely for a design you spent three weeks condemning is the only reliable way to find out whether your findings were sound or merely righteous.</p>
+    </div>
+
+    <div class="game"><span class="tag">Session 4.4 · 90 minutes · whole cohort</span>
+      <h3>Amend or Hold</h3>
+      <p>Not a game. Each team states aloud which findings it is amending after the hearing and which it holds, and why.</p>
+      <ol>
+        <li>Amendments are read first, before anything held.</li>
+        <li>No defending an amendment. State it and move on.</li>
+        <li>A finding held must be held with the objection repeated accurately alongside it.</li>
+        <li>The room may ask. The room may not congratulate.</li>
+      </ol>
+      <p class="why">An honest amendment scores above a finding held through stubbornness, and above a finding that was never tested. This is where the course's own standard — would you be comfortable if they could see exactly what you are doing and why — gets applied to the reviewer instead of to the product.</p>
+    </div>
+
+  </div>
+</section>
+
+<section id="instruments" class="wrap">
+  <div class="sec-head"><span class="sec-no">04</span><h2>Instruments</h2></div>
+  <p class="lede">Three instruments for use in the room, plus the gate shared with the rest of the programme. They keep nothing: no entry is stored, transmitted or counted.</p>
+
+  <div class="inst">
+    <h4>Instrument one</h4>
+    <h3>The Mechanism Deck</h3>
+    <p class="prose">Draw a mechanism. Teams name the cognitive target and the population most exposed before anything is revealed. Naming the mechanic alone does not score.</p>
+    <div class="card-face">
+      <span class="kicker" id="dk-kicker">Card — not yet drawn</span>
+      <p class="mech" id="dk-mech">Press draw to begin. The room answers before anyone reveals.</p>
+      <div class="card-answer" id="dk-answer" hidden>
+        <dl class="pair"><dt>Target</dt><dd id="dk-target"></dd></dl>
+        <dl class="pair"><dt>Most exposed</dt><dd id="dk-pop"></dd></dl>
+        <dl class="pair"><dt>At scale</dt><dd id="dk-scale"></dd></dl>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button type="button" id="dk-draw">Draw a card</button>
+      <button type="button" id="dk-reveal">Reveal</button>
+      <button type="button" id="dk-shuffle">Shuffle</button>
+      <span class="status" id="dk-count"></span>
+    </div>
+  </div>
+
+  <div class="inst">
+    <h4>Instrument two</h4>
+    <h3>The vulnerability matrix</h3>
+    <p class="prose">Pick a state and a population. The instrument returns the design obligations that follow and the questions the review must answer. It is a prompt, not an answer: the obligations are generic and the team's job is to make each one specific to the product in front of them.</p>
+    <div class="picker">
+      <div><label for="vm-state" style="display:block;font-size:11px;text-transform:uppercase;letter-spacing:0.2em;color:var(--ink-faint);margin-bottom:7px">The state</label>
+        <select id="vm-state"></select></div>
+      <div><label for="vm-pop" style="display:block;font-size:11px;text-transform:uppercase;letter-spacing:0.2em;color:var(--ink-faint);margin-bottom:7px">The population</label>
+        <select id="vm-pop"></select></div>
+    </div>
+    <div class="verdict-box">
+      <p class="big" id="vm-head">—</p>
+      <ul id="vm-list"></ul>
+    </div>
+  </div>
+
+  <div class="inst">
+    <h4>Instrument three</h4>
+    <h3>Regulatory exposure triage</h3>
+    <p class="prose">Select what a mechanism does. The instrument returns which regimes a review would have to ask about and what the team needs to establish before anyone can answer. It produces questions, never conclusions.</p>
+    <div id="rt-host"></div>
+    <div class="verdict-box">
+      <p class="big" id="rt-head">Select what the mechanism does.</p>
+      <ul id="rt-list"></ul>
+    </div>
+    <div class="caution">
+      <span>What this is not</span>
+      This is a teaching aid for structuring a review, not legal advice, and it is deliberately built to output questions rather than findings. Jurisdictions differ, the instruments it names are summarised rather than quoted, and whether any provision applies to a given product is a question for someone qualified to answer it. A student review states its regulatory section as <i>questions for counsel</i>, and a review that states a legal conclusion is marked down for doing so.
+    </div>
+  </div>
+
+  <div class="inst">
+    <h4>Instrument four</h4>
+    <h3>The five-question gate</h3>
+    <p class="prose">Shared with the rest of the programme, and run here on the review rather than on a design. Questions three and four are hard gates. Applied to a reviewer, question four reads: would you be comfortable if the team you are judging could see exactly how you reached this?</p>
+    <div id="gate"></div>
+    <div class="verdict-box">
+      <p class="big" id="gate-verdict">Answer the five to get a verdict.</p>
+      <p id="gate-detail" style="font-size:14px;max-width:62ch;margin-top:14px"></p>
+    </div>
+    <div class="btn-row"><button type="button" id="gate-reset">Clear the gate</button></div>
+  </div>
+</section>
+
+<section id="assess" class="wrap">
+  <div class="sec-head"><span class="sec-no">05</span><h2>Assessment</h2></div>
+  <p class="lede">One document, built over four weeks and defended once. No exam.</p>
+  <div class="tablewrap">
+    <table id="assess-t">
+      <thead><tr><th>Piece</th><th class="num">Weight</th><th>Graded on</th></tr></thead>
+      <tbody>
+        <tr><td>The review document</td><td class="num">40%</td><td>Whether each finding is specific, supported and remediable, and whether the verdict follows from the findings rather than preceding them.</td></tr>
+        <tr><td>The hearing</td><td class="num">25%</td><td>Both roles. Holding a sound finding under pressure, and arguing the opposing case in good faith rather than as a straw man.</td></tr>
+        <tr><td>The amendment record</td><td class="num">20%</td><td>Honest revision. An amendment made cleanly scores above a weak finding defended to the end, and above one never tested.</td></tr>
+        <tr><td>The consent dialogue</td><td class="num">15%</td><td>Whether it names the mechanism without euphemism and stays inside 120 words.</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="prose" style="margin-top:28px">
+    <p>Two rules stated in session 1.1. A regulatory section written as questions for counsel scores above one written as conclusions, every time. And a review that finds a product largely defensible, with the evidence to support that, is worth exactly as much as one that condemns it — a cohort that only ever convicts has learned a posture rather than a method.</p>
+  </div>
+</section>
+
+<section id="teaching" class="wrap">
+  <div class="sec-head"><span class="sec-no">06</span><h2>Teaching notes</h2></div>
+  <div class="prose">
+    <p><strong>Assign products you would defend.</strong> If every assigned product is an obvious villain, the hearing has no tension and the course teaches contempt. Include at least two products the room broadly likes, and one the facilitator uses daily.</p>
+    <p><strong>Play the defending team yourself, once.</strong> In the first hearing, take the product team's side and argue it properly. The room needs to see that the opposing case can be strong before it will take the role seriously in the second session.</p>
+    <p><strong>Do not let the regulatory week become a law seminar.</strong> The content is the shift from <i>objectionable</i> to <i>actionable</i>, not the provisions themselves. If a student wants the provisions, send them to someone qualified and move on.</p>
+    <p><strong>Refuse the moral register.</strong> The course argues from mechanism and consequence, not from character. A student calling a designer evil has stopped doing the work; ask them which mechanism, which state, which population, and the argument either recovers or dissolves.</p>
+    <p><strong>This course has no artifact, and students will ask for one.</strong> Hold the line. The document is the deliverable, and the reason is that a practitioner who can only make and cannot judge is the person this course exists to stop producing.</p>
+    <p><strong>Run the gate on yourself at the end.</strong> Answer question four out loud about your own teaching of the course, in front of the cohort, and say what you would change. It is the same demand the course makes of everyone in the room.</p>
+  </div>
+</section>
+
+</main>
+
+<footer class="wrap colophon">
+  <p>Assembled from material underlying <i>Media as Universe: An Antifragile Framework for Communication Design in the Attention Economy</i> — the neuro-aesthetic argument of its fifth chapter, the person-not-profile argument of its third, and the manipulation criteria it borrows from Sunstein. The five questions are the manuscript's own and are quoted rather than paraphrased.</p>
+  <p>This page stores nothing and counts nothing. No analytics, no persistence, no record of anything entered on it.</p>
+</footer>
+
+<script>
+(function () {
+  "use strict";
+  var el = function (id) { return document.getElementById(id); };
+
+  /* ---------- Mechanism Deck ---------- */
+  var DECK = [
+    { mech: "A red dot on the icon with nothing behind it.", target: "Conditioned checking. A reward schedule with no information content, so the loop runs on the possibility rather than the payload.", pop: "Anyone who keeps the device within reach while sleeping — and, at the top of the distribution, adolescents.", scale: "Deployed daily for years, it trains an orienting reflex toward a surface that usually has nothing on it." },
+    { mech: "The feed continues as long as the thumb moves.", target: "Directed attention, past its ceiling. The natural stopping cue the attention system looks for has been removed.", pop: "Anyone arriving already depleted, which is most people after work.", scale: "The baseline for how long a person can hold a single task shifts, and it shifts for everything, not just the feed." },
+    { mech: "Autoplay, with the next item starting before the last has resolved.", target: "The decision point itself. There is no moment at which continuing becomes a choice.", pop: "Children, and anyone whose System 2 has stepped down.", scale: "Sessions are extended by removing exits rather than by improving content, so the measured success of the feature is indistinguishable from its harm." },
+    { mech: "Streak counters, and a visible loss when the streak breaks.", target: "Loss aversion, plus guilt doing the work a reason would normally do.", pop: "Anyone with an anxious relationship to the underlying activity — which includes much of the intended audience of a habit product.", scale: "Adherence rises and so does distress; the metric the team watches only records the first." },
+    { mech: "Variable reward on pull-to-refresh.", target: "A reinforcement schedule that is maximally persistent and resistant to extinction, which is why it is also used in gambling.", pop: "Everyone. Susceptibility varies, exposure does not.", scale: "The mechanism does not require the content to be good, so content quality and engagement decouple permanently." },
+    { mech: "One tap in; six screens and a phone call out.", target: "Directed attention as the toll on leaving. Most people pay by not leaving.", pop: "Anyone with low time or low confidence — disproportionately older users and anyone in a second language.", scale: "Retention figures measure the friction, not the value, and the organisation loses the ability to tell the difference." },
+    { mech: "“No thanks, I prefer to pay full price.”", target: "Self-image. The opt-out is priced in dignity rather than in clicks.", pop: "Anyone already uncertain about the decision, which is precisely who the dialogue is shown to.", scale: "Normalises a register in which declining is made to feel foolish, which transfers to every other interaction the person has online." },
+    { mech: "A countdown that restarts when the page reloads.", target: "Urgency arriving as a bodily state before it is available as a judgement.", pop: "Anyone on a first visit, with no basis for scepticism.", scale: "Each exposure that is later discovered to be false contributes to a general suspicion that attaches to honest claims too." },
+    { mech: "Notification timing tuned to when the user has historically been most responsive.", target: "The moment of lowest resistance, identified empirically. Pre-suasion industrialised.", pop: "Anyone whose responsive window coincides with depletion, which is the common case.", scale: "The system learns each person's weakest hour and returns to it, which no individual designer ever decided to do." },
+    { mech: "Default on, buried in a submenu, re-enabled after an update.", target: "The gap between what a person consented to and what they are able to verify.", pop: "Everyone, and most severely anyone who does not know the setting exists.", scale: "Consent becomes nominal across an entire product category, and users stop believing any setting holds." },
+    { mech: "Progress toward a reward that recedes as it is approached.", target: "The goal-gradient effect. Effort already spent is the thing holding the person, not the reward.", pop: "Anyone who has already invested. The mechanism strengthens with use.", scale: "Produces a population that cannot say why it is still there, which is a measurable loss of agency rather than a preference." },
+    { mech: "Social proof shown at the moment of comparison.", target: "A System 2 assessment, interrupted mid-evaluation and handed a shortcut.", pop: "Agency-seeking users — the state in which a person arrived with a genuine intention.", scale: "Deliberate evaluation becomes rarer, and the market's ability to reward a better product degrades with it." }
+  ];
+  var order = [], pos = 0, cur = null;
+  function shuffle(n) { var a = []; for (var i = 0; i < n; i++) { a.push(i); }
+    for (var j = a.length - 1; j > 0; j--) { var k = Math.floor(Math.random() * (j + 1)); var t = a[j]; a[j] = a[k]; a[k] = t; } return a; }
+  function count() { var left = DECK.length - pos; el("dk-count").textContent = left + (left === 1 ? " card remaining" : " cards remaining"); }
+  function reset() { order = shuffle(DECK.length); pos = 0; cur = null;
+    el("dk-kicker").textContent = "Card — not yet drawn";
+    el("dk-mech").textContent = "Press draw to begin. The room answers before anyone reveals.";
+    el("dk-answer").hidden = true; count(); }
+  el("dk-draw").addEventListener("click", function () {
+    if (pos >= DECK.length) { reset(); }
+    cur = DECK[order[pos]]; pos++;
+    el("dk-kicker").textContent = "Card " + pos + " of " + DECK.length;
+    el("dk-mech").textContent = cur.mech; el("dk-answer").hidden = true; count();
+  });
+  el("dk-reveal").addEventListener("click", function () {
+    if (!cur) { return; }
+    el("dk-target").textContent = cur.target; el("dk-pop").textContent = cur.pop;
+    el("dk-scale").textContent = cur.scale; el("dk-answer").hidden = false;
+  });
+  el("dk-shuffle").addEventListener("click", reset);
+  reset();
+
+  /* ---------- vulnerability matrix ---------- */
+  var STATES = [
+    { id: "depleted", name: "Depleted — directed attention spent", obl: [
+      "Assume System 2 is unavailable. Any mechanic that only works while deliberation is offline is disqualified here, not merely discouraged.",
+      "Remove every urgency cue. Urgency met with depletion is the single most exploited combination in the field.",
+      "Provide a stopping cue the person does not have to generate themselves." ] },
+    { id: "grieving", name: "Grieving, or newly bereaved", obl: [
+      "Suspend all lifecycle automation. A re-engagement sequence arriving here is an injury the company did not intend and cannot apologise for at scale.",
+      "Audit every piece of personalisation that references a person, a date or a shared account.",
+      "Provide a route to pause or close an account that requires no explanation." ] },
+    { id: "debt", name: "Under financial pressure", obl: [
+      "Disclose total cost before any commitment step, not after.",
+      "Remove loss-framed and comparison-framed copy entirely; both exploit the state rather than inform it.",
+      "Make the cheaper option at least as easy to find as the expensive one." ] },
+    { id: "minor", name: "Under eighteen", obl: [
+      "Treat engagement-maximising defaults as prohibited rather than configurable.",
+      "Establish what the product actually knows about age, and what it does when it does not know.",
+      "Assume any mechanic exploiting social comparison operates with greater force and less resistance." ] },
+    { id: "pain", name: "In pain, or acutely unwell", obl: [
+      "Assume reading capacity is reduced and the cost of an error is higher than usual.",
+      "Remove all time-limited interactions; a session that expires is a harm here.",
+      "Make every irreversible action reversible, or gate it behind a delay the person controls." ] },
+    { id: "unfamiliar", name: "Operating in a second language", obl: [
+      "Test the exit path, not only the entry path, in each language shipped.",
+      "Remove idiom from anything consequential, especially confirmations and cancellations.",
+      "Treat any asymmetry between translated entry flows and untranslated exit flows as a finding." ] },
+    { id: "diagnosed", name: "Newly diagnosed, or seeking health information", obl: [
+      "Separate information from acquisition. Any flow that mixes them exploits the state.",
+      "Disclose commercial interest at the point of the claim, not in a footer.",
+      "Where the product is not clinical, say so where the person is reading, not in the terms." ] }
+  ];
+  var POPS = [
+    { id: "all", name: "The whole user base", note: "If the state is one everybody enters, the obligations belong in the main design rather than in an accessibility appendix. Establish what share of sessions occur in this state before arguing it is an edge case." },
+    { id: "share", name: "A measurable segment", note: "Name the share and say how it was estimated. A finding that rests on an unsupported number will be widened or withdrawn at the hearing." },
+    { id: "unknown", name: "Unknown — the product does not measure it", note: "That the product cannot tell is itself the finding. A design that cannot detect the state it harms has chosen not to know, and the review should say which measurement would be required." },
+    { id: "targeted", name: "Actively targeted by the product", note: "The strongest form of this finding. Where a product seeks out people in the state its mechanics exploit, the review's verdict should turn on that and the remediation is structural, not cosmetic." }
+  ];
+  (function () {
+    var s = el("vm-state"), p = el("vm-pop");
+    STATES.forEach(function (x) { var o = document.createElement("option"); o.value = x.id; o.textContent = x.name; s.appendChild(o); });
+    POPS.forEach(function (x) { var o = document.createElement("option"); o.value = x.id; o.textContent = x.name; p.appendChild(o); });
+    function up() {
+      var st = STATES.filter(function (x) { return x.id === s.value; })[0];
+      var po = POPS.filter(function (x) { return x.id === p.value; })[0];
+      el("vm-head").textContent = st.name + " · " + po.name;
+      var list = el("vm-list"); list.innerHTML = "";
+      st.obl.forEach(function (t) { var li = document.createElement("li"); li.textContent = t; list.appendChild(li); });
+      var li = document.createElement("li");
+      li.innerHTML = "<strong>On the population:</strong> " + po.note;
+      list.appendChild(li);
+    }
+    s.addEventListener("change", up); p.addEventListener("change", up); up();
+  })();
+
+  /* ---------- regulatory triage ---------- */
+  var TRIAGE = [
+    { id: "subliminal", q: "Operates outside the person's conscious awareness, or below the threshold at which they could notice it",
+      regimes: ["Prohibitions on subliminal and manipulative technique in AI and product regulation — the EU AI Act's Article 5 being the clearest written example."],
+      asks: ["Can the team demonstrate the mechanism is perceptible to the person it acts on?", "Is there internal documentation showing the effect was intended?"] },
+    { id: "vulnerability", q: "Exploits a vulnerability tied to age, disability, or economic or social circumstance",
+      regimes: ["The same prohibitions, which treat exploitation of these vulnerabilities separately and more strictly.", "Consumer protection regimes on unfair commercial practice."],
+      asks: ["Which vulnerability, named specifically?", "Does the product know, or could it know, when a user is in that group?"] },
+    { id: "minors", q: "Reaches users under eighteen, or cannot establish that it does not",
+      regimes: ["Minors' protection rules, including requirements for restricted modes and limits on engagement-maximising design.", "Data protection rules on children's data."],
+      asks: ["What is the actual age-assurance mechanism, as opposed to the stated policy?", "What are the defaults for a user of unknown age?"] },
+    { id: "recommender", q: "Ranks, recommends or sequences content algorithmically",
+      regimes: ["Algorithmic recommendation duties, including obligations to disclose that ranking is occurring and in some regimes to provide an off switch.", "Platform transparency obligations where the service is large enough to be in scope."],
+      asks: ["Is there a genuine, discoverable way to turn ranking off?", "What is optimised for, in the team's own words and in the code?"] },
+    { id: "profiling", q: "Profiles individuals, infers traits, or targets on inferred characteristics",
+      regimes: ["Data protection and personal information regimes, particularly on inference, sensitive categories and automated decision-making.", "Rules on targeted advertising where sensitive inference is involved."],
+      asks: ["Which inferences are made, and would the person recognise them as being about them?", "What is the lawful basis, and was it actually relied upon?"] },
+    { id: "darkpattern", q: "Makes an exit, cancellation or refusal materially harder than the corresponding entry",
+      regimes: ["Consumer law on unfair practice, subscription and cancellation.", "Emerging specific prohibitions on interface practices of this kind."],
+      asks: ["Measured in steps and seconds, what is the asymmetry?", "Was the asymmetry designed, or inherited? The documentation usually answers this."] },
+    { id: "health", q: "Makes a claim about health, wellbeing, learning outcomes or behaviour change",
+      regimes: ["Advertising standards on substantiation.", "Where the claim is clinical, medical device and health claim regimes."],
+      asks: ["What evidence substantiates the claim, and is it about this product?", "Would a reader take the claim as clinical, whatever the terms say?"] }
+  ];
+  (function () {
+    var host = el("rt-host");
+    TRIAGE.forEach(function (t) {
+      var d = document.createElement("div");
+      d.className = "field";
+      d.innerHTML = '<label style="text-transform:none;letter-spacing:0;font-size:14px;color:var(--ink);display:flex;gap:10px;align-items:flex-start;cursor:pointer">' +
+        '<input type="checkbox" id="rt-' + t.id + '" style="accent-color:var(--ink);margin:5px 0 0"> <span>' + t.q + '</span></label>';
+      host.appendChild(d);
+    });
+    function up() {
+      var on = TRIAGE.filter(function (t) { return el("rt-" + t.id).checked; });
+      var list = el("rt-list"); list.innerHTML = "";
+      if (!on.length) {
+        el("rt-head").textContent = "Select what the mechanism does.";
+        return;
+      }
+      el("rt-head").textContent = on.length === 1
+        ? "One area to ask about."
+        : on.length + " areas to ask about.";
+      on.forEach(function (t) {
+        var li = document.createElement("li");
+        li.style.marginBottom = "12px";
+        var r = t.regimes.map(function (x) { return x; }).join(" ");
+        li.innerHTML = "<strong>" + t.q + "</strong><br>" + r + "<br><i>Establish first:</i> " + t.asks.join(" · ");
+        list.appendChild(li);
+      });
+      var li = document.createElement("li");
+      li.style.marginTop = "16px";
+      li.textContent = "Write each of these into the review as a question for counsel. None of them is a finding yet.";
+      list.appendChild(li);
+    }
+    host.addEventListener("change", up); up();
+  })();
+
+  /* ---------- five-question gate ---------- */
+  var GATE = [
+    { q: "What state is the person in when this design reaches them?", note: "Not the segment. The probable cognitive condition at the moment of reception.", yes: "I can name it", no: "I am assuming it", hard: false },
+    { q: "Is what the design delivers appropriate for that state, or built to exploit it?", note: "Meeting someone where they are, against ambushing them there.", yes: "Appropriate", no: "Exploits it", hard: false },
+    { q: "Would these mechanics still work if the person could see them clearly?", note: "Hard gate. The same test the consent dialogue applies from the other direction.", yes: "Yes, they hold", no: "No, they collapse", hard: true },
+    { q: "Would you be comfortable if the team you are judging could see exactly how you reached this?", note: "Hard gate. Applied to the reviewer, not the product. The method, the evidence, what you chose not to look at.", yes: "Comfortable", no: "Not comfortable", hard: true },
+    { q: "How would you feel, being judged the way you are judging?", note: "As a practitioner. As a human being.", yes: "I would accept it", no: "I would not", hard: false }
+  ];
+  (function () {
+    var host = el("gate");
+    GATE.forEach(function (g, i) {
+      var d = document.createElement("div");
+      d.className = "field";
+      d.innerHTML = '<span style="font-size:11px;letter-spacing:0.2em;color:var(--ink-faint);font-variant-numeric:tabular-nums">' +
+          (i + 1) + (g.hard ? " · hard gate" : "") + "</span>" +
+        '<p style="font-size:15px;max-width:58ch;margin-top:4px">' + g.q + "</p>" +
+        '<p style="font-size:13px;color:var(--ink-faint);margin-top:4px">' + g.note + "</p>" +
+        '<div style="display:flex;gap:22px;margin-top:12px">' +
+          '<label style="font-size:13px;display:flex;align-items:center;gap:7px;cursor:pointer"><input type="radio" name="ng' + i + '" value="pass" style="accent-color:var(--ink);margin:0"> ' + g.yes + "</label>" +
+          '<label style="font-size:13px;display:flex;align-items:center;gap:7px;cursor:pointer"><input type="radio" name="ng' + i + '" value="fail" style="accent-color:var(--ink);margin:0"> ' + g.no + "</label>" +
+        "</div>";
+      host.appendChild(d);
+    });
+    function up() {
+      var answered = 0, failed = [], hard = [];
+      GATE.forEach(function (g, i) {
+        var s = host.querySelector('input[name="ng' + i + '"]:checked');
+        if (!s) { return; }
+        answered++;
+        if (s.value === "fail") { failed.push(i + 1); if (g.hard) { hard.push(i + 1); } }
+      });
+      if (answered < GATE.length) {
+        el("gate-verdict").textContent = "Answer the five to get a verdict.";
+        el("gate-detail").textContent = answered ? answered + " of 5 answered." : "";
+        return;
+      }
+      if (hard.length) {
+        el("gate-verdict").textContent = "Does not stand.";
+        el("gate-detail").textContent = "Question " + hard.join(" and ") + " failed. Rework the reasoning rather than the wording — a finding that only holds while unexamined is not a finding.";
+        return;
+      }
+      if (failed.length) {
+        el("gate-verdict").textContent = "Not yet.";
+        el("gate-detail").textContent = "Question " + failed.join(", ") + " failed. The reasoning is disclosable, so the review is recoverable, but it does not meet the standard as it stands.";
+        return;
+      }
+      el("gate-verdict").textContent = "Stands.";
+      el("gate-detail").textContent = "Take it to the hearing. The defence is on the reasoning, not the verdict.";
+    }
+    host.addEventListener("change", up);
+    el("gate-reset").addEventListener("click", function () {
+      Array.prototype.forEach.call(host.querySelectorAll("input[type=radio]"), function (r) { r.checked = false; });
+      up();
+    });
+    up();
+  })();
+})();
+</script>
+</body>
+</html>

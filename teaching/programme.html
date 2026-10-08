@@ -1,0 +1,462 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Attention, Ethics, Narrative</title>
+<style>
+  /* Layout: a short core, then every detail folded into a section the reader
+     opens. Hairlines instead of cards, nothing a filled area except the nodes
+     on the figure, nothing a straight segment — the open/close mark is a bowed
+     arc. Monochrome; emphasis comes from one solid rule, on the CTA. */
+  :root {
+    --ground: #ececeb;
+    --ink: #15161a;
+    --ink-soft: #55575d;
+    --ink-faint: #8b8d93;
+    --hair: #c6c7c4;
+    --hair-faint: #d9dad7;
+    --display: "Newsreader", "Iowan Old Style", Georgia, serif;
+    --body: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+    --ease: cubic-bezier(0.33, 0.01, 0.2, 1);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground: #0b0c0d; --ink: #e7e6e2; --ink-soft: #a0a09c; --ink-faint: #6e6f6c;
+      --hair: #35373a; --hair-faint: #25272a; color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --ground: #0b0c0d; --ink: #e7e6e2; --ink-soft: #a0a09c; --ink-faint: #6e6f6c;
+    --hair: #35373a; --hair-faint: #25272a; color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--ground); color: var(--ink);
+    font-family: var(--body); font-weight: 300; font-size: 15px; line-height: 1.68;
+    -webkit-font-smoothing: antialiased;
+  }
+  h1, h2, h3, h4, p, ul, ol, dl, dd, figure, blockquote { margin: 0; }
+  ul, ol { padding-left: 1.1em; } li { margin-block: 0.3em; }
+  strong { font-weight: 300; border-bottom: 1px solid var(--hair); }
+  i, em { font-style: italic; }
+
+  .wrap { max-width: 880px; margin: 0 auto; padding-inline: 20px; }
+
+  /* masthead */
+  .mast { padding-block: 56px 36px; }
+  .eyebrow { font-size: 11px; text-transform: uppercase; letter-spacing: 0.2em; color: var(--ink-faint); }
+  h1 {
+    font-family: var(--display); font-weight: 300;
+    font-size: clamp(30px, 6.6vw, 46px); line-height: 1.1; letter-spacing: -0.014em;
+    text-wrap: balance; margin-top: 15px; max-width: 24ch;
+  }
+  .standfirst { margin-top: 20px; max-width: 60ch; color: var(--ink-soft); }
+  .mast-meta {
+    display: flex; flex-wrap: wrap; gap: 4px 28px; margin-top: 24px;
+    font-size: 11px; text-transform: uppercase; letter-spacing: 0.2em; color: var(--ink-faint);
+  }
+
+  /* the core */
+  .core { padding-block: 0 36px; border-bottom: 1px solid var(--hair); }
+  .core p { max-width: 62ch; }
+  figure { margin: 30px 0 4px; }
+  figure svg { display: block; width: 100%; height: auto; color: var(--ink); }
+  .positions { display: grid; gap: 1px; background: var(--hair-faint); margin-top: 26px; }
+  @media (min-width: 760px) { .positions { grid-template-columns: repeat(3, 1fr); } }
+  .pos { background: var(--ground); padding: 18px 18px 20px; min-width: 0; }
+  .pos span {
+    font-size: 11px; text-transform: uppercase; letter-spacing: 0.2em;
+    color: var(--ink-faint); display: block; margin-bottom: 9px;
+  }
+  .pos p { font-family: var(--display); font-size: 17px; line-height: 1.3; }
+
+  /* folded sections */
+  details { border-bottom: 1px solid var(--hair); }
+  summary {
+    list-style: none; cursor: pointer; padding-block: 22px;
+    display: grid; grid-template-columns: 1fr 14px; gap: 0 18px; align-items: start;
+  }
+  summary::-webkit-details-marker { display: none; }
+  summary:focus-visible { outline: 1px solid var(--ink); outline-offset: 4px; }
+  .s-kind { font-size: 11px; text-transform: uppercase; letter-spacing: 0.2em; color: var(--ink-faint); }
+  .s-name {
+    font-family: var(--display); font-size: clamp(21px, 3.8vw, 27px); line-height: 1.18;
+    letter-spacing: -0.008em; margin-top: 7px; text-wrap: balance;
+  }
+  .s-q { margin-top: 10px; font-size: 15px; color: var(--ink-soft); max-width: 54ch; }
+  .mark { width: 14px; height: 14px; margin-top: 8px; color: var(--ink-faint); transition: transform 0.35s var(--ease); }
+  details[open] .mark { transform: rotate(180deg); }
+  .inner { padding-bottom: 30px; }
+  .inner .prose { max-width: 64ch; }
+  .inner .prose p + p { margin-top: 14px; }
+  h4 { font-size: 11px; text-transform: uppercase; letter-spacing: 0.2em; color: var(--ink-faint); margin-bottom: 11px; }
+
+  /* weeks inside a course */
+  .wks { border-top: 1px solid var(--hair-faint); }
+  .wk { display: grid; gap: 1px 18px; padding-block: 13px; border-bottom: 1px solid var(--hair-faint); }
+  @media (min-width: 620px) { .wk { grid-template-columns: 4.4em 1fr; } }
+  .wk .n { font-size: 11px; text-transform: uppercase; letter-spacing: 0.2em; color: var(--ink-faint); }
+  .wk b { font-family: var(--display); font-weight: 300; font-size: 16px; display: block; }
+  .wk p { font-size: 14px; color: var(--ink-soft); margin-top: 2px; max-width: 58ch; }
+
+  .pair { display: grid; gap: 18px; margin-top: 24px; }
+  @media (min-width: 680px) { .pair { grid-template-columns: 1fr 1fr; } }
+  .pair ul { font-size: 14px; }
+  .pair p { font-size: 14px; color: var(--ink-soft); max-width: 46ch; }
+
+  /* buttons */
+  .ctas { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 26px; }
+  a.btn, button.btn {
+    font-family: var(--body); font-weight: 300; font-size: 11px;
+    text-transform: uppercase; letter-spacing: 0.2em;
+    color: var(--ink); background: none; text-decoration: none;
+    border: 1px solid var(--hair); border-radius: 0;
+    padding: 10px 15px; cursor: pointer; display: inline-block;
+    transition: border-color 0.3s var(--ease);
+  }
+  a.btn:hover, a.btn:focus-visible, button.btn:hover, button.btn:focus-visible { border-color: var(--ink); }
+  a.btn:focus-visible, button.btn:focus-visible { outline: none; }
+  a.btn.lead { border-color: var(--ink); }
+  .ctas .note { font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--ink-faint); align-self: center; }
+
+  /* tables */
+  .tablewrap { overflow-x: auto; margin-top: 18px; }
+  table { border-collapse: collapse; width: 100%; font-size: 14px; }
+  th, td { text-align: left; padding: 10px 16px 10px 0; border-bottom: 1px solid var(--hair-faint); vertical-align: top; }
+  th { font-size: 11px; text-transform: uppercase; letter-spacing: 0.2em; color: var(--ink-faint);
+    font-weight: 300; border-bottom-color: var(--hair); }
+  td.num, th.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
+  #stack { min-width: 560px; } #routing { min-width: 720px; } #spine { min-width: 620px; }
+
+  blockquote {
+    margin-block: 22px; padding-left: 20px; border-left: 1px solid var(--hair);
+    font-family: var(--display); font-size: clamp(17px, 3vw, 20px); line-height: 1.42; max-width: 44ch;
+  }
+  blockquote cite {
+    display: block; margin-top: 11px; font-family: var(--body); font-size: 11px;
+    text-transform: uppercase; letter-spacing: 0.2em; color: var(--ink-faint); font-style: normal;
+  }
+
+  /* sheets + contact */
+  .sheets { padding-block: 40px; border-bottom: 1px solid var(--hair); }
+  .contact { padding-block: 40px 20px; border-top: 1px solid var(--ink); margin-top: 0; }
+  .contact .ask { font-family: var(--display); font-size: clamp(20px, 3.8vw, 26px); line-height: 1.28; max-width: 34ch; text-wrap: balance; }
+  .contact .req { margin-top: 14px; font-size: 14px; color: var(--ink-soft); max-width: 56ch; }
+  .addr { margin-top: 20px; font-size: 16px; }
+  .addr span { display: block; }
+  #fallback { margin-top: 16px; max-width: 46ch; }
+  #fallback p { font-size: 12px; color: var(--ink-faint); margin-bottom: 6px; }
+  #fallback input {
+    width: 100%; font-family: var(--body); font-weight: 300; font-size: 14px; color: var(--ink);
+    background: none; border: none; border-bottom: 1px solid var(--hair); border-radius: 0; padding: 7px 0;
+  }
+  #fallback input:focus { outline: none; border-bottom-color: var(--ink); }
+
+  .colophon { padding-block: 30px 60px; font-size: 13px; color: var(--ink-faint); max-width: 64ch; }
+  .colophon p + p { margin-top: 11px; }
+
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition-duration: 0.01ms !important; } }
+</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300;1,6..72,300&family=IBM+Plex+Sans:ital,wght@0,300;1,300&display=swap">
+<style>[hidden]{display:none!important}img{max-width:100%}</style>
+</head>
+<body>
+
+<header class="wrap mast">
+  <span class="eyebrow">Teaching programme</span>
+  <h1>Attention, ethics and narrative</h1>
+  <p class="standfirst">Three four-week studio courses on what communication design does to the people who receive it. Any one stands alone. Taken together they are a sequence.</p>
+  <div class="mast-meta">
+    <span>Three courses</span><span>Four weeks each</span><span>48 contact hours</span>
+    <span>Studio, in English</span><span>No prerequisites</span>
+  </div>
+</header>
+
+<section class="wrap core">
+  <p>All three are about one thing: a human nervous system receiving something that was built to affect it. What separates them is where the student is standing when they look at it.</p>
+
+  <figure>
+    <svg viewBox="0 0 760 240" role="img" aria-label="Three nodes joined by bowed filaments into a closed figure: what it does, what we owe, what else.">
+      <path d="M 120 182 Q 236 40 388 50" fill="none" stroke="currentColor" stroke-width="1.3" opacity="0.85"/>
+      <path d="M 388 50 Q 556 64 648 178" fill="none" stroke="currentColor" stroke-width="1.3" opacity="0.85"/>
+      <path d="M 648 178 Q 404 230 120 182" fill="none" stroke="currentColor" stroke-width="1.3" opacity="0.85"/>
+      <path d="M 128 176 Q 250 56 382 60" fill="none" stroke="currentColor" stroke-width="0.6" opacity="0.26"/>
+      <path d="M 394 58 Q 548 76 640 172" fill="none" stroke="currentColor" stroke-width="0.6" opacity="0.26"/>
+      <circle cx="120" cy="182" r="5" fill="currentColor"/>
+      <circle cx="388" cy="50" r="5" fill="currentColor"/>
+      <circle cx="648" cy="178" r="5" fill="currentColor"/>
+      <text x="120" y="212" font-size="11" text-anchor="middle" fill="currentColor" opacity="0.6" letter-spacing="2.2">WHAT IT DOES</text>
+      <text x="388" y="30" font-size="11" text-anchor="middle" fill="currentColor" opacity="0.6" letter-spacing="2.2">WHAT WE OWE</text>
+      <text x="648" y="208" font-size="11" text-anchor="middle" fill="currentColor" opacity="0.6" letter-spacing="2.2">WHAT ELSE</text>
+    </svg>
+  </figure>
+
+  <div class="positions">
+    <div class="pos"><span>Diagnosis</span><p>What is being done, and why the model that does it breaks.</p></div>
+    <div class="pos"><span>Obligation</span><p>What a designer owes the person on the other side.</p></div>
+    <div class="pos"><span>Construction</span><p>What else these mechanics could be for.</p></div>
+  </div>
+
+  <div class="ctas">
+    <a class="btn lead" href="placement-test.html">Start here — six questions, five minutes</a>
+    <span class="note">It tells you which course to begin with</span>
+  </div>
+</section>
+
+<main class="wrap">
+
+  <details>
+    <summary>
+      <div>
+        <span class="s-kind">Course one · the attention economy</span>
+        <h2 class="s-name">Media as Universe</h2>
+        <p class="s-q">Why were we never built for this — and what breaks first in a business that depends on us not noticing?</p>
+      </div>
+      <svg class="mark" viewBox="0 0 14 14" aria-hidden="true"><path d="M 1.5 4.5 Q 7 11 12.5 4.5" fill="none" stroke="currentColor" stroke-width="1.3"/></svg>
+    </summary>
+    <div class="inner">
+      <div class="wks">
+        <div class="wk"><span class="n">Week 1</span><div><b>The mechanics</b><p>Name every weapon operating on you, and find the four places the model that uses them is structurally weak.</p></div></div>
+        <div class="wk"><span class="n">Week 2</span><div><b>The person</b><p>Stop writing to profiles. Write to the state someone is actually in when the message arrives.</p></div></div>
+        <div class="wk"><span class="n">Week 3</span><div><b>The claim</b><p>Take a commercial claim apart, down to its economic, historical and cognitive roots.</p></div></div>
+        <div class="wk"><span class="n">Week 4</span><div><b>The proof</b><p>Build one thing. Measure what it costs the people who receive it. Read the number out loud.</p></div></div>
+      </div>
+      <div class="pair">
+        <div><h4>Students leave with</h4><ul>
+          <li>One finished artifact</li>
+          <li>A measured result, obtained under their own protocol</li>
+          <li>A sourced causal analysis of a real claim</li>
+        </ul></div>
+        <div><h4>Suits</h4><p>Advertising and communication, marketing and brand strategy, design, media studies, business. The strongest fit of the three for a communication faculty, and the easiest to justify commercially.</p></div>
+      </div>
+      <div class="ctas">
+        <a class="btn lead" href="sheet-1-media-as-universe.html">One-page sheet</a>
+        <a class="btn" href="kit-1-media-as-universe.html">Facilitator's kit</a>
+        <a class="btn" href="handbook-1-media-as-universe.html">Student handbook</a>
+      </div>
+    </div>
+  </details>
+
+  <details>
+    <summary>
+      <div>
+        <span class="s-kind">Course two · the designer's obligation</span>
+        <h2 class="s-name">Human-Centric and Neuroethical Design</h2>
+        <p class="s-q">If every interface decision activates or suppresses a cognitive system, what is a designer responsible for?</p>
+      </div>
+      <svg class="mark" viewBox="0 0 14 14" aria-hidden="true"><path d="M 1.5 4.5 Q 7 11 12.5 4.5" fill="none" stroke="currentColor" stroke-width="1.3"/></svg>
+    </summary>
+    <div class="inner">
+      <div class="wks">
+        <div class="wk"><span class="n">Week 1</span><div><b>The act</b><p>Design as a neurological decision, made daily, at scale, on an unconsenting population.</p></div></div>
+        <div class="wk"><span class="n">Week 2</span><div><b>The person</b><p>What behavioural data cannot know. Vulnerability as a state anyone enters, not a category of person.</p></div></div>
+        <div class="wk"><span class="n">Week 3</span><div><b>The line</b><p>Consent where there is no consent form, and what is now actionable rather than merely objectionable.</p></div></div>
+        <div class="wk"><span class="n">Week 4</span><div><b>The review</b><p>Defend your verdict to a room arguing in good faith for the product you condemned.</p></div></div>
+      </div>
+      <div class="pair">
+        <div><h4>Students leave with</h4><ul>
+          <li>A design review document on a real product</li>
+          <li>A verdict they can hold, or amend honestly</li>
+          <li>An account of what is actionable, not just wrong</li>
+        </ul></div>
+        <div><h4>Suits</h4><p>Design and HCI, product and engineering, psychology, media law and policy. The most portable of the three — it needs a room and nothing else, and runs unchanged as professional training.</p></div>
+      </div>
+      <div class="ctas">
+        <a class="btn lead" href="sheet-2-neuroethical-design.html">One-page sheet</a>
+        <a class="btn" href="kit-2-neuroethical-design.html">Facilitator's kit</a>
+        <a class="btn" href="handbook-2-neuroethical-design.html">Student handbook</a>
+      </div>
+    </div>
+  </details>
+
+  <details>
+    <summary>
+      <div>
+        <span class="s-kind">Course three · narrative and play</span>
+        <h2 class="s-name">Alternative Storytelling</h2>
+        <p class="s-q">Why is a story retained when a fact is not — and when is a loop a gift rather than a trap?</p>
+      </div>
+      <svg class="mark" viewBox="0 0 14 14" aria-hidden="true"><path d="M 1.5 4.5 Q 7 11 12.5 4.5" fill="none" stroke="currentColor" stroke-width="1.3"/></svg>
+    </summary>
+    <div class="inner">
+      <div class="wks">
+        <div class="wk"><span class="n">Week 1</span><div><b>The pact</b><p>Disbelief suspended by consent. A fiction you have agreed to is not a lie — and what generative media did to that.</p></div></div>
+        <div class="wk"><span class="n">Week 2</span><div><b>The tests</b><p>Who holds the goal. Are the mechanics disclosable. Does leaving cost nothing. Then find the one edit at which a mechanic flips.</p></div></div>
+        <div class="wk"><span class="n">Week 3</span><div><b>The turn</b><p>The same mechanics made extractive, the biases they run on, and where the clinician's boundary sits.</p></div></div>
+        <div class="wk"><span class="n">Week 4</span><div><b>The proof</b><p>Build it, measure it, then let the players say in their own words what they thought they agreed to.</p></div></div>
+      </div>
+      <div class="pair">
+        <div><h4>Students leave with</h4><ul>
+          <li>One playable or readable artifact</li>
+          <li>A mechanic-by-mechanic justification, rejections included</li>
+          <li>A measured result, and their players' account of it</li>
+        </ul></div>
+        <div><h4>Suits</h4><p>Education and instructional design, serious games and interaction design, health communication, museum and cultural programming. Taught through three built projects: an XR escape room, a flow game, and a journal game on paper.</p></div>
+      </div>
+      <div class="ctas">
+        <a class="btn lead" href="sheet-3-alternative-storytelling.html">One-page sheet</a>
+        <a class="btn" href="kit-3-alternative-storytelling.html">Facilitator's kit</a>
+        <a class="btn" href="handbook-3-alternative-storytelling.html">Student handbook</a>
+      </div>
+    </div>
+  </details>
+
+  <details>
+    <summary>
+      <div>
+        <span class="s-kind">The obvious problem</span>
+        <h2 class="s-name">One course forbids streaks. Another teaches you to build with them.</h2>
+        <p class="s-q">Both positions are held deliberately. What reconciles them is a definition, not a compromise.</p>
+      </div>
+      <svg class="mark" viewBox="0 0 14 14" aria-hidden="true"><path d="M 1.5 4.5 Q 7 11 12.5 4.5" fill="none" stroke="currentColor" stroke-width="1.3"/></svg>
+    </summary>
+    <div class="inner prose">
+      <p>The mechanic is not the unit of judgement. The consent is.</p>
+      <blockquote>
+        They built worlds — storytelling, gamification, branded fictions — and invited the audience inside. Trust was not required, because the audience had entered the pact that cinema and literature rely on: disbelief suspended by consent. A fiction you have agreed to is not a lie.
+        <cite>Media as Universe, §2.1</cite>
+      </blockquote>
+      <p>A streak serving a habit someone chose supports that person's own intention. The identical streak serving a subscription they are trying to cancel extracts from them. Same code, opposite direction of agency. Three things keep this from being a licence: the person must hold the goal, the mechanics must survive being disclosed, and the exit must cost nothing.</p>
+      <p>The third has a provenance worth stating, because it is what separates this from a position arrived at for convenience. It was not reasoned out. It was noticed by a designer about her own game, built deliberately for flow, with every one of flow's conditions satisfied:</p>
+      <blockquote>
+        The ethical question was, this flow was capturing, this boat could become a safe place one couldn't easily leave.
+        <cite>On Cloudy Horizons, 2025</cite>
+      </blockquote>
+      <p>A practitioner catching her own successful design in the act, and treating it as a problem rather than a retention metric, is the whole programme in one sentence. The three courses are the method for arriving there reliably, from whichever side you approach it.</p>
+    </div>
+  </details>
+
+  <details>
+    <summary>
+      <div>
+        <span class="s-kind">Timetabling</span>
+        <h2 class="s-name">Taking one, two or all three</h2>
+        <p class="s-q">No course requires another. Hours are stated so they map onto your own credit framework.</p>
+      </div>
+      <svg class="mark" viewBox="0 0 14 14" aria-hidden="true"><path d="M 1.5 4.5 Q 7 11 12.5 4.5" fill="none" stroke="currentColor" stroke-width="1.3"/></svg>
+    </summary>
+    <div class="inner">
+      <div class="tablewrap"><table id="stack">
+        <thead><tr><th>Taken as</th><th class="num">Weeks</th><th class="num">Hours</th><th>What it is</th></tr></thead>
+        <tbody>
+          <tr><td>Any one course</td><td class="num">4</td><td class="num">48</td><td>A complete short course with its own deliverable and defence. The usual entry.</td></tr>
+          <tr><td>Courses one and two</td><td class="num">8</td><td class="num">96</td><td>Diagnosis then obligation. For a faculty wanting an ethics strand with teeth.</td></tr>
+          <tr><td>Courses one and three</td><td class="num">8</td><td class="num">96</td><td>Critique then construction. For education, serious games, health communication.</td></tr>
+          <tr><td>All three</td><td class="num">12</td><td class="num">144</td><td>A sequence, suitable as a certificate or a semester specialisation.</td></tr>
+          <tr><td>Any course, extended</td><td class="num">16</td><td class="num">32</td><td>The same material as a conventional module at two hours a week.</td></tr>
+        </tbody>
+      </table></div>
+      <div class="tablewrap"><table id="routing">
+        <thead><tr><th>Course</th><th>Deliverable</th><th>Needs</th><th>Ethics review</th></tr></thead>
+        <tbody>
+          <tr><td>Media as Universe</td><td>Artifact, delta study, causal analysis, oral defence</td><td>A studio room and a wall. No laboratory, no equipment, no licences.</td><td>Not normally — adult peer volunteers, anonymous self-report, aggregate only</td></tr>
+          <tr><td>Neuroethical Design</td><td>Design review document and verdict, presented</td><td>Nothing beyond a room.</td><td>Not required — no human subjects</td></tr>
+          <tr><td>Alternative Storytelling</td><td>Playable artifact, justification, measured result</td><td>A studio room and basic prototyping materials. Paper is acceptable throughout.</td><td>Required only if a proposal involves minors or patients</td></tr>
+        </tbody>
+      </table></div>
+      <div class="pair">
+        <div><h4>Delivery, in every case</h4><p>Taught in English with bilingual slides. Four sessions a week of three hours, suitable for a summer session, a short semester or an international teaching week; or sixteen weeks at two hours. No prior design or marketing training assumed.</p></div>
+        <div><h4>Documentation</h4><p>Each course has a syllabus in outcome-based format, with objectives mapped to graduate attributes, hour allocation and assessment weighting tabulated, and a curriculum-ethics component stated.</p></div>
+      </div>
+    </div>
+  </details>
+
+  <details>
+    <summary>
+      <div>
+        <span class="s-kind">What holds it together</span>
+        <h2 class="s-name">Four shared instruments</h2>
+        <p class="s-q">Students use them on their own output in week four, not on a case study.</p>
+      </div>
+      <svg class="mark" viewBox="0 0 14 14" aria-hidden="true"><path d="M 1.5 4.5 Q 7 11 12.5 4.5" fill="none" stroke="currentColor" stroke-width="1.3"/></svg>
+    </summary>
+    <div class="inner">
+      <div class="tablewrap"><table id="spine">
+        <thead><tr><th>Instrument</th><th>What it does</th></tr></thead>
+        <tbody>
+          <tr><td>The five-question gate</td><td>Five questions run before anything ships, two of them hard gates. A mechanic that cannot be disclosed does not pass, and softening the language is not a fix.</td></tr>
+          <tr><td>The restoration reading</td><td>Three questions before an interaction and three after, averaged. Measures the state the person is left in, indifferent to which mechanics produced it — the same wording and thresholds in all three courses, so results compare.</td></tr>
+          <tr><td>Three cognitive postures</td><td>Designed analytical categories describing what a person can receive at the moment of contact, used instead of demographic or psychographic segments.</td></tr>
+          <tr><td>The cost of leaving</td><td>Whether a person can stop without it costing them, counted in steps, in lost progress, and in how the design makes going feel.</td></tr>
+        </tbody>
+      </table></div>
+    </div>
+  </details>
+
+</main>
+
+<section class="wrap sheets">
+  <h4>Sheets to print or forward</h4>
+  <p style="max-width:58ch;color:var(--ink-soft);font-size:14px">Each is a single A4 page, sized in millimetres and built to print — one sheet per course, plus one for the programme.</p>
+  <div class="ctas">
+    <a class="btn lead" href="sheet-0-programme.html">Programme sheet</a>
+    <a class="btn" href="sheet-1-media-as-universe.html">Media as Universe</a>
+    <a class="btn" href="sheet-2-neuroethical-design.html">Neuroethical Design</a>
+    <a class="btn" href="sheet-3-alternative-storytelling.html">Alternative Storytelling</a>
+  </div>
+</section>
+
+<section class="wrap contact">
+  <p class="ask">Fifteen minutes on a call will tell you whether any of this fits your programme.</p>
+  <p class="req">Full syllabus in outcome-based format, facilitator's kit and student handbook for any course, all on request. The structure adapts to your calendar.</p>
+  <p class="addr">
+    <span>[Name]</span>
+    <span id="email-text">[email]</span>
+    <span>[phone]</span>
+  </p>
+  <div class="ctas">
+    <button class="btn" type="button" id="copy-email">Copy the address</button>
+    <span class="note" id="copy-status"></span>
+  </div>
+  <div id="fallback" hidden>
+    <p>Select and copy:</p>
+    <input type="text" id="fallback-input" readonly>
+  </div>
+</section>
+
+<footer class="wrap colophon">
+  <p>Course one derives from <i>Media as Universe: An Antifragile Framework for Communication Design in the Attention Economy</i>, whose §2.1 supplies the pact passage. Course three derives from Di Patre, P. (2025), <i>New Technologies in Storytelling and Gamification for Education and Mental Health</i>, Pantheon Institute of Design and Technology, and the three projects it documents. Course two is assembled from material both theses already rest on.</p>
+  <p>Instrument wordings and thresholds are quoted from the source manuscripts rather than paraphrased, so a reading taken in one course is comparable with one taken in another.</p>
+</footer>
+
+<script>
+(function () {
+  "use strict";
+  var btn = document.getElementById("copy-email");
+  var status = document.getElementById("copy-status");
+  var fallback = document.getElementById("fallback");
+  var input = document.getElementById("fallback-input");
+
+  function show(msg) {
+    status.textContent = msg;
+    window.setTimeout(function () { if (status.textContent === msg) { status.textContent = ""; } }, 2600);
+  }
+
+  btn.addEventListener("click", function () {
+    var value = (document.getElementById("email-text").textContent || "").trim();
+    fallback.hidden = true;
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(value).then(
+        function () { show("Copied"); },
+        function () {
+          input.value = value;
+          fallback.hidden = false;
+          input.focus();
+          input.setSelectionRange(0, input.value.length);
+        }
+      );
+    } else {
+      input.value = value;
+      fallback.hidden = false;
+      input.focus();
+      input.setSelectionRange(0, input.value.length);
+    }
+  });
+})();
+</script>
+</body>
+</html>

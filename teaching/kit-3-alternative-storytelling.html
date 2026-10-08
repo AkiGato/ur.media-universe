@@ -1,0 +1,836 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Narrative Studio Kit</title>
+<style>
+  /* Layout: a column of sheets separated by hairlines, never cards. Nothing a
+     filled area except a light source; nothing a straight segment. Monochrome,
+     with state read from the direction a filament bows. Same system as the
+     other kits in this programme. */
+  :root {
+    --ground: #ececeb; --ink: #15161a; --ink-soft: #55575d; --ink-faint: #8b8d93;
+    --hair: #c6c7c4; --hair-faint: #d9dad7; --field: #e3e3e1;
+    --display: "Newsreader", "Iowan Old Style", Georgia, serif;
+    --body: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+    --ease: cubic-bezier(0.33, 0.01, 0.2, 1);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground: #0b0c0d; --ink: #e7e6e2; --ink-soft: #a0a09c; --ink-faint: #6e6f6c;
+      --hair: #35373a; --hair-faint: #25272a; --field: #16181a; color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --ground: #0b0c0d; --ink: #e7e6e2; --ink-soft: #a0a09c; --ink-faint: #6e6f6c;
+    --hair: #35373a; --hair-faint: #25272a; --field: #16181a; color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--ground); color: var(--ink); font-family: var(--body);
+    font-weight: 300; font-size: 15px; line-height: 1.68; -webkit-font-smoothing: antialiased; }
+  h1,h2,h3,h4,p,ul,ol,dl,dd,figure,blockquote { margin: 0; }
+  ul, ol { padding-left: 1.1em; } li { margin-block: 0.32em; }
+  strong { font-weight: 300; border-bottom: 1px solid var(--hair); }
+  i, em { font-style: italic; }
+  .wrap { max-width: 920px; margin: 0 auto; padding-inline: 20px; }
+  .index { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 10;
+    background: var(--ground); border-bottom: 1px solid var(--hair); }
+  .index-row { display: flex; flex-wrap: wrap; gap: 4px 20px; align-items: baseline; padding-block: 11px; }
+  .index a { font-size: 11px; text-transform: uppercase; letter-spacing: 0.2em; color: var(--ink-faint);
+    text-decoration: none; padding-bottom: 2px; border-bottom: 1px solid transparent;
+    transition: color 0.3s var(--ease), border-color 0.3s var(--ease); }
+  .index a:hover, .index a:focus-visible { color: var(--ink); border-bottom-color: var(--hair); }
+  .mast { padding-block: 56px 40px; border-bottom: 1px solid var(--hair); }
+  .eyebrow { font-size: 11px; text-transform: uppercase; letter-spacing: 0.2em; color: var(--ink-faint); }
+  h1 { font-family: var(--display); font-weight: 300; font-size: clamp(30px, 6.4vw, 44px);
+    line-height: 1.12; letter-spacing: -0.012em; text-wrap: balance; margin-top: 14px; max-width: 24ch; }
+  .standfirst { margin-top: 20px; max-width: 64ch; color: var(--ink-soft); }
+  .mast-meta { display: flex; flex-wrap: wrap; gap: 0 32px; margin-top: 28px; font-size: 11px;
+    text-transform: uppercase; letter-spacing: 0.2em; color: var(--ink-faint); }
+  section { padding-block: 52px; border-bottom: 1px solid var(--hair); }
+  .sec-head { display: flex; gap: 14px; align-items: baseline; margin-bottom: 26px; }
+  .sec-no { font-size: 11px; letter-spacing: 0.2em; color: var(--ink-faint);
+    font-variant-numeric: tabular-nums; flex: none; }
+  h2 { font-family: var(--display); font-weight: 300; font-size: clamp(22px, 4vw, 30px);
+    line-height: 1.2; letter-spacing: -0.008em; text-wrap: balance; }
+  .lede { max-width: 64ch; color: var(--ink-soft); margin-bottom: 30px; }
+  h3 { font-family: var(--display); font-weight: 300; font-size: 19px; line-height: 1.3;
+    margin-bottom: 8px; text-wrap: balance; }
+  h4 { font-size: 11px; text-transform: uppercase; letter-spacing: 0.2em; color: var(--ink-faint); margin-bottom: 10px; }
+  .prose { max-width: 66ch; } .prose p + p { margin-top: 14px; } .prose h3 { margin-top: 26px; }
+  blockquote { margin-block: 24px; padding-left: 20px; border-left: 1px solid var(--hair);
+    font-family: var(--display); font-size: clamp(17px, 3vw, 20px); line-height: 1.42; max-width: 44ch; }
+  blockquote cite { display: block; margin-top: 10px; font-family: var(--body); font-size: 11px;
+    text-transform: uppercase; letter-spacing: 0.2em; color: var(--ink-faint); font-style: normal; }
+  .weeks { display: grid; gap: 1px; background: var(--hair-faint); }
+  @media (min-width: 760px) { .weeks { grid-template-columns: repeat(4, 1fr); } }
+  .week { background: var(--ground); padding: 20px 18px 24px; min-width: 0; }
+  .week .no { font-size: 11px; text-transform: uppercase; letter-spacing: 0.2em;
+    color: var(--ink-faint); display: block; margin-bottom: 10px; }
+  .week p { font-size: 13px; color: var(--ink-soft); line-height: 1.6; }
+  .week .out { margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--hair-faint); font-size: 13px; }
+  .week .out span { font-size: 11px; text-transform: uppercase; letter-spacing: 0.2em;
+    color: var(--ink-faint); display: block; margin-bottom: 4px; }
+  .runs { display: grid; gap: 34px; }
+  .run-week > h3 { padding-bottom: 10px; border-bottom: 1px solid var(--hair); margin-bottom: 0; }
+  .sess { padding-block: 16px; border-bottom: 1px solid var(--hair-faint); }
+  .sess-top { display: flex; gap: 14px; align-items: baseline; }
+  .sess-no { font-size: 11px; letter-spacing: 0.2em; color: var(--ink-faint);
+    font-variant-numeric: tabular-nums; flex: none; min-width: 2.6em; }
+  .sess-q { font-family: var(--display); font-size: 19px; line-height: 1.3; min-width: 0; }
+  .sess-body { margin-top: 10px; display: grid; gap: 10px; }
+  @media (min-width: 680px) { .sess-body { padding-left: calc(2.6em + 14px); } }
+  .pair { display: grid; gap: 2px; }
+  @media (min-width: 560px) { .pair { grid-template-columns: 7.5em 1fr; gap: 0 18px; } }
+  .pair dt { font-size: 11px; text-transform: uppercase; letter-spacing: 0.2em; color: var(--ink-faint); }
+  .pair dd { font-size: 14px; min-width: 0; }
+  .games { display: grid; gap: 1px; background: var(--hair-faint); }
+  @media (min-width: 720px) { .games { grid-template-columns: 1fr 1fr; } }
+  .game { background: var(--ground); padding: 24px 20px 26px; min-width: 0; }
+  .game .tag { font-size: 11px; text-transform: uppercase; letter-spacing: 0.2em;
+    color: var(--ink-faint); display: block; margin-bottom: 10px; }
+  .game ol { font-size: 14px; margin-top: 10px; }
+  .game .why { margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--hair-faint);
+    font-size: 13px; color: var(--ink-soft); }
+  .inst { padding-block: 30px; border-top: 1px solid var(--hair); }
+  .inst:first-of-type { border-top: none; padding-top: 0; }
+  button { font-family: var(--body); font-weight: 300; font-size: 11px; text-transform: uppercase;
+    letter-spacing: 0.2em; color: var(--ink); background: none; border: none;
+    border-bottom: 1px solid var(--hair); padding: 6px 0; cursor: pointer; border-radius: 0;
+    transition: border-color 0.3s var(--ease); }
+  button:hover, button:focus-visible { border-bottom-color: var(--ink); }
+  button:focus-visible { outline: none; }
+  .btn-row { display: flex; flex-wrap: wrap; gap: 0 26px; align-items: baseline; margin-top: 20px; }
+  .status { font-size: 11px; text-transform: uppercase; letter-spacing: 0.2em; color: var(--ink-faint);
+    font-variant-numeric: tabular-nums; }
+  .draw { display: grid; gap: 1px; background: var(--hair-faint); margin-top: 20px; }
+  @media (min-width: 680px) { .draw { grid-template-columns: 1fr 1fr; } }
+  .draw-cell { background: var(--ground); padding: 18px; min-width: 0; }
+  .draw-cell span { font-size: 11px; text-transform: uppercase; letter-spacing: 0.2em;
+    color: var(--ink-faint); display: block; margin-bottom: 8px; }
+  .draw-cell p { font-family: var(--display); font-size: 18px; line-height: 1.32; }
+  .tests { margin-top: 24px; }
+  .test { padding-block: 16px; border-top: 1px solid var(--hair-faint); }
+  .test .n { font-size: 11px; letter-spacing: 0.2em; color: var(--ink-faint); font-variant-numeric: tabular-nums; }
+  .test p.q { font-size: 15px; max-width: 58ch; margin-top: 4px; }
+  .test p.note { font-size: 13px; color: var(--ink-faint); margin-top: 4px; max-width: 60ch; }
+  .choices { display: flex; gap: 22px; margin-top: 12px; flex-wrap: wrap; }
+  .choices label { font-size: 13px; display: flex; align-items: center; gap: 7px; cursor: pointer; }
+  input[type="radio"] { accent-color: var(--ink); margin: 0; }
+  .verdict-box { margin-top: 26px; padding-top: 20px; border-top: 1px solid var(--hair); }
+  .verdict-box .big { font-family: var(--display); font-size: clamp(22px, 4.4vw, 30px); line-height: 1.22;
+    max-width: 42ch; text-wrap: balance; }
+  .verdict-box p.d { font-size: 14px; max-width: 62ch; margin-top: 14px; }
+  .delta-grid { display: grid; gap: 28px; margin-top: 10px; }
+  @media (min-width: 780px) { .delta-grid { grid-template-columns: 1fr 1fr; gap: 40px; } }
+  fieldset { border: none; padding: 0; margin: 0; min-width: 0; }
+  legend { font-size: 11px; text-transform: uppercase; letter-spacing: 0.2em; color: var(--ink-faint);
+    padding: 0; margin-bottom: 14px; }
+  .q { padding-block: 12px; border-top: 1px solid var(--hair-faint); }
+  .q label { display: block; font-size: 14px; line-height: 1.5; }
+  .q .anchors { display: flex; justify-content: space-between; gap: 12px; font-size: 11px;
+    color: var(--ink-faint); margin-top: 8px; }
+  input[type="range"] { -webkit-appearance: none; appearance: none; width: 100%; margin: 10px 0 0;
+    background: none; cursor: pointer; }
+  input[type="range"]::-webkit-slider-runnable-track { height: 1px; background: var(--hair); }
+  input[type="range"]::-moz-range-track { height: 1px; background: var(--hair); }
+  input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none;
+    width: 9px; height: 9px; border-radius: 50%; background: var(--ink); border: none; margin-top: -4px; }
+  input[type="range"]::-moz-range-thumb { width: 9px; height: 9px; border-radius: 50%;
+    background: var(--ink); border: none; }
+  input[type="range"]:focus-visible { outline: 1px solid var(--ink); outline-offset: 6px; }
+  .reading { margin-top: 30px; padding-top: 22px; border-top: 1px solid var(--hair); }
+  .reading-row { display: flex; flex-wrap: wrap; gap: 10px 40px; align-items: baseline; }
+  .reading-row + .reading-row { margin-top: 20px; padding-top: 18px; border-top: 1px solid var(--hair-faint); }
+  .big-n { font-family: var(--display); font-size: clamp(32px, 7vw, 46px); line-height: 1;
+    font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
+  .band { font-size: 11px; text-transform: uppercase; letter-spacing: 0.2em; }
+  .which { font-size: 11px; text-transform: uppercase; letter-spacing: 0.2em; color: var(--ink-faint); }
+  .plot { margin-top: 22px; overflow-x: auto; }
+  .plot svg { display: block; max-width: 100%; height: auto; }
+  .caution { margin-top: 22px; padding-top: 16px; border-top: 1px solid var(--hair);
+    font-size: 13px; color: var(--ink-soft); max-width: 66ch; }
+  .caution span { font-size: 11px; text-transform: uppercase; letter-spacing: 0.2em;
+    color: var(--ink-faint); display: block; margin-bottom: 8px; }
+  .tablewrap { overflow-x: auto; margin-top: 18px; }
+  table { border-collapse: collapse; width: 100%; font-size: 14px; }
+  th, td { text-align: left; padding: 11px 16px 11px 0; border-bottom: 1px solid var(--hair-faint); vertical-align: top; }
+  th { font-size: 11px; text-transform: uppercase; letter-spacing: 0.2em; color: var(--ink-faint);
+    font-weight: 300; border-bottom-color: var(--hair); }
+  td.num, th.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
+  #assess-t { min-width: 480px; }
+  .colophon { padding-block: 44px 64px; font-size: 13px; color: var(--ink-faint); max-width: 66ch; }
+  .colophon p + p { margin-top: 12px; }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition-duration: 0.01ms !important; } }
+</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300;1,6..72,300&family=IBM+Plex+Sans:ital,wght@0,300;1,300&display=swap">
+<style>[hidden]{display:none!important}img{max-width:100%}</style>
+</head>
+<body>
+<nav class="index">
+  <div class="wrap index-row">
+    <a href="#map">Map</a><a href="#runs">Run sheets</a><a href="#games">Moves</a>
+    <a href="#instruments">Instruments</a><a href="#cases">The three cases</a>
+    <a href="#assess">Assessment</a><a href="#teaching">Teaching notes</a>
+  </div>
+</nav>
+
+<header class="wrap mast">
+  <span class="eyebrow">Facilitator's kit · course three</span>
+  <h1>Alternative Storytelling</h1>
+  <p class="standfirst">Four weeks on narrative and game mechanics in education and wellbeing. Built on <i>New Technologies in Storytelling and Gamification for Education and Mental Health</i> and taught through the three projects developed inside it — an XR escape room, a flying-boat flow game, and an analogue journal game with an AI companion. The three tests the course runs on were found in that practice, not imported into it.</p>
+  <div class="mast-meta">
+    <span>4 weeks · 16 sessions</span><span>48 contact hours</span><span>Studio</span>
+  </div>
+</header>
+
+<main>
+
+<section id="map" class="wrap">
+  <div class="sec-head"><span class="sec-no">01</span><h2>The map</h2></div>
+  <div class="prose">
+    <p>State the apparent contradiction in the first ten minutes. Students who have taken the first course of this programme know it names streaks, leaderboards and variable reward as weapons and forbids them outright. This course teaches them to build with the same vocabulary, and the thing that reconciles the two is a definition rather than a compromise.</p>
+    <blockquote>
+      They built worlds — storytelling, gamification, branded fictions — and invited the audience inside. Trust was not required, because the audience had entered the pact that cinema and literature rely on: disbelief suspended by consent. A fiction you have agreed to is not a lie.
+      <cite>Media as Universe, §2.1</cite>
+    </blockquote>
+    <p>Suspension of disbelief is Coleridge's term, from 1817, and it appears in both source theses — which is the point worth making to the room. The mechanic is not the unit of judgement; the consent is. A streak serving a habit someone chose supports that person's own intention. The identical streak serving a subscription they are trying to cancel extracts from them. Same code, opposite direction of agency.</p>
+    <p>Three tests separate them, and the third one has a provenance the room should hear. It was not derived from theory. It was found by the author of the source thesis in her own project, in the middle of building something that worked:</p>
+    <blockquote>
+      The ethical question was, this flow was capturing, this boat could become a safe place one couldn't easily leave.
+      <cite>On Cloudy Horizons</cite>
+    </blockquote>
+    <p>A designer noticing that her own good design had become difficult to leave, and treating that as a problem rather than a success metric, is the whole course in one sentence. Everything else is method for arriving at the same observation reliably.</p>
+  </div>
+  <div class="weeks" style="margin-top:34px">
+    <div class="week"><span class="no">Week one</span><h3>The synergy and the pact</h3>
+      <p>Storytelling and play as one subject. The measurable physiology of narration. The three-way distinction between a game, game-based learning and gamification. Disbelief suspended by consent, and what generative media did to it.</p>
+      <div class="out"><span>Output</span>A recall figure measured on the room, and a pact analysis of an existing work.</div></div>
+    <div class="week"><span class="no">Week two</span><h3>The permitted mechanics</h3>
+      <p>Self-determination theory as the working criteria. Player archetypes, and why their origin in audience segmentation matters. Flow, and its four conditions. The three tests.</p>
+      <div class="out"><span>Output</span>A signed mechanic justification table, and the exact edit at which a mechanic flips.</div></div>
+    <div class="week"><span class="no">Week three</span><h3>The dark side, and the boundary</h3>
+      <p>The same mechanics turned: loot boxes, gacha, streaks, engineered scarcity, and the bias set they run on. Then the clinical boundary, emotional architecture, and the question of what the design does by week nine.</p>
+      <div class="out"><span>Output</span>A boundary statement, a week-nine projection, and a fixed brief.</div></div>
+    <div class="week"><span class="no">Week four</span><h3>Build and measure</h3>
+      <p>One playable or readable artifact for a named goal, handed to someone cold, measured on consenting peers, then given back to its players to say what they thought they agreed to.</p>
+      <div class="out"><span>Output</span>The artifact, paired readings, and the players' own account of the pact.</div></div>
+  </div>
+</section>
+
+<section id="runs" class="wrap">
+  <div class="sec-head"><span class="sec-no">02</span><h2>Run sheets</h2></div>
+  <p class="lede">Forty minutes of seminar, then the room works. Teams of three or four. Paper prototypes are acceptable throughout and no engine is prescribed — one of the three teaching cases is a board game, which settles that argument early.</p>
+  <div class="runs">
+
+    <div class="run-week">
+      <h3>Week one — The synergy and the pact</h3>
+      <div class="sess"><div class="sess-top"><span class="sess-no">1.1</span><p class="sess-q">Why do you remember the story and not the statistic?</p></div>
+        <div class="sess-body">
+          <dl class="pair"><dt>Beat</dt><dd>Narration as a force as ancient as the world: cave paintings, Sumerian law tablets, Greek myths — all of them narratives designed to educate. Transformative narration speaks to the emotional sphere, bypassing reason and promoting empathy. Zak's work on the dramatic arc, oxytocin, and mirror neurons as a virtual-reality experience that lets us step into another's shoes.</dd></dl>
+          <dl class="pair"><dt>Evidence</dt><dd>Brockington and colleagues, on storytelling with eighty-one hospitalised children: oxytocin up 815 per cent, cortisol down 59 per cent, pain perception down 70 per cent, and more positive language than the riddle group. <i>More than Words</i> adds that a story <i>told</i> beats a story read aloud — greater vocabulary gain, better comprehension, more questions asked — and that live oral narration yields the best results of any condition.</dd></dl>
+          <dl class="pair"><dt>Move</dt><dd><strong>The Transport Test.</strong> Run it early so the recall check lands before the session ends.</dd></dl>
+          <dl class="pair"><dt>Output</dt><dd>The room's own recall figure, on the wall, kept until session 3.1.</dd></dl>
+        </div></div>
+      <div class="sess"><div class="sess-top"><span class="sess-no">1.2</span><p class="sess-q">What is the difference between a game, game-based learning and gamification?</p></div>
+        <div class="sess-body">
+          <dl class="pair"><dt>Beat</dt><dd>The distinction most of the field muddles, stated cleanly. A game is active storytelling: the player becomes the protagonist of a story that develops through their choices. Game-based learning uses an actual game as the medium of instruction. Gamification layers game elements — points, badges, leaderboards, progress bars — onto something that is not a game, to motivate behaviour. Gamification is not gaming, and conflating them is how both arguments about it go wrong.</dd></dl>
+          <dl class="pair"><dt>Beat</dt><dd>Then the origin story. Malone at MIT showed the learning potential in the 1980s; the word spread in 2010 after Jesse Schell's D.I.C.E. talk, which described a world of connected soda cans and cereal boxes awarding points for brushing your teeth, driven by advertising and government incentive. The term became popular <i>because</i> the example was scandalous. That is worth sitting with: the field's popular birth was a critique mistaken for a roadmap.</dd></dl>
+          <dl class="pair"><dt>Move</dt><dd>Teams sort twenty real products into the three categories. The disagreements are the lesson; the hard cases are usually the honest ones.</dd></dl>
+          <dl class="pair"><dt>Output</dt><dd>A sorted wall, and a shared vocabulary for the rest of the course.</dd></dl>
+        </div></div>
+      <div class="sess"><div class="sess-top"><span class="sess-no">1.3</span><p class="sess-q">What is a pact, and when did you enter one?</p></div>
+        <div class="sess-body">
+          <dl class="pair"><dt>Beat</dt><dd>Suspension of disbelief, described by Coleridge in 1817: engaging deeply with a fictional world without questioning its logic, accepting for a while the existence of fairies, elves, or cursed ghosts. The condition is that you knew you were entering it. Then what generative media broke — when a convincing world can be produced in seconds at negligible cost, the audience loses the one thing the pact depended on, which is the ability to tell which fictions it agreed to. Suspicion stops being a response to a claim and becomes the default posture toward everything, the honest kind included.</dd></dl>
+          <dl class="pair"><dt>Move</dt><dd><strong>Whose Fiction Is It.</strong></dd></dl>
+          <dl class="pair"><dt>Output</dt><dd>A sorted wall — pacts entered, pacts assumed, and a contested pile that becomes the syllabus for session 2.3.</dd></dl>
+        </div></div>
+      <div class="sess"><div class="sess-top"><span class="sess-no">1.4</span><p class="sess-q">What pact is this work asking for?</p></div>
+        <div class="sess-body">
+          <dl class="pair"><dt>Beat</dt><dd>None. Analysis session.</dd></dl>
+          <dl class="pair"><dt>Move</dt><dd>Teams produce a pact analysis of one existing narrative or game work: what it asks the audience to accept, whether it discloses the ask, where a first-time audience would actually meet that disclosure, and what the work then does with what it was given.</dd></dl>
+          <dl class="pair"><dt>Output</dt><dd>The pact analysis. Assessed.</dd></dl>
+        </div></div>
+    </div>
+
+    <div class="run-week">
+      <h3>Week two — The permitted mechanics</h3>
+      <div class="sess"><div class="sess-top"><span class="sess-no">2.1</span><p class="sess-q">What makes a system encourage growth from within?</p></div>
+        <div class="sess-body">
+          <dl class="pair"><dt>Beat</dt><dd>Self-determination theory, in its operational form. <strong>Autonomy</strong> is player agency: the freedom and control a learner has over their decisions, actions and path, and the meaningful choices that make them invested. <strong>Competence</strong> is skill progression: gradually increasing challenge with improvement made visible, paced to keep the learner in the zone — challenged but not frustrated. <strong>Relatedness</strong> is social interaction: working with peers, which nurtures emotional intelligence and belonging, and through which students often learn better under adequate confrontation.</dd></dl>
+          <dl class="pair"><dt>Beat</dt><dd>Then the point that saves the theory from being decoration. Games redefine failure: mistakes become opportunities to practise, fear of failure decreases, perseverance follows. Gamified training has been reported to raise motivation by around 44 per cent and to get tasks completed roughly 57 per cent faster — but those are engagement figures, and the course's whole argument is that engagement figures are not the question.</dd></dl>
+          <dl class="pair"><dt>Move</dt><dd>Teams map a product they use against all three needs and mark which are genuinely met and which are simulated. A badge is not a competence; a follower count is not relatedness.</dd></dl>
+          <dl class="pair"><dt>Output</dt><dd>Three columns per product, with the simulated ones named.</dd></dl>
+        </div></div>
+      <div class="sess"><div class="sess-top"><span class="sess-no">2.2</span><p class="sess-q">What is an archetype actually for?</p></div>
+        <div class="sess-body">
+          <dl class="pair"><dt>Beat</dt><dd>Achievers, Explorers, Socializers, Killers — the player types, with the real-world parallels and the MBTI resemblances. Then the critical turn, which is the source thesis's own: these categories were used not only for design but for <i>marketing audience segmentation and product tailoring</i>. They help creators map experiences, reach wider audiences and make bigger sales, and they are absolutely not meant to define identities. When archetypes harden into labels they foster misunderstanding, exclusion, and subtle forms of discrimination. A person may be an Achiever at work, an Explorer at home, a Socializer among friends and a Killer in debate.</dd></dl>
+          <dl class="pair"><dt>Beat</dt><dd>Then where that goes when the social scaffolding is missing: main character syndrome, a distorted pursuit of self-validation amplified by social media, which undermines relatedness and empathy and produces social disconnection and fragile self-worth. And its counterweight: reframing, the technique at the centre of cognitive behavioural therapy — shift the frame and the meaning of the situation changes, with thinking and behaviour following.</dd></dl>
+          <dl class="pair"><dt>Move</dt><dd>Each team takes an archetype and designs the same feature twice: once treating the archetype as a state the person is in today, once as a label that defines them. Present both.</dd></dl>
+          <dl class="pair"><dt>Output</dt><dd>Two versions of one feature, and a statement of what the second one costs.</dd></dl>
+        </div></div>
+      <div class="sess"><div class="sess-top"><span class="sess-no">2.3</span><p class="sess-q">Who holds the goal?</p></div>
+        <div class="sess-body">
+          <dl class="pair"><dt>Beat</dt><dd>The three tests, stated plainly and used for the rest of the course. Who holds the goal. Are the mechanics disclosable. Does leaving cost nothing. Give the third one its provenance — the boat that became a safe place one couldn't easily leave — because a test with a story behind it is remembered and a test asserted from the front of the room is not.</dd></dl>
+          <dl class="pair"><dt>Move</dt><dd><strong>The Mechanic Trial</strong>, two rounds, using the contested pile from 1.3. The same mechanic is tried twice in different contexts and should be acquitted once.</dd></dl>
+          <dl class="pair"><dt>Output</dt><dd>Two verdicts on one mechanic, which is the point.</dd></dl>
+        </div></div>
+      <div class="sess"><div class="sess-top"><span class="sess-no">2.4</span><p class="sess-q">Where exactly does it flip?</p></div>
+        <div class="sess-body">
+          <dl class="pair"><dt>Beat</dt><dd>Brief: the boundary between support and capture is usually one design decision wide, and a practitioner who cannot locate it will cross it by accident.</dd></dl>
+          <dl class="pair"><dt>Move</dt><dd><strong>Goal Theft.</strong> Then teams complete the mechanic justification table for what they intend to build — every mechanic, who holds the goal, how it is disclosed, what leaving costs, and the ruling.</dd></dl>
+          <dl class="pair"><dt>Output</dt><dd>The signed justification table. Mechanics not on it may not appear in the build.</dd></dl>
+        </div></div>
+    </div>
+
+    <div class="run-week">
+      <h3>Week three — The dark side, and the boundary</h3>
+      <div class="sess"><div class="sess-top"><span class="sess-no">3.1</span><p class="sess-q">What happens when these mechanics are turned?</p></div>
+        <div class="sess-body">
+          <dl class="pair"><dt>Beat</dt><dd>The same communicative wonders that inspired learning and fostered empathy, used to deceive, addict and control. Likes, shares and streaks triggering dopamine release and compelling return. Loot boxes and gacha mechanics that mimic gambling, linked in the literature to gambling addiction among younger players — banned outright in Belgium and the Netherlands, age-restricted in Japan. The Labubu case: fairy-tale storytelling plus gacha, around four hundred million dollars in a year inside a one-point-eight-billion-dollar total, built on a character whose story is a small tragedy, which is exactly reliable for an audience seeking emotional comfort and escapism.</dd></dl>
+          <dl class="pair"><dt>Beat</dt><dd>And the bias set the whole apparatus runs on: confirmation bias, illusory superiority and its counterpart the illusion of inferiority, locus of control, loss aversion — marketing's favourite — fear of missing out, illusory correlation, information bias, clustering illusion. Then the figures that make it a public matter rather than a design preference: the rise in adolescent depression and anxiety from the early 2010s, with self-harm up sharply among teenage girls and far more sharply among preteens.</dd></dl>
+          <dl class="pair"><dt>Move</dt><dd>Each team takes one mechanic from its own justification table and builds the extractive version of it. Twenty minutes. Then runs the three tests on what it just built.</dd></dl>
+          <dl class="pair"><dt>Output</dt><dd>A paired honest-and-extractive version of one mechanic, with both rulings written down.</dd></dl>
+        </div></div>
+      <div class="sess"><div class="sess-top"><span class="sess-no">3.2</span><p class="sess-q">What can design not do here?</p></div>
+        <div class="sess-body">
+          <dl class="pair"><dt>Beat</dt><dd>The boundary, taught as method rather than attached as a disclaimer. The source thesis is exact about it: the symbolic architecture, the sensory rhythm and the emotional scaffolding of Coil Hibiki <i>were not to make a diagnosis</i> — they were resonance, understanding and connection. Design can shape an environment, carry a practice someone has already been given, lower the cost of a good habit and make a difficult thing approachable. It cannot assess, diagnose or hold risk. Where it would need to, it needs a clinician, and the design's job is to make that handover easy rather than to substitute for it.</dd></dl>
+          <dl class="pair"><dt>Beat</dt><dd>Then emotional architecture, which is what design <i>can</i> do: catharsis, emotional release in metaphorical and controlled environments; reflection, revisiting choices without real-world stakes; regulation, practising fear, empathy and guilt in low-pressure scenarios. And the thing most teams cut first — quiet moments, which mirror mindfulness practice, help regulate anxiety between intense scenes, and are never filler.</dd></dl>
+          <dl class="pair"><dt>Move</dt><dd>Each team writes its boundary statement: what the artifact does, what it explicitly does not claim, what happens when a user is beyond its scope, and where in the artifact a person will actually meet this.</dd></dl>
+          <dl class="pair"><dt>Output</dt><dd>The boundary statement. It goes into the artifact, not the documentation.</dd></dl>
+        </div></div>
+      <div class="sess"><div class="sess-top"><span class="sess-no">3.3</span><p class="sess-q">Could they leave?</p></div>
+        <div class="sess-body">
+          <dl class="pair"><dt>Beat</dt><dd>Flow, in Csikszentmihalyi's terms and in the four conditions the source thesis states: clear goals and instant feedback; a gradual increase in difficulty; environments that remove distractions; rewards that reinforce mastery. Then the trap, which is that all four can be satisfied by something a person cannot put down. Flow is the course's most powerful tool and its most dangerous one, and the test for it is the third test.</dd></dl>
+          <dl class="pair"><dt>Move</dt><dd><strong>The Boat Problem.</strong></dd></dl>
+          <dl class="pair"><dt>Output</dt><dd>A week-nine projection and, for most teams, a design change. Assessed.</dd></dl>
+        </div></div>
+      <div class="sess"><div class="sess-top"><span class="sess-no">3.4</span><p class="sess-q">What are you building, and for whom?</p></div>
+        <div class="sess-body">
+          <dl class="pair"><dt>Beat</dt><dd>None. Briefing session.</dd></dl>
+          <dl class="pair"><dt>Move</dt><dd>Briefs fixed. Each team names the learner or the goal specifically, states which mechanics it is forbidding itself, and confirms the consent protocol for week four. Any proposal involving minors or patients is redirected here, while the brief is still movable — not in week four.</dd></dl>
+          <dl class="pair"><dt>Output</dt><dd>A fixed brief and a signed constraint sheet.</dd></dl>
+        </div></div>
+    </div>
+
+    <div class="run-week">
+      <h3>Week four — Build and measure</h3>
+      <div class="sess"><div class="sess-top"><span class="sess-no">4.1</span><p class="sess-q">Does it work at all?</p></div>
+        <div class="sess-body">
+          <dl class="pair"><dt>Beat</dt><dd>None. Build, supervised. Open the three cases on the wall as precedents, not as models to copy.</dd></dl>
+          <dl class="pair"><dt>Move</dt><dd>Facilitator circulates with one question: which mechanic did you just reach for, and which test did you run on it?</dd></dl>
+          <dl class="pair"><dt>Output</dt><dd>A playable draft by the end of the session. Playable, not finished.</dd></dl>
+        </div></div>
+      <div class="sess"><div class="sess-top"><span class="sess-no">4.2</span><p class="sess-q">Does it work for someone who is not you?</p></div>
+        <div class="sess-body">
+          <dl class="pair"><dt>Beat</dt><dd>One rule, from the source thesis's account of designing for VR: a good designer must always assume the user is totally clueless. In an unfamiliar medium that is not unflattering, it is foundational — a first-time user, unprompted, will stand still and look around for a surprisingly long time.</dd></dl>
+          <dl class="pair"><dt>Move</dt><dd>Teams swap artifacts and play each other's cold, with no explanation offered. The builder may not speak. Everything the player has to ask is a finding.</dd></dl>
+          <dl class="pair"><dt>Output</dt><dd>The list of questions players had to ask, and one revision pass.</dd></dl>
+        </div></div>
+      <div class="sess"><div class="sess-top"><span class="sess-no">4.3</span><p class="sess-q">What state does it leave them in?</p></div>
+        <div class="sess-body">
+          <dl class="pair"><dt>Beat</dt><dd>The paired reading: the restoration instrument shared with the rest of the programme, and an SDT reading built from the three needs as the source thesis defines them. Tell the room what each one is before either is used.</dd></dl>
+          <dl class="pair"><dt>Move</dt><dd>Readings taken on consenting peers under the protocol. Written down before anyone discusses them.</dd></dl>
+          <dl class="pair"><dt>Output</dt><dd>Paired readings per subject.</dd></dl>
+        </div></div>
+      <div class="sess"><div class="sess-top"><span class="sess-no">4.4</span><p class="sess-q">Would they say they agreed to it?</p></div>
+        <div class="sess-body">
+          <dl class="pair"><dt>Beat</dt><dd>The facilitator does not speak for the first hour.</dd></dl>
+          <dl class="pair"><dt>Move</dt><dd><strong>The Pact Reading.</strong></dd></dl>
+          <dl class="pair"><dt>Output</dt><dd>The players' own account of what they agreed to, set beside what the team built. Assessed.</dd></dl>
+        </div></div>
+    </div>
+
+  </div>
+</section>
+
+<section id="games" class="wrap">
+  <div class="sec-head"><span class="sec-no">03</span><h2>Six moves</h2></div>
+  <p class="lede">Five games and a closing session that deliberately is not one. A course about play has an obvious temptation here, so it is worth naming: nothing in this kit awards points that persist, keeps a leaderboard or records a streak. A course teaching the three tests cannot run on mechanics that fail them.</p>
+  <div class="games">
+
+    <div class="game"><span class="tag">Session 1.1 · 45 minutes, split · whole cohort</span>
+      <h3>The Transport Test</h3>
+      <p>The room is taught the same content twice, in two halves, one as information and one as narrative. Recall is checked twenty minutes later, before anyone knows a check is coming.</p>
+      <ol>
+        <li>Split the room. Each half gets one version, out of earshot of the other.</li>
+        <li>Teach something genuinely dull and factual — a procedure, a set of figures, a sequence of dates.</li>
+        <li>Tell the narrative version aloud rather than reading it. The evidence is specifically that telling beats reading, and that gesture, vocal variation and eye contact carry much of the effect.</li>
+        <li>Carry on for twenty minutes, then run an unannounced written free recall. Count items retrieved per person and put both figures on the wall.</li>
+      </ol>
+      <p class="why">The narrative half usually wins, and occasionally it does not, which is better. Either way the room now has its own number instead of a claim from a reading, and it gets compared with the scaffold they build in week three. Step three is the part facilitators skip and should not.</p>
+    </div>
+
+    <div class="game"><span class="tag">Session 1.3 · 50 minutes · whole cohort</span>
+      <h3>Whose Fiction Is It</h3>
+      <p>Students bring a piece of media and the room rules on one thing: was a pact entered, or assumed?</p>
+      <ol>
+        <li>Describe the work and what it asks the audience to accept.</li>
+        <li>The room votes: entered, assumed, or contested.</li>
+        <li>For anything ruled <i>assumed</i>, name the moment at which the audience should have been told and was not.</li>
+        <li>Keep the contested pile. It is the syllabus for session 2.3.</li>
+      </ol>
+      <p class="why">Students arrive able to tell advertising from art and unable to say why, which leaves them defenceless when the two are blended — which is what transmedia does by design. Making the ruling the unit of work rather than the genre establishes that the question is disclosure.</p>
+    </div>
+
+    <div class="game"><span class="tag">Session 2.3 · 80 minutes · two teams plus a bench</span>
+      <h3>The Mechanic Trial</h3>
+      <p>A mechanic is tried in a named context. Prosecution argues extraction, defence argues pact, and the bench rules on the three tests only.</p>
+      <ol>
+        <li>Draw a mechanic and a context. Fifteen minutes to prepare each side.</li>
+        <li>Prosecution, then defence. Six minutes each, then questions from the bench.</li>
+        <li>The bench rules test by test — goal, disclosure, exit — and may not rule on whether it likes the mechanic.</li>
+        <li>Retry the same mechanic in a different context with the sides swapped.</li>
+      </ol>
+      <p class="why">A mechanic acquitted in one context and convicted in another, by the same bench, twenty minutes apart, is the course's thesis demonstrated rather than argued. Draw the contexts so this happens at least once in the first round.</p>
+    </div>
+
+    <div class="game"><span class="tag">Session 2.4 · 55 minutes · teams of three</span>
+      <h3>Goal Theft</h3>
+      <p>Start with a mechanic that genuinely serves the person. Change it as little as possible until it serves the system instead. Find the exact edit.</p>
+      <ol>
+        <li>Describe the honest version precisely enough to build.</li>
+        <li>Make the smallest single change that moves the goal from the person to the system.</li>
+        <li>Present both versions and the one edit between them.</li>
+        <li>The room challenges: was that the smallest possible change? Usually it was not, and a smaller one is worse.</li>
+      </ol>
+      <p class="why">The boundary turns out to be one decision wide — a default, a visibility, a reset condition, a timing — and having located it once by hand, a designer stops crossing it by accident. The real precedent is in the source thesis: Coil Hibiki's progress rewards are offered as journal accessories and playlists the player <i>is not forced to take if they do not need to</i>. Remove that clause and the same reward becomes an obligation.</p>
+    </div>
+
+    <div class="game"><span class="tag">Session 3.3 · 70 minutes · teams</span>
+      <h3>The Boat Problem</h3>
+      <p>The flow state is the thing this course is best at producing and the thing most likely to go wrong. Teams find in their own design what the author of the source thesis found in hers.</p>
+      <ol>
+        <li>Read the Cloudy Horizons passage aloud: a flying boat, a minimal interface with no pressuring health or hunger statistics and no notifications, repetitive calming loops — and then the designer's own observation that the flow was capturing, and the boat could become a safe place one couldn't easily leave.</li>
+        <li>Each team checks its own design against the four flow conditions, and confirms it satisfies them.</li>
+        <li>Then the real question: what in your design makes leaving cost something? Count it in steps, in lost progress, and in how the design makes going <i>feel</i>.</li>
+        <li>Describe the person in week one and the same person in week nine, assuming nothing improved and nothing was added. If what they can no longer do without it is something they could previously do unaided, the design has a finding against it and changes.</li>
+      </ol>
+      <p class="why">This is the session students report back on. Wellbeing and education products are almost always evaluated at the point of maximum novelty, which is when they look best and tell you least — and a design good enough to produce flow is a design good enough to trap someone in it. Running the exercise on a real case where a real designer caught herself is what stops the room treating it as a hypothetical.</p>
+    </div>
+
+    <div class="game"><span class="tag">Session 4.4 · 90 minutes · whole cohort</span>
+      <h3>The Pact Reading</h3>
+      <p>Not a game. The people who played each artifact say, in their own words and with the builders silent, what they understood themselves to have agreed to.</p>
+      <ol>
+        <li>Players speak first. Builders may not introduce, frame or correct.</li>
+        <li>The team then reads out what it intended the pact to be.</li>
+        <li>Where the two differ, the team says which one is true of the thing they built.</li>
+        <li>Readings are stated with the same plainness whether or not they flatter. The room may ask, and may not congratulate.</li>
+      </ol>
+      <p class="why">Consent is the course's whole criterion and it is not something a designer can self-assess. If the players' account does not match the intention, the intention was not communicated and the design does not have the consent it claims, whatever the readings say.</p>
+    </div>
+
+  </div>
+</section>
+
+<section id="instruments" class="wrap">
+  <div class="sec-head"><span class="sec-no">04</span><h2>Instruments</h2></div>
+  <p class="lede">Four instruments for use in the room. They keep nothing: no reading is stored, transmitted or counted here or anywhere.</p>
+
+  <div class="inst">
+    <h4>Instrument one</h4>
+    <h3>The trial bench</h3>
+    <p class="prose">Draw a mechanic and a context, then rule on the three tests. The verdict follows mechanically, which is the point — the bench rules on the tests, not on whether it likes the mechanic.</p>
+    <div class="draw">
+      <div class="draw-cell"><span>The mechanic</span><p id="tb-mech">—</p></div>
+      <div class="draw-cell"><span>The context</span><p id="tb-ctx">—</p></div>
+    </div>
+    <div class="btn-row"><button type="button" id="tb-draw">Draw a case</button></div>
+    <div class="tests" id="tb-tests"></div>
+    <div class="verdict-box">
+      <p class="big" id="tb-verdict">Rule on the three tests.</p>
+      <p class="d" id="tb-detail"></p>
+    </div>
+  </div>
+
+  <div class="inst">
+    <h4>Instrument two</h4>
+    <h3>The flow check</h3>
+    <p class="prose">The four conditions of flow as the source thesis states them, run as a gate — and then the question that stops the gate being a licence. A design can satisfy all four and still be something a person cannot put down.</p>
+    <div class="tests" id="fc-host"></div>
+    <div class="verdict-box">
+      <p class="big" id="fc-verdict">Rule on the four.</p>
+      <p class="d" id="fc-detail"></p>
+    </div>
+    <div class="btn-row"><button type="button" id="fc-reset">Clear</button></div>
+  </div>
+
+  <div class="inst">
+    <h4>Instrument three</h4>
+    <h3>The paired reading</h3>
+    <p class="prose">Two readings taken together, before the interaction and immediately after. On the left, the restoration instrument shared with the rest of the programme — same three questions, same thresholds, so a reading taken here is comparable with one taken in the other courses. On the right, a reading built from the three self-determination needs as the source thesis defines them: player agency, skill progression, and the freedom the third test asks about.</p>
+    <div class="delta-grid">
+      <fieldset>
+        <legend>Restoration — before</legend>
+        <div class="q"><label for="rb1">Right now, how easily could you concentrate on something that requires effort?</label>
+          <input type="range" id="rb1" min="1" max="5" step="1" value="3">
+          <div class="anchors"><span>1 · not at all</span><span>5 · easily</span></div></div>
+        <div class="q"><label for="rb2">Right now, how much does anything feel urgent or demanding of you?</label>
+          <input type="range" id="rb2" min="1" max="5" step="1" value="3">
+          <div class="anchors"><span>1 · everything</span><span>5 · nothing</span></div></div>
+        <div class="q"><label for="rb3">Right now, could you make a considered decision, or only react?</label>
+          <input type="range" id="rb3" min="1" max="5" step="1" value="3">
+          <div class="anchors"><span>1 · only react</span><span>5 · a considered decision</span></div></div>
+        <legend style="margin-top:26px">Restoration — after</legend>
+        <div class="q"><label for="ra1">Right now, how easily could you concentrate on something that requires effort?</label>
+          <input type="range" id="ra1" min="1" max="5" step="1" value="4">
+          <div class="anchors"><span>1 · not at all</span><span>5 · easily</span></div></div>
+        <div class="q"><label for="ra2">Right now, how much does anything feel urgent or demanding of you?</label>
+          <input type="range" id="ra2" min="1" max="5" step="1" value="4">
+          <div class="anchors"><span>1 · everything</span><span>5 · nothing</span></div></div>
+        <div class="q"><label for="ra3">Right now, could you make a considered decision, or only react?</label>
+          <input type="range" id="ra3" min="1" max="5" step="1" value="4">
+          <div class="anchors"><span>1 · only react</span><span>5 · a considered decision</span></div></div>
+      </fieldset>
+      <fieldset>
+        <legend>Self-determination — before</legend>
+        <div class="q"><label for="ab1">Autonomy. Right now, how much is what you are doing shaped by your own choices?</label>
+          <input type="range" id="ab1" min="1" max="5" step="1" value="3">
+          <div class="anchors"><span>1 · I am following</span><span>5 · I am shaping it</span></div></div>
+        <div class="q"><label for="ab2">Competence. Right now, how much more capable do you feel of the thing you came to do?</label>
+          <input type="range" id="ab2" min="1" max="5" step="1" value="3">
+          <div class="anchors"><span>1 · no more capable</span><span>5 · clearly more</span></div></div>
+        <div class="q"><label for="ab3">Freedom to leave. Right now, how easily could you stop and walk away?</label>
+          <input type="range" id="ab3" min="1" max="5" step="1" value="3">
+          <div class="anchors"><span>1 · it would cost me</span><span>5 · freely</span></div></div>
+        <legend style="margin-top:26px">Self-determination — after</legend>
+        <div class="q"><label for="aa1">Autonomy. Right now, how much is what you are doing shaped by your own choices?</label>
+          <input type="range" id="aa1" min="1" max="5" step="1" value="4">
+          <div class="anchors"><span>1 · I am following</span><span>5 · I am shaping it</span></div></div>
+        <div class="q"><label for="aa2">Competence. Right now, how much more capable do you feel of the thing you came to do?</label>
+          <input type="range" id="aa2" min="1" max="5" step="1" value="4">
+          <div class="anchors"><span>1 · no more capable</span><span>5 · clearly more</span></div></div>
+        <div class="q"><label for="aa3">Freedom to leave. Right now, how easily could you stop and walk away?</label>
+          <input type="range" id="aa3" min="1" max="5" step="1" value="4">
+          <div class="anchors"><span>1 · it would cost me</span><span>5 · freely</span></div></div>
+      </fieldset>
+    </div>
+    <div class="reading">
+      <div class="reading-row">
+        <span class="which">Restoration</span>
+        <span class="big-n" id="pr-rd">+1.00</span>
+        <span class="band" id="pr-rb">Restorative</span>
+      </div>
+      <div class="reading-row">
+        <span class="which">Self-determination</span>
+        <span class="big-n" id="pr-ad">+1.00</span>
+        <span class="band" id="pr-ab">Supporting</span>
+      </div>
+      <div class="plot" id="pr-plot"></div>
+      <p class="d" id="pr-verdict" style="font-size:14px;max-width:62ch;margin-top:18px"></p>
+    </div>
+    <div class="caution">
+      <span>What each of these is</span>
+      The restoration reading is the master's manuscript's own instrument: its three questions, its wording and its thresholds, quoted rather than paraphrased. The self-determination reading is <strong>a teaching instrument assembled for this course</strong> from Deci and Ryan's three needs as the source thesis operationalises them — player agency, skill progression, and the freedom the third test asks about. It is grounded, but it is not a validated scale and has not been psychometrically tested. Use it to make a design conversation specific. If this work is written up, replace it with a validated self-determination measure and say that you did.
+    </div>
+  </div>
+
+  <div class="inst">
+    <h4>Instrument four</h4>
+    <h3>The three tests</h3>
+    <p class="prose">Run on every mechanic before it enters a build, and on the artifact as a whole before it is shown to anyone. The five questions of the first course still apply; the second test is that same hard gate in different words.</p>
+    <div class="tests" id="tt-host"></div>
+    <div class="verdict-box">
+      <p class="big" id="tt-verdict">Rule on the three.</p>
+      <p class="d" id="tt-detail"></p>
+    </div>
+    <div class="btn-row"><button type="button" id="tt-reset">Clear</button></div>
+  </div>
+</section>
+
+<section id="cases" class="wrap">
+  <div class="sec-head"><span class="sec-no">05</span><h2>The three cases</h2></div>
+  <p class="lede">Taught as precedents, not as models. Each one is a real project with real constraints, and each carries one lesson the course cannot teach any other way. Put all three on the wall in week four.</p>
+
+  <div class="prose">
+    <h3>VALLAE — game-based learning in mixed reality</h3>
+    <p>An educational escape room built in XR around a virtual reconstruction of the Renaissance philologist Lorenzo Valla's study, teaching Roman sites, figures and philological concepts. What makes it a teaching case is the constraint work. Difficulty is held <i>constant rather than exponential</i>, to keep an even rhythm and avoid both tedium and manufactured urgency. The time restriction — normally an enemy — is used deliberately, both to bound how much a person has to learn in one sitting and to limit the disorientation and headache that prolonged VR produces. Movement in VR is limited to teleportation while players move freely in the real room.</p>
+    <p>And the mechanic worth stealing: players in VR and players in reality alternate on every challenge and must guide each other across the two. Cooperation is what turns the cognitive biases into a bonus — confirmation bias and illusory superiority become visible to the people experiencing them, and get resolved through dialogue rather than instruction.</p>
+    <p><strong>Teach it for:</strong> designing an educational constraint on purpose; the clue that only works because it is withheld; bias made useful by being made social.</p>
+
+    <h3>Cloudy Horizons — flow, and its ethical problem</h3>
+    <p>A flying boat above a lost Earth: check the systems, tend the plants, keep the birds safe, make tea, read letters that arrive by bird, organise your thoughts in a three-dimensional realm that opens from a desk. Anxiety-informed design, with escalating tension met through manageable exposure so a player learns to tolerate it without panic — courage practised through a story rather than a speech. The interface is deliberately minimal: no pressuring health or hunger statistics, no overwhelming notifications. Ambient sound does the work — engines, birds, creaking fire, bubbling from the kitchen as a gentle signal that cooking is nearly ready.</p>
+    <p>It satisfies all four flow conditions, and the designer then noticed the problem herself: the flow was capturing, and the boat could become a safe place one couldn't easily leave. That observation is the third test, and this case is where the room meets it.</p>
+    <p><strong>Teach it for:</strong> flow built deliberately; the restorative interface as a set of removals; and a practitioner catching her own design in the act.</p>
+
+    <h3>Coil Hibiki — self-determination made analogue</h3>
+    <p>A board game and a journal, deliberately on paper, with a website behind a unique code. Built against the blank first page of a journal nobody ever writes in. The three needs are mapped explicitly: autonomy, because the player shapes the journey rather than following it; competence, because progress is felt rather than scored and the small rewards — journal accessories, new playlists — are offered and not imposed; relatedness, through echoes of lost souls and memories carried by symbolic immersion rather than dialogue trees.</p>
+    <p>The mechanics are chosen against research into cognitive decline: alternating typefaces as mnemonic cues that switch the reader's inner tone of voice; colour-coded symbol slots where the player picks which prompt suits today, with the meditative lake pages distinguished from the shorter leaf ones; sudoku and crosswords as locks to break, training recall and logical flow; and colouring, which is naturally gamified because the motivation is simply to see the finished image. The letters are cryptic on purpose, to make the mind remember, connect and reframe. The AI layer translates in-game actions into personal insight, and the stated ambition is to train a model with professional assistance — not to diagnose.</p>
+    <p><strong>Teach it for:</strong> a reward the player may decline; a prompt the player chooses; and a wellbeing design that states what it is not.</p>
+  </div>
+</section>
+
+<section id="assess" class="wrap">
+  <div class="sec-head"><span class="sec-no">06</span><h2>Assessment</h2></div>
+  <p class="lede">No exam. One artifact, and the account of why every mechanic in it is there.</p>
+  <div class="tablewrap">
+    <table id="assess-t">
+      <thead><tr><th>Piece</th><th class="num">Weight</th><th>Graded on</th></tr></thead>
+      <tbody>
+        <tr><td>The artifact</td><td class="num">35%</td><td>Whether it holds the signed constraint sheet, whether a cold player can use it unaided, and whether the boundary statement is in the thing rather than the documentation.</td></tr>
+        <tr><td>The mechanic justification</td><td class="num">30%</td><td>Every mechanic ruled on all three tests, rejections included. The rejections carry as much of the mark as the inclusions.</td></tr>
+        <tr><td>The pact reading</td><td class="num">20%</td><td>The gap between what players said they agreed to and what the team intended, and the honesty of the team's account of it.</td></tr>
+        <tr><td>The boat problem</td><td class="num">15%</td><td>Whether the cost of leaving was found before the build and designed out, rather than noticed afterwards.</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="prose" style="margin-top:28px">
+    <p>Two rules stated in session 1.1. A mechanic correctly rejected is worth as much as one well used, and a team whose justification table contains no rejections will be asked what it considered. And the paired readings are graded on protocol, never on the numbers — a measured depletion, honestly obtained and correctly interpreted, scores above an unmeasured claim of restoration.</p>
+  </div>
+</section>
+
+<section id="teaching" class="wrap">
+  <div class="sec-head"><span class="sec-no">07</span><h2>Teaching notes</h2></div>
+  <div class="prose">
+    <p><strong>State the contradiction in the first ten minutes.</strong> Students who have taken the first course know it forbids streaks and leaderboards outright. Read the §2.1 passage, give the three tests, give the third one its provenance, and move on. If you do not, half the room spends two weeks waiting for you to notice.</p>
+    <p><strong>Teach the three-way distinction before anything else.</strong> Game, game-based learning, gamification. Almost every bad argument in this field — in both directions — comes from collapsing the three, and the room cannot rule on a mechanic it cannot classify.</p>
+    <p><strong>Gamification is not the vocabulary.</strong> The word carries a decade of bad practice and students reach for its techniques as a kit. If a team says they are gamifying something, ask who holds the goal and the conversation recovers.</p>
+    <p><strong>Draw trial contexts so a mechanic gets acquitted.</strong> If the first round convicts everything, the room concludes the tests are decoration and that this is really the first course again. Make sure one well-argued acquittal happens early.</p>
+    <p><strong>Tell the Transport Test story rather than reading it.</strong> The evidence is specifically that telling beats reading aloud, and that gesture, vocal variation and eye contact carry much of the effect. A facilitator who reads the narrative version from a script has run the wrong experiment and will get a flat result.</p>
+    <p><strong>Hold the clinical boundary without making the course timid.</strong> Say plainly in 3.2 that nothing here trains anyone to treat anyone, then let students design ambitiously inside that limit. The boundary constrains claims, not ambition — the Coil Hibiki case is the proof, since it researched depression, anxiety and dementia, consulted people who work with patients, and still stated that it was not there to diagnose.</p>
+    <p><strong>Redirect protected-population proposals in 3.4, not in week four.</strong> Students will want to test with children, patients or their own support groups. They design <i>for</i> that population and test <i>with</i> consenting adult peers unless institutional ethics review is already in hand, and the time to say so is while the brief can still move.</p>
+    <p><strong>Say what the self-determination reading is.</strong> It is assembled for the course from the three needs, it is grounded, and it is not validated. A course whose criterion is disclosed consent cannot hand students an instrument with an unstated provenance.</p>
+  </div>
+</section>
+
+</main>
+
+<footer class="wrap colophon">
+  <p>Built on Di Patre, P. (2025), <i>New Technologies in Storytelling and Gamification for Education and Mental Health</i>, Pantheon Institute of Design and Technology — its self-determination chapter, its account of player archetypes as marketing segments, its <i>Story of Misery</i> chapter on the dark side of AI-powered media, and the three projects it documents. The pact argument and the restoration instrument are from <i>Media as Universe: An Antifragile Framework for Communication Design in the Attention Economy</i>, §2.1 and §5.6, quoted rather than paraphrased so that readings taken here are comparable with readings taken elsewhere in the programme.</p>
+  <p>The third test is the source thesis's own observation about Cloudy Horizons. The self-determination reading is a teaching instrument assembled for this course and is not a validated scale. This page stores nothing and counts nothing.</p>
+</footer>
+
+<script>
+(function () {
+  "use strict";
+  var el = function (id) { return document.getElementById(id); };
+
+  /* ---------- trial bench ---------- */
+  var MECHANICS = [
+    "A streak counter, visible, that breaks if a day is missed",
+    "A leaderboard ranking everyone in the cohort",
+    "A loot box opened with real money",
+    "A gacha pull for a randomised collectable",
+    "A badge awarded for a completed sequence",
+    "A notification sent at the hour the person has historically been most responsive",
+    "Progress toward a reward that recedes as it is approached",
+    "A narrative that continues only if the person returns tomorrow",
+    "A reward the player may decline without losing anything",
+    "A choice of three prompts, one short and one meditative, picked by the player each day",
+    "A cryptic letter that has to be decoded to be understood",
+    "A quiet moment with nothing asked of the player",
+    "A playlist the player may edit or replace",
+    "An avatar whose condition reflects the person's own adherence",
+    "A puzzle lock that must be solved to pass",
+    "Loss of accumulated progress after a period of absence"
+  ];
+  var CONTEXTS = [
+    "An educational escape room played once, in a group, with a time limit",
+    "A subscription the person is in the middle of trying to cancel",
+    "A journal game bought by someone who has never managed to keep a journal",
+    "A free app monetised by advertising, installed after a video ad",
+    "An adherence tool given to someone by their own clinician, for a goal they set",
+    "A museum's companion piece for a visit the person chose to make",
+    "A workplace training module nobody opted into",
+    "A reading app a parent installed on a nine-year-old's tablet",
+    "A language course a student enrolled in voluntarily",
+    "A peer support community the person sought out",
+    "A fitness product bought in January, used in March",
+    "A tool used daily for two months by someone living alone"
+  ];
+  var TESTS = [
+    { id: "goal", q: "Who holds the goal?", note: "Did the person arrive with the intention this mechanic serves, or did the system supply it? Autonomy is player agency — the freedom and control they have over their own path.",
+      pass: "The person does", fail: "The system does" },
+    { id: "disc", q: "Are the mechanics disclosable?", note: "Would it still work if the person were shown exactly how and why it was built to affect them? The same hard gate as the five-question standard.",
+      pass: "Yes, they hold", fail: "No, they collapse" },
+    { id: "exit", q: "Does leaving cost nothing?", note: "Counted in steps, in lost progress, and in how the design makes going feel. The boat that became a safe place one couldn't easily leave.",
+      pass: "Nothing", fail: "It costs them" }
+  ];
+
+  function buildTests(hostId, prefix, spec, onChange) {
+    var host = el(hostId);
+    spec.forEach(function (t, i) {
+      var d = document.createElement("div");
+      d.className = "test";
+      d.innerHTML = '<span class="n">' + (t.label || ("Test " + (i + 1))) + "</span>" +
+        '<p class="q">' + t.q + "</p>" +
+        '<p class="note">' + t.note + "</p>" +
+        '<div class="choices">' +
+          '<label><input type="radio" name="' + prefix + t.id + '" value="pass"> ' + t.pass + "</label>" +
+          '<label><input type="radio" name="' + prefix + t.id + '" value="fail"> ' + t.fail + "</label>" +
+        "</div>";
+      host.appendChild(d);
+    });
+    host.addEventListener("change", onChange);
+  }
+
+  function readTests(host, prefix, spec) {
+    var answered = 0, failed = [];
+    spec.forEach(function (t, i) {
+      var s = host.querySelector('input[name="' + prefix + t.id + '"]:checked');
+      if (!s) { return; }
+      answered++;
+      if (s.value === "fail") { failed.push(i + 1); }
+    });
+    return { answered: answered, failed: failed };
+  }
+
+  function threeVerdict(r, vEl, dEl) {
+    if (r.answered < TESTS.length) {
+      vEl.textContent = "Rule on the three tests.";
+      dEl.textContent = r.answered ? r.answered + " of 3 ruled." : "";
+      return;
+    }
+    if (r.failed.indexOf(2) !== -1) {
+      vEl.textContent = "Extraction.";
+      dEl.textContent = "Test two failed, and it is the hard one. A mechanic that only works while unexplained has no pact behind it, whatever the other two say. Rework the approach rather than the wording.";
+      return;
+    }
+    if (r.failed.length) {
+      vEl.textContent = "Not a pact yet.";
+      dEl.textContent = "Test " + r.failed.join(" and ") + " failed. The mechanics are disclosable, so this is recoverable — the person either did not bring the goal or cannot leave freely, and both are fixable by design rather than by argument.";
+      return;
+    }
+    vEl.textContent = "A pact.";
+    dEl.textContent = "The person holds the goal, the mechanics survive disclosure, and leaving costs nothing. Record the ruling with the context attached: the same mechanic in a different context is a different case and has to be tried again.";
+  }
+
+  var benchHost = el("tb-tests");
+  function benchUpdate() { threeVerdict(readTests(benchHost, "tb-", TESTS), el("tb-verdict"), el("tb-detail")); }
+  buildTests("tb-tests", "tb-", TESTS, benchUpdate);
+  function pick(a) { return a[Math.floor(Math.random() * a.length)]; }
+  el("tb-draw").addEventListener("click", function () {
+    el("tb-mech").textContent = pick(MECHANICS);
+    el("tb-ctx").textContent = pick(CONTEXTS);
+    Array.prototype.forEach.call(benchHost.querySelectorAll("input[type=radio]"), function (r) { r.checked = false; });
+    benchUpdate();
+  });
+  benchUpdate();
+
+  /* ---------- the three tests, standalone ---------- */
+  var ttHost = el("tt-host");
+  function ttUpdate() { threeVerdict(readTests(ttHost, "tt-", TESTS), el("tt-verdict"), el("tt-detail")); }
+  buildTests("tt-host", "tt-", TESTS, ttUpdate);
+  el("tt-reset").addEventListener("click", function () {
+    Array.prototype.forEach.call(ttHost.querySelectorAll("input[type=radio]"), function (r) { r.checked = false; });
+    ttUpdate();
+  });
+  ttUpdate();
+
+  /* ---------- flow check ---------- */
+  var FLOW = [
+    { id: "goals", label: "Condition one", q: "Clear goals and instant feedback.", note: "Does the player know what is being asked, and does the world answer immediately when they act?", pass: "Present", fail: "Absent" },
+    { id: "diff", label: "Condition two", q: "A gradual increase in difficulty.", note: "Challenge matched to skill — not too easy, not too hard. Difficulty may be constant rather than exponential where an even rhythm serves the learning better.", pass: "Present", fail: "Absent" },
+    { id: "dist", label: "Condition three", q: "An environment that removes distractions.", note: "No pressuring statistics, no overwhelming notifications. What has been taken away matters more here than what has been added.", pass: "Present", fail: "Absent" },
+    { id: "rew", label: "Condition four", q: "Rewards that reinforce mastery.", note: "The reward tells the player what they can now do, rather than what they have accumulated.", pass: "Present", fail: "Absent" },
+    { id: "leave", label: "And then", q: "Could the player leave in the middle of this without it costing them?", note: "The question that stops the other four being a licence. A design can satisfy all of them and still be a safe place nobody can get out of.", pass: "Yes, freely", fail: "No, it would cost them" }
+  ];
+  var fcHost = el("fc-host");
+  function fcUpdate() {
+    var r = readTests(fcHost, "fc-", FLOW);
+    var leaveSel = fcHost.querySelector('input[name="fc-leave"]:checked');
+    if (r.answered < FLOW.length) {
+      el("fc-verdict").textContent = "Rule on the four.";
+      el("fc-detail").textContent = r.answered ? r.answered + " of 5 ruled." : "";
+      return;
+    }
+    var conditions = r.failed.filter(function (n) { return n <= 4; });
+    var leaveFails = leaveSel && leaveSel.value === "fail";
+    if (leaveFails && !conditions.length) {
+      el("fc-verdict").textContent = "Flow, and a cost to leaving.";
+      el("fc-detail").textContent = "All four conditions are met and the player cannot leave freely. This is the most dangerous reading the instrument gives, because everything about it looks like success. Run the Boat Problem on it: find what makes going cost something and remove that, not the flow.";
+      return;
+    }
+    if (!conditions.length) {
+      el("fc-verdict").textContent = "Flow, and a free exit.";
+      el("fc-detail").textContent = "Four conditions met and leaving costs nothing. This is the reading the course aims at and it is rarer than teams expect — confirm it with a player rather than with the team.";
+      return;
+    }
+    el("fc-verdict").textContent = conditions.length === 1 ? "One condition missing." : conditions.length + " conditions missing.";
+    el("fc-detail").textContent = "Condition " + conditions.join(", ") + " absent"
+      + (leaveFails ? ", and leaving costs the player something. Fix the exit first: an incomplete flow state that is also hard to leave is the worst of both." : ". The exit is free, so this is a craft problem rather than an ethical one.");
+  }
+  buildTests("fc-host", "fc-", FLOW, fcUpdate);
+  el("fc-reset").addEventListener("click", function () {
+    Array.prototype.forEach.call(fcHost.querySelectorAll("input[type=radio]"), function (r) { r.checked = false; });
+    fcUpdate();
+  });
+  fcUpdate();
+
+  /* ---------- paired reading ---------- */
+  function mean(ids) {
+    var s = 0;
+    ids.forEach(function (i) { s += Number(el(i).value); });
+    return s / ids.length;
+  }
+  function signed(n) { return (n > 0 ? "+" : n < 0 ? "−" : "") + Math.abs(n).toFixed(2); }
+  function rBand(d) { return d >= 0.5 ? "Restorative" : d > -0.5 ? "Neutral" : "Depleting"; }
+  function aBand(d) { return d >= 0.5 ? "Supporting" : d > -0.5 ? "Neutral" : "Capturing"; }
+
+  /* Two bowed filaments, one per reading. Nothing is a straight segment, so no
+     bow is ever zero, and the direction a filament bows is how its band reads. */
+  function plot(rb, ra, ab, aa) {
+    var W = 560, H = 190, L = 92, R = 470;
+    var y = function (v) { return 150 - (v - 1) * 28; };
+    var g = ['<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="Restoration and self-determination readings drawn as two bowed filaments.">'];
+    [1, 3, 5].forEach(function (v) {
+      var gy = y(v);
+      g.push('<path d="M 66 ' + (gy + 1.2) + ' Q ' + ((L + R) / 2) + ' ' + (gy - 1.4) + ' ' + (R + 24) + ' ' + (gy + 1.2) + '" fill="none" stroke="currentColor" stroke-width="0.6" opacity="0.24"/>');
+      g.push('<text x="56" y="' + (gy + 4) + '" font-size="10" text-anchor="end" fill="currentColor" opacity="0.5">' + v + '</text>');
+    });
+    function filament(b, a, w, op, label) {
+      var d = a - b, yb = y(b), ya = y(a);
+      var bow = d === 0 ? 8 : -Math.max(8, Math.min(30, Math.abs(d) * 15)) * (d > 0 ? 1 : -1);
+      var cx = (L + R) / 2, cy = (yb + ya) / 2 + bow;
+      g.push('<path d="M ' + L + ' ' + yb.toFixed(1) + ' Q ' + cx + ' ' + cy.toFixed(1) + ' ' + R + ' ' + ya.toFixed(1) + '" fill="none" stroke="currentColor" stroke-width="' + w + '" opacity="' + op + '"/>');
+      g.push('<circle cx="' + L + '" cy="' + yb.toFixed(1) + '" r="2.4" fill="currentColor" opacity="' + (op * 0.5) + '"/>');
+      g.push('<circle cx="' + R + '" cy="' + ya.toFixed(1) + '" r="3.8" fill="currentColor" opacity="' + op + '"/>');
+      g.push('<text x="' + (R + 14) + '" y="' + (ya + 4).toFixed(1) + '" font-size="10" fill="currentColor" opacity="0.55">' + label + '</text>');
+    }
+    filament(rb, ra, 1.5, 0.95, "R");
+    filament(ab, aa, 1.1, 0.55, "S");
+    g.push('<text x="' + L + '" y="' + (H - 8) + '" font-size="10" text-anchor="middle" fill="currentColor" opacity="0.5">BEFORE</text>');
+    g.push('<text x="' + R + '" y="' + (H - 8) + '" font-size="10" text-anchor="middle" fill="currentColor" opacity="0.5">AFTER</text>');
+    g.push("</svg>");
+    el("pr-plot").innerHTML = g.join("");
+  }
+
+  function prUpdate() {
+    var rb = mean(["rb1", "rb2", "rb3"]), ra = mean(["ra1", "ra2", "ra3"]);
+    var ab = mean(["ab1", "ab2", "ab3"]), aa = mean(["aa1", "aa2", "aa3"]);
+    var exitBefore = Number(el("ab3").value), exitAfter = Number(el("aa3").value);
+    var rd = ra - rb, ad = aa - ab;
+    el("pr-rd").textContent = signed(rd);
+    el("pr-rb").textContent = rBand(rd);
+    el("pr-ad").textContent = signed(ad);
+    el("pr-ab").textContent = aBand(ad);
+    var v;
+    if (exitAfter <= 2 && exitAfter < exitBefore) {
+      v = "Look at the third item before anything else: the player found it harder to walk away after the interaction than before it. Whatever the two averages say, this is the boat problem. Find what makes leaving cost something and remove that, not the flow.";
+    } else if (rd <= -0.5 && ad <= -0.5) {
+      v = "Depleting and capturing. Whatever it taught, it took more than it gave and left the person less able to leave. A depleting score fails the fifth question of the Chapter III standard, whatever the completion rate.";
+    } else if (rd >= 0.5 && ad >= 0.5) {
+      v = "Restorative and supporting. The person left more capable than they arrived and no less free to go. This is the reading the course aims at, and it is rarer than teams expect.";
+    } else if (ad <= -0.5) {
+      v = "The self-determination reading is the problem. Something here is holding the person rather than serving them, even though their attention recovered. Run Goal Theft backwards on the design: find the one edit that moved the goal, and undo it.";
+    } else if (rd <= -0.5) {
+      v = "Depleting, though the person still holds the goal. That is the common profile of a demanding thing someone chose, and it is not automatically a failure — but it owes a silence afterwards, and the week-nine question becomes the one that matters.";
+    } else {
+      v = "A neutral reading on at least one instrument. Neither restored nor depleted, neither supported nor captured. That is not evidence of a good design; it is usually evidence that the artifact did not do very much.";
+    }
+    el("pr-verdict").textContent = v;
+    plot(rb, ra, ab, aa);
+  }
+
+  ["rb1", "rb2", "rb3", "ra1", "ra2", "ra3", "ab1", "ab2", "ab3", "aa1", "aa2", "aa3"].forEach(function (id) {
+    el(id).addEventListener("input", prUpdate);
+  });
+  prUpdate();
+})();
+</script>
+</body>
+</html>

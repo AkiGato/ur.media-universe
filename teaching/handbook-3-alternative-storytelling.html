@@ -1,0 +1,693 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Pact Working Papers</title>
+<style>
+  /* Layout: a column of working papers separated by hairlines, never cards.
+     Nothing a filled area, nothing a straight segment, monochrome throughout.
+     Same system as the rest of the programme. */
+  :root {
+    --ground: #ececeb; --ink: #15161a; --ink-soft: #55575d; --ink-faint: #8b8d93;
+    --hair: #c6c7c4; --hair-faint: #d9dad7; --field: #e3e3e1;
+    --display: "Newsreader", "Iowan Old Style", Georgia, serif;
+    --body: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+    --ease: cubic-bezier(0.33, 0.01, 0.2, 1);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground: #0b0c0d; --ink: #e7e6e2; --ink-soft: #a0a09c; --ink-faint: #6e6f6c;
+      --hair: #35373a; --hair-faint: #25272a; --field: #16181a; color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --ground: #0b0c0d; --ink: #e7e6e2; --ink-soft: #a0a09c; --ink-faint: #6e6f6c;
+    --hair: #35373a; --hair-faint: #25272a; --field: #16181a; color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--ground); color: var(--ink); font-family: var(--body);
+    font-weight: 300; font-size: 15px; line-height: 1.68; -webkit-font-smoothing: antialiased; }
+  h1,h2,h3,h4,p,ul,ol,dl,dd,blockquote { margin: 0; }
+  ul, ol { padding-left: 1.1em; } li { margin-block: 0.32em; }
+  strong { font-weight: 300; border-bottom: 1px solid var(--hair); }
+  i, em { font-style: italic; }
+  .wrap { max-width: 920px; margin: 0 auto; padding-inline: 20px; }
+  .index { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 10;
+    background: var(--ground); border-bottom: 1px solid var(--hair); }
+  .index-row { display: flex; flex-wrap: wrap; gap: 4px 20px; align-items: baseline; padding-block: 11px; }
+  .index a { font-size: 11px; text-transform: uppercase; letter-spacing: 0.2em; color: var(--ink-faint);
+    text-decoration: none; padding-bottom: 2px; border-bottom: 1px solid transparent;
+    transition: color 0.3s var(--ease), border-color 0.3s var(--ease); }
+  .index a:hover, .index a:focus-visible { color: var(--ink); border-bottom-color: var(--hair); }
+  .mast { padding-block: 56px 40px; border-bottom: 1px solid var(--hair); }
+  .eyebrow { font-size: 11px; text-transform: uppercase; letter-spacing: 0.2em; color: var(--ink-faint); }
+  h1 { font-family: var(--display); font-weight: 300; font-size: clamp(30px, 6.4vw, 44px);
+    line-height: 1.12; letter-spacing: -0.012em; text-wrap: balance; margin-top: 14px; max-width: 24ch; }
+  .standfirst { margin-top: 20px; max-width: 64ch; color: var(--ink-soft); }
+  .mast-meta { display: flex; flex-wrap: wrap; gap: 0 32px; margin-top: 28px; font-size: 11px;
+    text-transform: uppercase; letter-spacing: 0.2em; color: var(--ink-faint); }
+  section { padding-block: 52px; border-bottom: 1px solid var(--hair); }
+  .sec-head { display: flex; gap: 14px; align-items: baseline; margin-bottom: 26px; }
+  .sec-no { font-size: 11px; letter-spacing: 0.2em; color: var(--ink-faint);
+    font-variant-numeric: tabular-nums; flex: none; }
+  h2 { font-family: var(--display); font-weight: 300; font-size: clamp(22px, 4vw, 30px);
+    line-height: 1.2; letter-spacing: -0.008em; text-wrap: balance; }
+  .lede { max-width: 64ch; color: var(--ink-soft); margin-bottom: 30px; }
+  h3 { font-family: var(--display); font-weight: 300; font-size: 19px; line-height: 1.3;
+    margin-bottom: 8px; text-wrap: balance; }
+  h4 { font-size: 11px; text-transform: uppercase; letter-spacing: 0.2em; color: var(--ink-faint); margin-bottom: 10px; }
+  .prose { max-width: 66ch; } .prose p + p { margin-top: 14px; } .prose h3 { margin-top: 26px; }
+  blockquote { margin-block: 22px; padding-left: 20px; border-left: 1px solid var(--hair);
+    font-family: var(--display); font-size: 18px; line-height: 1.42; max-width: 44ch; }
+  blockquote cite { display: block; margin-top: 10px; font-family: var(--body); font-size: 11px;
+    text-transform: uppercase; letter-spacing: 0.2em; color: var(--ink-faint); font-style: normal; }
+  .terms { display: grid; gap: 1px; background: var(--hair-faint); }
+  @media (min-width: 720px) { .terms { grid-template-columns: 1fr 1fr; } }
+  .term { background: var(--ground); padding: 22px 20px 24px; min-width: 0; }
+  .term span { font-size: 11px; text-transform: uppercase; letter-spacing: 0.2em;
+    color: var(--ink-faint); display: block; margin-bottom: 10px; }
+  .term .claim { font-family: var(--display); font-size: 19px; line-height: 1.3; }
+  .term p { font-size: 14px; color: var(--ink-soft); margin-top: 8px; }
+  .arc-step { display: grid; gap: 4px 20px; padding-block: 20px; border-bottom: 1px solid var(--hair-faint); }
+  @media (min-width: 680px) { .arc-step { grid-template-columns: 7em 1fr 1fr; } }
+  .arc-step .wk { font-size: 11px; text-transform: uppercase; letter-spacing: 0.2em; color: var(--ink-faint); }
+  .arc-step h3 { margin-bottom: 4px; }
+  .arc-step .d { font-size: 14px; color: var(--ink-soft); }
+  .arc-step .have { font-size: 14px; min-width: 0; }
+  .arc-step .have span { font-size: 11px; text-transform: uppercase; letter-spacing: 0.2em;
+    color: var(--ink-faint); display: block; margin-bottom: 4px; }
+  .paper { padding-block: 34px; border-top: 1px solid var(--hair); }
+  .paper:first-of-type { border-top: none; padding-top: 0; }
+  .paper-head { display: flex; flex-wrap: wrap; gap: 6px 18px; align-items: baseline; }
+  .paper-head .ref { font-size: 11px; text-transform: uppercase; letter-spacing: 0.2em;
+    color: var(--ink-faint); font-variant-numeric: tabular-nums; }
+  .paper > .prose { margin-top: 10px; }
+  .fields { margin-top: 20px; }
+  .field { padding-block: 12px; border-bottom: 1px solid var(--hair-faint); }
+  .field label { display: block; font-size: 11px; text-transform: uppercase; letter-spacing: 0.2em;
+    color: var(--ink-faint); margin-bottom: 7px; }
+  .field .hint { font-size: 13px; color: var(--ink-faint); margin-bottom: 8px; max-width: 62ch; }
+  input[type="text"], input[type="number"], textarea { width: 100%; font-family: var(--body);
+    font-weight: 300; font-size: 14px; line-height: 1.6; color: var(--ink); background: var(--field);
+    border: none; border-bottom: 1px solid var(--hair); border-radius: 0; padding: 9px 10px; resize: vertical; }
+  input:focus, textarea:focus { outline: none; border-bottom-color: var(--ink); }
+  input::placeholder, textarea::placeholder { color: var(--ink-faint); opacity: 1; }
+  textarea { min-height: 76px; }
+  button { font-family: var(--body); font-weight: 300; font-size: 11px; text-transform: uppercase;
+    letter-spacing: 0.2em; color: var(--ink); background: none; border: none;
+    border-bottom: 1px solid var(--hair); padding: 6px 0; cursor: pointer; border-radius: 0;
+    transition: border-color 0.3s var(--ease); }
+  button:hover, button:focus-visible { border-bottom-color: var(--ink); }
+  button:focus-visible { outline: none; }
+  .btn-row { display: flex; flex-wrap: wrap; gap: 0 26px; align-items: baseline; margin-top: 18px; }
+  .status { font-size: 11px; text-transform: uppercase; letter-spacing: 0.2em; color: var(--ink-faint);
+    font-variant-numeric: tabular-nums; }
+  .copyout { margin-top: 16px; }
+  .copyout p { font-size: 13px; color: var(--ink-faint); margin-bottom: 8px; }
+  .copyout textarea { min-height: 150px; font-size: 13px; }
+  .tablewrap { overflow-x: auto; margin-top: 20px; }
+  table { border-collapse: collapse; width: 100%; font-size: 14px; }
+  th, td { text-align: left; padding: 9px 14px 9px 0; border-bottom: 1px solid var(--hair-faint); vertical-align: top; }
+  th { font-size: 11px; text-transform: uppercase; letter-spacing: 0.2em; color: var(--ink-faint);
+    font-weight: 300; border-bottom-color: var(--hair); white-space: nowrap; }
+  td.num, th.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
+  table input[type="text"] { min-width: 8em; padding: 6px 8px; font-size: 13px; }
+  table input[type="number"] { min-width: 4.6em; padding: 6px 8px; font-size: 13px; }
+  #just-table { min-width: 860px; } #pr-table { min-width: 800px; } #tests-t { min-width: 560px; }
+  #as-t { min-width: 480px; }
+  .rowdrop { border-bottom: 1px solid transparent; padding: 4px 0; font-size: 11px; letter-spacing: 0.2em; }
+  .totals { margin-top: 20px; padding-top: 18px; border-top: 1px solid var(--hair);
+    display: flex; flex-wrap: wrap; gap: 14px 40px; align-items: baseline; }
+  .totals .big { font-family: var(--display); font-size: clamp(26px, 5.4vw, 36px); line-height: 1;
+    font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
+  .totals .band { font-size: 11px; text-transform: uppercase; letter-spacing: 0.2em; }
+  .totals .which { font-size: 11px; text-transform: uppercase; letter-spacing: 0.2em; color: var(--ink-faint); }
+  .totals .note { font-size: 13px; color: var(--ink-soft); }
+  .caution { margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--hair);
+    font-size: 13px; color: var(--ink-soft); max-width: 66ch; }
+  .caution span { font-size: 11px; text-transform: uppercase; letter-spacing: 0.2em;
+    color: var(--ink-faint); display: block; margin-bottom: 8px; }
+  .colophon { padding-block: 44px 64px; font-size: 13px; color: var(--ink-faint); max-width: 66ch; }
+  .colophon p + p { margin-top: 12px; }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition-duration: 0.01ms !important; } }
+</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300;1,6..72,300&family=IBM+Plex+Sans:ital,wght@0,300;1,300&display=swap">
+<style>[hidden]{display:none!important}img{max-width:100%}</style>
+</head>
+<body>
+<nav class="index">
+  <div class="wrap index-row">
+    <a href="#terms">The terms</a><a href="#arc">Four weeks</a><a href="#papers">Working papers</a>
+    <a href="#reference">Reference</a><a href="#assess">Assessment</a><a href="#consent">Consent</a><a href="#reading">Reading</a>
+  </div>
+</nav>
+
+<header class="wrap mast">
+  <span class="eyebrow">Student handbook · course three</span>
+  <h1>Alternative Storytelling</h1>
+  <p class="standfirst">You will build one playable or readable thing and justify every mechanic in it against three tests. These are the seven papers that justification is assembled from, the things you are expected to use without looking them up, and the protocol for the session where you take readings from real people.</p>
+  <div class="mast-meta">
+    <span>4 weeks · 16 sessions</span><span>48 contact hours</span><span>Studio</span>
+  </div>
+</header>
+
+<main>
+
+<section id="terms" class="wrap">
+  <div class="sec-head"><span class="sec-no">01</span><h2>The terms</h2></div>
+  <p class="lede">If you have taken the first course of this programme you already know it names streaks, leaderboards and variable reward as weapons and forbids them outright. This course teaches you to build with the same vocabulary. That is not a reversal.</p>
+  <blockquote>
+    They built worlds — storytelling, gamification, branded fictions — and invited the audience inside. Trust was not required, because the audience had entered the pact that cinema and literature rely on: disbelief suspended by consent. A fiction you have agreed to is not a lie.
+    <cite>Media as Universe, §2.1</cite>
+  </blockquote>
+  <div class="prose" style="margin-bottom:30px">
+    <p>Suspension of disbelief is Coleridge's term, from 1817, and it turns up in both source theses. The mechanic is not the unit of judgement; the consent is. A streak serving a habit you chose supports your own intention. The identical streak serving a subscription you are trying to cancel extracts from you. Same code, opposite direction of agency.</p>
+    <p>Three tests tell them apart. The third one was not derived from theory — it was found by the author of the source thesis in the middle of building something that worked, and it is the most useful sentence in this handbook:</p>
+  </div>
+  <blockquote>
+    The ethical question was, this flow was capturing, this boat could become a safe place one couldn't easily leave.
+    <cite>On Cloudy Horizons</cite>
+  </blockquote>
+  <div class="prose" style="margin-bottom:30px">
+    <p>The tests disqualify most of what the industry currently ships under the name <i>gamification</i>. This is a standard, not a permission.</p>
+  </div>
+  <div class="terms">
+    <div class="term"><span>On rejection</span>
+      <p class="claim">A mechanic correctly rejected is worth as much as one well used.</p>
+      <p>Your justification table is assessed on the rulings, negative ones included. A table with no rejections in it will be asked what you considered, and <i>nothing</i> is not an answer that scores.</p></div>
+    <div class="term"><span>On the word</span>
+      <p class="claim">Do not say you are gamifying something.</p>
+      <p>The word carries a decade of bad practice and it makes people reach for techniques as a kit. Name the mechanic, name who holds the goal. If you cannot do both, you do not yet know what you are building.</p></div>
+    <div class="term"><span>On the boundary</span>
+      <p class="claim">Nothing here trains you to treat anyone.</p>
+      <p>Design can shape an environment, carry a practice someone was already given, and lower the cost of a good habit. It cannot assess, diagnose or hold risk. Where yours would need to, it needs a clinician, and your job is to make that handover easy.</p></div>
+    <div class="term"><span>On measurement</span>
+      <p class="claim">Protocol, never the number.</p>
+      <p>A measured depletion, honestly obtained and correctly interpreted, scores above an unmeasured claim of restoration. The readings are graded on how you took them and what you concluded from them.</p></div>
+  </div>
+</section>
+
+<section id="arc" class="wrap">
+  <div class="sec-head"><span class="sec-no">02</span><h2>Four weeks</h2></div>
+  <div>
+    <div class="arc-step"><span class="wk">Week one</span>
+      <div><h3>The synergy and the pact</h3><p class="d">Storytelling and play as one subject, with the physiology measured. The three-way distinction between a game, game-based learning and gamification — and why the word became popular because an example was scandalous. Disbelief suspended by consent, and what generative media did to it.</p></div>
+      <div class="have"><span>You will hold</span>A recall figure measured on your own cohort, and a pact analysis of an existing work.</div></div>
+    <div class="arc-step"><span class="wk">Week two</span>
+      <div><h3>The permitted mechanics</h3><p class="d">Self-determination theory in its operational form. Player archetypes, and why their origin in audience segmentation matters. The three tests, and the single edit at which a mechanic flips.</p></div>
+      <div class="have"><span>You will hold</span>A signed mechanic justification table and a goal theft note.</div></div>
+    <div class="arc-step"><span class="wk">Week three</span>
+      <div><h3>The dark side, and the boundary</h3><p class="d">The same mechanics turned: loot boxes, gacha, engineered scarcity, and the bias set they run on. The clinical boundary. Flow, its four conditions, and the trap inside it.</p></div>
+      <div class="have"><span>You will hold</span>A boundary statement, a boat problem analysis, and a fixed brief.</div></div>
+    <div class="arc-step"><span class="wk">Week four</span>
+      <div><h3>Build and measure</h3><p class="d">Build it, hand it to someone cold, measure what it leaves them with, then let them tell you in their own words what they thought they had agreed to.</p></div>
+      <div class="have"><span>You will hold</span>The artifact, paired readings, and the players' own account of the pact.</div></div>
+  </div>
+</section>
+
+<section id="papers" class="wrap">
+  <div class="sec-head"><span class="sec-no">03</span><h2>Working papers</h2></div>
+  <p class="lede">Seven papers, in the order you need them. Each copies out as plain text and keeps a draft in this browser only — nothing typed here is transmitted, stored elsewhere or visible to anyone, including the instructor.</p>
+
+  <div class="paper" id="paper-pact">
+    <div class="paper-head"><h3>Pact analysis</h3><span class="ref">Paper one · session 1.4</span></div>
+    <div class="prose"><p>Of an existing narrative or game work, not your own. What does it ask the audience to accept, does it disclose the ask, and what does it do with what it is given? A work can ask for a great deal and still be honest about asking — nobody questions whether the fairy selling the necklace is telling the truth, because everyone knew they were entering a fiction.</p></div>
+    <div class="fields" data-paper="pact">
+      <div class="field"><label for="p-work">The work</label><input type="text" id="p-work" data-f="Work"></div>
+      <div class="field"><label for="p-class">Game, game-based learning, or gamification?</label><div class="hint">Classify it before you judge it. Most bad arguments in this field come from collapsing the three.</div><input type="text" id="p-class" data-f="Classification"></div>
+      <div class="field"><label for="p-ask">What it asks the audience to accept</label><textarea id="p-ask" data-f="The ask"></textarea></div>
+      <div class="field"><label for="p-disc">Does it disclose the ask, and where?</label><div class="hint">A disclosure buried where nobody reads it is not one. Say where a first-time audience would actually meet it.</div><textarea id="p-disc" data-f="Disclosure"></textarea></div>
+      <div class="field"><label for="p-use">What it does with what it is given</label><div class="hint">Having obtained the suspension of disbelief, what does the work then do? This is where an honest fiction and a dishonest one separate.</div><textarea id="p-use" data-f="Use"></textarea></div>
+      <div class="field"><label for="p-rule">Entered, assumed, or contested</label><div class="hint">Your ruling, and the moment at which the audience should have been told if it was not.</div><textarea id="p-rule" data-f="Ruling"></textarea></div>
+    </div>
+    <div class="btn-row"><button type="button" data-copy="pact">Copy out</button><span class="status" id="st-pact"></span></div>
+  </div>
+
+  <div class="paper" id="paper-just">
+    <div class="paper-head"><h3>Mechanic justification</h3><span class="ref">Paper two · session 2.4 · signed, and binding</span></div>
+    <div class="prose">
+      <p>One row per mechanic you intend to use, and one row per mechanic you considered and rejected. Every row ruled on all three tests. A mechanic that is not on this table may not appear in the build.</p>
+      <p>Test two is the hard one: if it fails, the other two do not rescue it. Record the context, because the same mechanic in a different context is a different case and has to be ruled again — a reward offered in a journal game someone bought to help themselves is not the same object as the identical reward in a subscription they are trying to leave.</p>
+    </div>
+    <div class="tablewrap">
+      <table id="just-table">
+        <thead><tr><th>Mechanic</th><th>Context</th><th>Who holds the goal</th><th>How it is disclosed</th><th>What leaving costs</th><th>Ruling</th><th>Used?</th><th></th></tr></thead>
+        <tbody id="just-body"></tbody>
+      </table>
+    </div>
+    <div class="btn-row"><button type="button" data-addrow="just">Add a row</button><button type="button" data-copy="just">Copy out</button><span class="status" id="st-just"></span></div>
+  </div>
+
+  <div class="paper" id="paper-theft">
+    <div class="paper-head"><h3>Goal theft note</h3><span class="ref">Paper three · session 2.4</span></div>
+    <div class="prose">
+      <p>Start from a mechanic that genuinely serves the person. Change it as little as possible until it serves the system. The value of this paper is the precision of the edit — the boundary is usually one decision wide, and the students who find a smaller edit than they expected have learned the most.</p>
+      <p>A worked precedent from the source thesis: in Coil Hibiki, progress rewards are journal accessories and new playlists which the player <i>is not forced to take if they do not need to</i>. Delete that clause and nothing else, and the same reward becomes an obligation. That is the whole exercise.</p>
+    </div>
+    <div class="fields" data-paper="theft">
+      <div class="field"><label for="t-honest">The honest version</label><div class="hint">Described precisely enough that someone could build it.</div><textarea id="t-honest" data-f="Honest version"></textarea></div>
+      <div class="field"><label for="t-edit">The single edit</label><div class="hint">One change. A default, a visibility, a reset condition, a timing, a removed clause.</div><textarea id="t-edit" data-f="The edit"></textarea></div>
+      <div class="field"><label for="t-after">What it serves afterwards</label><textarea id="t-after" data-f="After the edit"></textarea></div>
+      <div class="field"><label for="t-smaller">The smaller edit the room found</label><div class="hint">The room will challenge whether yours was the smallest possible. Record what they found — a smaller edit is a worse one and more useful to know.</div><textarea id="t-smaller" data-f="Smaller edit"></textarea></div>
+    </div>
+    <div class="btn-row"><button type="button" data-copy="theft">Copy out</button><span class="status" id="st-theft"></span></div>
+  </div>
+
+  <div class="paper" id="paper-bound">
+    <div class="paper-head"><h3>Boundary statement</h3><span class="ref">Paper four · session 3.2 · goes into the artifact</span></div>
+    <div class="prose">
+      <p>What your artifact does, what it explicitly does not claim, and what it does when a user is in difficulty beyond its scope. This is not documentation. It goes into the thing itself, where a user will meet it, in language a person in difficulty could read.</p>
+      <p>The precedent is exact. Coil Hibiki researched depression, anxiety and dementia, consulted people who work with patients, and built its symbolic architecture and emotional scaffolding on that — and the thesis still states plainly that none of it <i>was to make a diagnosis</i>. It was resonance, understanding and connection. Ambition and boundary are not in tension; write the boundary and then be ambitious inside it.</p>
+      <p>Write it even if your brief is purely educational. A learning product that quietly implies it can carry someone through a hard time has made a claim it cannot keep.</p>
+    </div>
+    <div class="fields" data-paper="bound">
+      <div class="field"><label for="b-does">What it does</label><textarea id="b-does" data-f="What it does"></textarea></div>
+      <div class="field"><label for="b-not">What it does not claim</label><div class="hint">Plainly, in the second person, without hedging. Not <i>this is not intended to replace professional advice</i> — say what it is not.</div><textarea id="b-not" data-f="What it does not claim"></textarea></div>
+      <div class="field"><label for="b-hand">The handover</label><div class="hint">What happens when someone is beyond its scope. Who they reach, how fast, and how many steps from wherever they are when they need it.</div><textarea id="b-hand" data-f="Handover"></textarea></div>
+      <div class="field"><label for="b-where">Where in the artifact this appears</label><div class="hint">A screen, a page, a moment. If the answer is a settings submenu, it does not count.</div><textarea id="b-where" data-f="Placement"></textarea></div>
+    </div>
+    <div class="btn-row"><button type="button" data-copy="bound">Copy out</button><span class="status" id="st-bound"></span></div>
+  </div>
+
+  <div class="paper" id="paper-boat">
+    <div class="paper-head"><h3>The boat problem</h3><span class="ref">Paper five · session 3.3</span></div>
+    <div class="prose">
+      <p>Flow is the most powerful thing this course can teach you to build and the most dangerous. Check your design against the four conditions, confirm it meets them, and then answer the question that stops the four being a licence: what in your design makes leaving cost something?</p>
+      <p>Then the durability half. Products in this field are almost always evaluated at the point of maximum novelty, which is when they look best and tell you least.</p>
+    </div>
+    <div class="fields" data-paper="boat">
+      <div class="field"><label for="o-f1">Clear goals and instant feedback</label><textarea id="o-f1" data-f="Flow 1 goals and feedback"></textarea></div>
+      <div class="field"><label for="o-f2">Gradual increase in difficulty</label><div class="hint">Or deliberately constant, where an even rhythm serves the learning better — say which you chose and why.</div><textarea id="o-f2" data-f="Flow 2 difficulty"></textarea></div>
+      <div class="field"><label for="o-f3">An environment that removes distractions</label><div class="hint">What you took away matters more here than what you added.</div><textarea id="o-f3" data-f="Flow 3 distractions"></textarea></div>
+      <div class="field"><label for="o-f4">Rewards that reinforce mastery</label><textarea id="o-f4" data-f="Flow 4 rewards"></textarea></div>
+      <div class="field"><label for="o-cost">What makes leaving cost something?</label><div class="hint">Count it in steps, in lost progress, and in how the design makes going <i>feel</i>. The honest answer is rarely none.</div><textarea id="o-cost" data-f="Cost of leaving" style="min-height:110px"></textarea></div>
+      <div class="field"><label for="o-w1">The person in week one</label><div class="hint">What changed for them, and why they came back.</div><textarea id="o-w1" data-f="Week one"></textarea></div>
+      <div class="field"><label for="o-w9">The same person in week nine</label><div class="hint">Assuming nothing improved and nothing was added.</div><textarea id="o-w9" data-f="Week nine"></textarea></div>
+      <div class="field"><label for="o-dep">What can they now not do without this?</label><div class="hint">If the answer is anything they could previously do unaided, that is a finding against the design and it has to change.</div><textarea id="o-dep" data-f="Dependency"></textarea></div>
+      <div class="field"><label for="o-chg">What you changed as a result</label><textarea id="o-chg" data-f="Change made"></textarea></div>
+    </div>
+    <div class="btn-row"><button type="button" data-copy="boat">Copy out</button><span class="status" id="st-boat"></span></div>
+  </div>
+
+  <div class="paper" id="paper-pr">
+    <div class="paper-head"><h3>Paired readings</h3><span class="ref">Paper six · session 4.3</span></div>
+    <div class="prose">
+      <p>One row per subject. Take all twelve item readings on the instrument in the room, then record the four averages here. Both instruments band at plus and minus a half point: restoration reads restorative, neutral or depleting; self-determination reads supporting, neutral or capturing.</p>
+      <p>Subjects are numbered, never named. Write the numbers down before anyone in your team discusses them.</p>
+    </div>
+    <div class="tablewrap">
+      <table id="pr-table">
+        <thead><tr>
+          <th>Subject</th><th class="num">R before</th><th class="num">R after</th><th class="num">S before</th><th class="num">S after</th>
+          <th class="num">R delta</th><th>Restoration</th><th class="num">S delta</th><th>Self-determination</th><th></th>
+        </tr></thead>
+        <tbody id="pr-body"></tbody>
+      </table>
+    </div>
+    <div class="totals">
+      <span class="which">Mean restoration</span><span class="big" id="pr-mr">—</span><span class="band" id="pr-mrb"></span>
+      <span class="which">Mean self-determination</span><span class="big" id="pr-ma">—</span><span class="band" id="pr-mab"></span>
+    </div>
+    <p class="status" id="pr-note" style="margin-top:14px">A subject counts once all four averages are in.</p>
+    <div class="btn-row"><button type="button" data-addrow="pr">Add a subject</button><button type="button" data-copy="pr">Copy out</button><span class="status" id="st-pr"></span></div>
+    <div class="caution">
+      <span>What each instrument is</span>
+      The restoration reading is the master's manuscript's own: its wording and its thresholds, quoted rather than paraphrased, so a reading you take here is comparable with one taken in the other courses of this programme. The self-determination reading is <strong>a teaching instrument assembled for this course</strong> from Deci and Ryan's three needs as the source thesis operationalises them — player agency, skill progression, and the freedom the third test asks about. It is grounded, and it is not a validated scale: it has not been psychometrically tested. Report it inside the room, and if this work is ever written up, replace it with a validated self-determination measure and say that you did. Watch the third item on its own as well as the average: a subject who finds it harder to walk away after the interaction than before is the boat problem, whatever the averages say.
+    </div>
+  </div>
+
+  <div class="paper" id="paper-read">
+    <div class="paper-head"><h3>Pact reading record</h3><span class="ref">Paper seven · session 4.4</span></div>
+    <div class="prose"><p>What the players said, in their words, before you said anything. Then what you intended. Then which of the two is true of the thing you actually built. Consent is this course's whole criterion and it is not something a designer can self-assess — if the accounts differ, you do not have the consent you claim, whatever the readings say.</p></div>
+    <div class="fields" data-paper="read">
+      <div class="field"><label for="d-said">What the players said they agreed to</label><div class="hint">Their words. Write them down as spoken, not summarised into yours.</div><textarea id="d-said" data-f="What players said" style="min-height:120px"></textarea></div>
+      <div class="field"><label for="d-meant">What you intended the pact to be</label><textarea id="d-meant" data-f="Intended pact"></textarea></div>
+      <div class="field"><label for="d-gap">The gap, and which account is true of what you built</label><div class="hint">This is the line that is assessed.</div><textarea id="d-gap" data-f="The gap" style="min-height:120px"></textarea></div>
+      <div class="field"><label for="d-ask">What a player had to ask you</label><div class="hint">From session 4.2. Assume the user is totally clueless — in an unfamiliar medium that is foundational, not unflattering. Everything a cold player had to ask is a finding about the artifact, not about the player.</div><textarea id="d-ask" data-f="Questions players asked"></textarea></div>
+    </div>
+    <div class="btn-row"><button type="button" data-copy="read">Copy out</button><span class="status" id="st-read"></span></div>
+  </div>
+
+  <div class="copyout" id="copyout" hidden>
+    <p id="copyout-msg"></p>
+    <textarea id="copyout-text" readonly></textarea>
+  </div>
+</section>
+
+<section id="reference" class="wrap">
+  <div class="sec-head"><span class="sec-no">04</span><h2>Without looking it up</h2></div>
+  <p class="lede">Used in the room, at speed, without a screen.</p>
+
+  <div>
+    <h4>The three tests</h4>
+    <div class="tablewrap"><table id="tests-t">
+      <thead><tr><th class="num">Test</th><th>The question</th><th>What a failure means</th></tr></thead>
+      <tbody>
+        <tr><td class="num">1</td><td>Who holds the goal? Did the person arrive with the intention this mechanic serves, or did the system supply it?</td><td>The person did not bring the goal. Fixable by design: give them the goal, or drop the mechanic.</td></tr>
+        <tr><td class="num">2</td><td>Are the mechanics disclosable? Would it still work if the person were shown exactly how and why it was built to affect them?</td><td>Hard gate. A mechanic that only works while unexplained has no pact behind it. Rework the approach, not the wording.</td></tr>
+        <tr><td class="num">3</td><td>Does leaving cost nothing? Counted in steps, in lost progress, and in how the design makes going feel.</td><td>A pact you cannot leave was not a pact. Usually the cheapest of the three to fix and the most often ignored.</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+
+  <div style="margin-top:30px">
+    <h4>Three things that are not the same thing</h4>
+    <ul>
+      <li><strong>A game</strong> is active storytelling: the player becomes the protagonist of a story that develops through their choices and actions.</li>
+      <li><strong>Game-based learning</strong> uses an actual game as the central medium of instruction — immersive and narrative-driven, built to teach specific skills or knowledge.</li>
+      <li><strong>Gamification</strong> applies game elements — points, badges, leaderboards, progress bars — to something that is <i>not</i> a game, to motivate behaviour. It is not gaming, and the two are routinely confused.</li>
+    </ul>
+  </div>
+
+  <div style="margin-top:30px">
+    <h4>The three needs, in their working form</h4>
+    <ul>
+      <li><strong>Autonomy — player agency.</strong> The freedom and control a learner has over their decisions, actions and path. When someone feels in charge they become invested, and meaningful choice drives problem-solving.</li>
+      <li><strong>Competence — skill progression.</strong> Gradually increasing challenge with improvement made visible. Paced to keep the learner in the zone: challenged but not frustrated. A badge is not a competence.</li>
+      <li><strong>Relatedness — social interaction.</strong> Working with peers, which nurtures emotional intelligence and belonging. Students often learn better under adequate confrontation. A follower count is not relatedness.</li>
+    </ul>
+  </div>
+
+  <div style="margin-top:30px">
+    <h4>The four conditions of flow</h4>
+    <ul>
+      <li>Clear goals and instant feedback.</li>
+      <li>A gradual increase in difficulty — challenge matched to skill, not too easy and not too hard.</li>
+      <li>An environment that removes distractions.</li>
+      <li>Rewards that reinforce mastery.</li>
+    </ul>
+    <p class="prose" style="font-size:14px;color:var(--ink-soft);margin-top:10px">All four can be satisfied by something a person cannot put down. That is why the third test exists, and why a design that scores perfectly here still has to answer the boat problem.</p>
+  </div>
+
+  <div style="margin-top:30px">
+    <h4>What an archetype is for, and what it is not</h4>
+    <p class="prose" style="font-size:14px;color:var(--ink-soft)">Achievers, Explorers, Socializers, Killers. Useful for mapping motivation — and originally used not only for design but for marketing audience segmentation and product tailoring, to reach wider audiences and make bigger sales. They are not meant to define identities. When archetypes harden into labels they foster misunderstanding, exclusion and subtle forms of discrimination. A person may be an Achiever at work, an Explorer at home, a Socializer among friends and a Killer in debate. Design for the state someone is in today, not the label.</p>
+  </div>
+
+  <div style="margin-top:30px">
+    <h4>The bias set these mechanics run on</h4>
+    <p class="prose" style="font-size:14px;color:var(--ink-soft)">Confirmation bias. Illusory superiority, and its counterpart the illusion of inferiority — both tied to locus of control, and both inflamed by comparison with other people's edited lives. Loss aversion, which is marketing's favourite. Fear of missing out. Illusory correlation. Information bias. Clustering illusion, because the brain seeks order even in randomness. Your brain is not a truth-seeking machine; it is a pattern matcher. Every one of these can be used to help someone think or to stop them thinking, and the difference is the three tests.</p>
+  </div>
+
+  <div style="margin-top:30px">
+    <h4>What design can and cannot do here</h4>
+    <p class="prose" style="font-size:14px;color:var(--ink-soft)">It can shape an environment, carry a practice someone has already been given, lower the cost of a good habit, and make a difficult thing approachable. Through emotional architecture it can offer catharsis, reflection and regulation — emotional release in a controlled metaphorical setting, revisiting choices without real-world stakes, and practising fear, empathy or guilt at low pressure. Quiet moments are part of that scaffolding and are never filler. It cannot assess, diagnose, or hold risk. Where it would need to, it needs a clinician, and the design's job is to make that handover easy.</p>
+  </div>
+</section>
+
+<section id="assess" class="wrap">
+  <div class="sec-head"><span class="sec-no">05</span><h2>How you are assessed</h2></div>
+  <div class="tablewrap"><table id="as-t">
+    <thead><tr><th>Piece</th><th class="num">Weight</th><th>What earns the mark</th></tr></thead>
+    <tbody>
+      <tr><td>The artifact</td><td class="num">35%</td><td>Holding the signed constraint sheet; a cold player able to use it unaided; the boundary statement inside the thing rather than in the documentation.</td></tr>
+      <tr><td>The mechanic justification</td><td class="num">30%</td><td>Every mechanic ruled on all three tests, rejections included. The rejections carry as much as the inclusions.</td></tr>
+      <tr><td>The pact reading</td><td class="num">20%</td><td>The gap between what players said and what you intended, and the honesty of your account of it.</td></tr>
+      <tr><td>The boat problem</td><td class="num">15%</td><td>Whether the cost of leaving was found before the build and designed out, rather than noticed afterwards.</td></tr>
+    </tbody>
+  </table></div>
+  <div class="prose" style="margin-top:26px"><p>No exam. Nothing is submitted that has not been played by someone other than its makers. If you are unsure whether something counts as a legitimate rejection, a contested ruling or a finding against your own design, bring it — all three carry marks and none is an admission of failure.</p></div>
+</section>
+
+<section id="consent" class="wrap">
+  <div class="sec-head"><span class="sec-no">06</span><h2>Consent</h2></div>
+  <p class="lede">You will ask real people for an account of their own state. Write the protocol before you collect anything; it must contain all eight of these.</p>
+  <div class="prose">
+    <ol>
+      <li>Subjects volunteer, and are told what the readings are for before they give any.</li>
+      <li>A subject may stop at any point, including after the before-readings, and nothing is inferred from a withdrawal.</li>
+      <li>No names and no identifiers. Subjects are numbered.</li>
+      <li>No demographic fields beyond what your analysis actually requires, which is almost always none.</li>
+      <li>Readings go on paper or into a form your team controls. Not into a third-party tool.</li>
+      <li>Only aggregate figures leave the room.</li>
+      <li>You may withhold your own readings from the cohort register without any effect on your grade, and you need give no reason.</li>
+      <li>Subjects are consenting adult peers. You design <strong>for</strong> a population and test <strong>with</strong> peers: any proposal to test with minors, patients or another protected group goes through institutional ethics review before a single reading is taken, and the assumption in a four-week course is that it will not happen. Raise it in session 3.4 while the brief is still movable.</li>
+    </ol>
+    <p>The papers on this page hold nothing and send nothing — drafts stay in your own browser. That is deliberate, and it is the standard you are being asked to meet: an instrument built to teach disclosed consent cannot collect without it.</p>
+  </div>
+</section>
+
+<section id="reading" class="wrap">
+  <div class="sec-head"><span class="sec-no">07</span><h2>Reading</h2></div>
+  <p class="lede">The first three do the structural work. Read them before week two.</p>
+  <div class="prose"><ul>
+    <li>Deci, E.L. &amp; Ryan, R.M. — Self-determination theory. Autonomy, competence and relatedness. The criteria behind test one; read an overview rather than the full literature.</li>
+    <li>Csikszentmihalyi, M. — Flow. The four conditions, and the reason this course treats flow as a hazard as well as a goal.</li>
+    <li>Williams, J. (2018). <i>Stand Out of Our Light.</i> — Impulsive against reflective will, and agency as the measure of a technology.</li>
+    <li>Zak, P.J. — <i>Why inspiring stories make us react: the neuroscience of narrative.</i> The dramatic arc, oxytocin, and the behavioural consequence.</li>
+    <li>Brockington, G. et al. — Storytelling with hospitalised children: oxytocin, cortisol, pain perception. The measured case for narration, and the evidence behind the Transport Test.</li>
+    <li>Isbister, K. (2016). <i>How Games Move Us.</i> — Emotion by design: how constructed atmosphere nudges players toward introspection and connection.</li>
+    <li>Jenkins, H. — Transmedia storytelling. The systematic distribution of a narrative across platforms, each contributing to the whole.</li>
+    <li>Zichermann, G. &amp; Cunningham, C. (2011). <i>Gamification by Design.</i> — How storytelling gives rewards meaning. Read it critically; it is the field's own manual.</li>
+    <li>Coleridge, S.T. (1817) — on the willing suspension of disbelief. One passage, and the origin of the pact.</li>
+    <li>Kahneman, D. &amp; Tversky, A. — on heuristics and biases. The set in the reference section above.</li>
+    <li>Telfer, S. — <i>Innovation, Integration &amp; Education Through Storytelling</i> (TEDx University of Bolton). Conversation theory, narrative pedagogy, and the distinction between narrative teaching and narrative learning.</li>
+    <li>Haidt, J. — on adolescent mental health and the arrival of the platforms. The figures behind week three.</li>
+  </ul></div>
+</section>
+
+</main>
+
+<footer class="wrap colophon">
+  <p>Built on Di Patre, P. (2025), <i>New Technologies in Storytelling and Gamification for Education and Mental Health</i>, Pantheon Institute of Design and Technology — its self-determination chapter, its critique of player archetypes as marketing segments, its <i>Story of Misery</i> chapter, and the three projects it documents: VALLAE, Cloudy Horizons and Coil Hibiki. The pact argument and the restoration instrument are from <i>Media as Universe: An Antifragile Framework for Communication Design in the Attention Economy</i>, §2.1 and §5.6, quoted rather than paraphrased so that readings taken here are comparable with readings taken elsewhere in the programme.</p>
+  <p>The third test is the source thesis's own observation about Cloudy Horizons. The self-determination reading is a teaching instrument assembled for this course and is not a validated scale. Drafts you type into the papers above are kept in this browser and nowhere else: not transmitted, not stored on a server, not visible to the instructor. Clearing your browser data clears them.</p>
+</footer>
+
+<script>
+(function () {
+  "use strict";
+  var el = function (id) { return document.getElementById(id); };
+
+  var KEY = "alt-handbook-v2";
+  var draft = {};
+  try { var raw = window.localStorage.getItem(KEY); if (raw) { draft = JSON.parse(raw) || {}; } } catch (e) { draft = {}; }
+  var t = null;
+  function save() {
+    if (t) { window.clearTimeout(t); }
+    t = window.setTimeout(function () {
+      try { window.localStorage.setItem(KEY, JSON.stringify(draft)); } catch (e) { /* blocked storage */ }
+    }, 400);
+  }
+
+  /* ---------- field papers ---------- */
+  ["pact", "theft", "bound", "boat", "read"].forEach(function (name) {
+    var host = document.querySelector('[data-paper="' + name + '"]');
+    if (!host) { return; }
+    Array.prototype.forEach.call(host.querySelectorAll("input[data-f], textarea[data-f]"), function (node) {
+      var k = name + ":" + node.id;
+      if (typeof draft[k] === "string") { node.value = draft[k]; }
+      node.addEventListener("input", function () { draft[k] = node.value; save(); });
+    });
+  });
+
+  function paperText(name) {
+    var host = document.querySelector('[data-paper="' + name + '"]');
+    var title = document.querySelector("#paper-" + name + " h3");
+    var lines = [(title ? title.textContent : name).toUpperCase(), ""];
+    Array.prototype.forEach.call(host.querySelectorAll("input[data-f], textarea[data-f]"), function (node) {
+      lines.push(node.getAttribute("data-f") + ": " + (node.value.trim() || "—"));
+    });
+    return lines.join("\n");
+  }
+
+  /* ---------- justification table ---------- */
+  var JCOLS = ["mechanic", "context", "goal", "disclosure", "exit", "ruling", "used"];
+  var JHEAD = ["Mechanic", "Context", "Who holds the goal", "How it is disclosed", "What leaving costs", "Ruling", "Used?"];
+  var JPLACE = { mechanic: "named", context: "the specific case", goal: "person / system",
+    disclosure: "where, and when", exit: "steps, progress, feeling", ruling: "pact / not yet / extraction", used: "yes / rejected" };
+  var jRows = Array.isArray(draft.jRows) ? draft.jRows : [];
+
+  function jRender() {
+    var body = el("just-body");
+    body.innerHTML = "";
+    jRows.forEach(function (row, i) {
+      var tr = document.createElement("tr");
+      JCOLS.forEach(function (c) {
+        var td = document.createElement("td");
+        var inp = document.createElement("input");
+        inp.type = "text"; inp.value = row[c] || ""; inp.placeholder = JPLACE[c];
+        inp.setAttribute("aria-label", c + ", row " + (i + 1));
+        inp.addEventListener("input", function () { jRows[i][c] = inp.value; draft.jRows = jRows; save(); });
+        td.appendChild(inp); tr.appendChild(td);
+      });
+      var tdx = document.createElement("td");
+      var b = document.createElement("button");
+      b.type = "button"; b.className = "rowdrop"; b.textContent = "Drop";
+      b.addEventListener("click", function () { jRows.splice(i, 1); draft.jRows = jRows; save(); jRender(); });
+      tdx.appendChild(b); tr.appendChild(tdx);
+      body.appendChild(tr);
+    });
+  }
+  function jText() {
+    var out = ["MECHANIC JUSTIFICATION", "", JHEAD.join("\t")];
+    jRows.forEach(function (r) {
+      out.push(JCOLS.map(function (c) { return (r[c] || "").replace(/\t/g, " "); }).join("\t"));
+    });
+    var rejected = jRows.filter(function (r) { return (r.used || "").toLowerCase().indexOf("reject") !== -1; }).length;
+    out.push("");
+    out.push("Rows: " + jRows.length + " · rejected: " + rejected);
+    return out.join("\n");
+  }
+
+  /* ---------- paired readings ---------- */
+  var PCOLS = ["rb", "ra", "ab", "aa"];
+  var pRows = Array.isArray(draft.pRows) ? draft.pRows : [];
+
+  function num(v) { var n = Number(v); return v === "" || v === undefined || isNaN(n) ? null : n; }
+  function signed(n) { return (n > 0 ? "+" : n < 0 ? "−" : "") + Math.abs(n).toFixed(2); }
+  function rBand(d) { return d >= 0.5 ? "Restorative" : d > -0.5 ? "Neutral" : "Depleting"; }
+  function aBand(d) { return d >= 0.5 ? "Supporting" : d > -0.5 ? "Neutral" : "Capturing"; }
+
+  function pStats(row) {
+    var rb = num(row.rb), ra = num(row.ra), ab = num(row.ab), aa = num(row.aa);
+    if (rb === null || ra === null || ab === null || aa === null) { return null; }
+    return { rd: ra - rb, ad: aa - ab };
+  }
+
+  function pRender() {
+    var body = el("pr-body");
+    body.innerHTML = "";
+    pRows.forEach(function (row, i) {
+      var tr = document.createElement("tr");
+
+      var tdS = document.createElement("td");
+      var sub = document.createElement("input");
+      sub.type = "text"; sub.value = row.subject || ""; sub.placeholder = "S" + (i + 1);
+      sub.setAttribute("aria-label", "Subject, row " + (i + 1));
+      sub.addEventListener("input", function () { pRows[i].subject = sub.value; draft.pRows = pRows; save(); });
+      tdS.appendChild(sub); tr.appendChild(tdS);
+
+      PCOLS.forEach(function (c) {
+        var td = document.createElement("td");
+        td.className = "num";
+        var inp = document.createElement("input");
+        inp.type = "number"; inp.min = "1"; inp.max = "5"; inp.step = "0.01";
+        inp.value = row[c] === undefined ? "" : row[c];
+        inp.setAttribute("aria-label", c + ", row " + (i + 1));
+        inp.addEventListener("input", function () {
+          var v = inp.value === "" ? "" : Math.max(1, Math.min(5, Number(inp.value)));
+          pRows[i][c] = v; draft.pRows = pRows; save(); pRender();
+        });
+        td.appendChild(inp); tr.appendChild(td);
+      });
+
+      var s = pStats(row);
+      [["rd", rBand], ["ad", aBand]].forEach(function (spec) {
+        var tdN = document.createElement("td");
+        tdN.className = "num";
+        tdN.textContent = s ? signed(s[spec[0]]) : "—";
+        tr.appendChild(tdN);
+        var tdB = document.createElement("td");
+        tdB.textContent = s ? spec[1](s[spec[0]]) : "incomplete";
+        if (!s) { tdB.style.color = "var(--ink-faint)"; }
+        tr.appendChild(tdB);
+      });
+
+      var tdx = document.createElement("td");
+      var b = document.createElement("button");
+      b.type = "button"; b.className = "rowdrop"; b.textContent = "Drop";
+      b.addEventListener("click", function () { pRows.splice(i, 1); draft.pRows = pRows; save(); pRender(); });
+      tdx.appendChild(b); tr.appendChild(tdx);
+      body.appendChild(tr);
+    });
+    pTotals();
+  }
+
+  function pTotals() {
+    var done = [];
+    pRows.forEach(function (r) { var s = pStats(r); if (s) { done.push(s); } });
+    if (!done.length) {
+      el("pr-mr").textContent = "—"; el("pr-mrb").textContent = "";
+      el("pr-ma").textContent = "—"; el("pr-mab").textContent = "";
+      el("pr-note").textContent = "A subject counts once all four averages are in.";
+      return;
+    }
+    var sr = 0, sa = 0;
+    done.forEach(function (s) { sr += s.rd; sa += s.ad; });
+    var mr = sr / done.length, ma = sa / done.length;
+    el("pr-mr").textContent = signed(mr); el("pr-mrb").textContent = rBand(mr);
+    el("pr-ma").textContent = signed(ma); el("pr-mab").textContent = aBand(ma);
+    el("pr-note").textContent = done.length + (done.length === 1 ? " completed subject" : " completed subjects")
+      + " of " + pRows.length + " row" + (pRows.length === 1 ? "" : "s");
+  }
+
+  function pText() {
+    var out = ["PAIRED READINGS", "",
+      ["Subject", "R before", "R after", "S before", "S after", "R delta", "Restoration", "S delta", "Self-determination"].join("\t")];
+    pRows.forEach(function (r, i) {
+      var s = pStats(r);
+      out.push([
+        r.subject || ("S" + (i + 1)),
+        r.rb === undefined ? "" : r.rb, r.ra === undefined ? "" : r.ra,
+        r.ab === undefined ? "" : r.ab, r.aa === undefined ? "" : r.aa,
+        s ? signed(s.rd) : "", s ? rBand(s.rd) : "incomplete",
+        s ? signed(s.ad) : "", s ? aBand(s.ad) : "incomplete"
+      ].join("\t"));
+    });
+    var done = [];
+    pRows.forEach(function (r) { var s = pStats(r); if (s) { done.push(s); } });
+    if (done.length) {
+      var sr = 0, sa = 0;
+      done.forEach(function (s) { sr += s.rd; sa += s.ad; });
+      out.push("");
+      out.push("Mean across " + done.length + " subjects · restoration " + signed(sr / done.length) +
+        " (" + rBand(sr / done.length) + ") · self-determination " + signed(sa / done.length) + " (" + aBand(sa / done.length) + ")");
+    }
+    out.push("");
+    out.push("Restoration: the master's manuscript's instrument, quoted. Self-determination: a teaching instrument assembled for this course from the three needs; not a validated scale.");
+    return out.join("\n");
+  }
+
+  /* ---------- copy out ---------- */
+  function textFor(name) {
+    if (name === "just") { return jText(); }
+    if (name === "pr") { return pText(); }
+    return paperText(name);
+  }
+  function fallback(text, msg) {
+    el("copyout-msg").textContent = msg;
+    el("copyout-text").value = text;
+    el("copyout").hidden = false;
+    var ta = el("copyout-text");
+    ta.focus(); ta.setSelectionRange(0, ta.value.length);
+    el("copyout").scrollIntoView({ block: "nearest" });
+  }
+  function flash(name, msg) {
+    var s = el("st-" + name);
+    if (!s) { return; }
+    s.textContent = msg;
+    window.setTimeout(function () { if (s.textContent === msg) { s.textContent = ""; } }, 2600);
+  }
+  Array.prototype.forEach.call(document.querySelectorAll("[data-copy]"), function (btn) {
+    btn.addEventListener("click", function () {
+      var name = btn.getAttribute("data-copy");
+      var text = textFor(name);
+      el("copyout").hidden = true;
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(
+          function () { flash(name, "Copied"); },
+          function () { fallback(text, "Copying was refused here. Select the text below and copy it manually."); }
+        );
+      } else {
+        fallback(text, "Select the text below and copy it manually.");
+      }
+    });
+  });
+  Array.prototype.forEach.call(document.querySelectorAll("[data-addrow]"), function (btn) {
+    btn.addEventListener("click", function () {
+      if (btn.getAttribute("data-addrow") === "just") { jRows.push({}); draft.jRows = jRows; save(); jRender(); }
+      else { pRows.push({}); draft.pRows = pRows; save(); pRender(); }
+    });
+  });
+
+  if (!jRows.length) { jRows.push({}, {}, {}); draft.jRows = jRows; }
+  if (!pRows.length) { pRows.push({}, {}, {}); draft.pRows = pRows; }
+  jRender();
+  pRender();
+})();
+</script>
+</body>
+</html>

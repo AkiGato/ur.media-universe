@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Media as Universe</title>
+<style>
+  /* Layout: one A4 sheet (210 × 297 mm), sized in mm so print is exact. On
+     screen it sits on a neutral ground; in print the ground goes and the sheet
+     is the page. Hairlines only — nothing a filled area except the nodes on the
+     figure, nothing a straight segment. */
+  :root {
+    --ground: #e2e2e0;
+    --sheet: #f2f2f1;
+    --ink: #15161a;
+    --ink-soft: #55575d;
+    --ink-faint: #85878c;
+    --hair: #c2c3c0;
+    --hair-faint: #d6d7d4;
+    --display: "Newsreader", "Iowan Old Style", Georgia, serif;
+    --body: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground: #07080a; --sheet: #101113; --ink: #e8e7e3; --ink-soft: #a2a29e;
+      --ink-faint: #74756f; --hair: #35373a; --hair-faint: #262829;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --ground: #07080a; --sheet: #101113; --ink: #e8e7e3; --ink-soft: #a2a29e;
+    --ink-faint: #74756f; --hair: #35373a; --hair-faint: #262829;
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--ground); color: var(--ink);
+    font-family: var(--body); font-weight: 300;
+    -webkit-font-smoothing: antialiased;
+    display: flex; justify-content: center;
+    padding: 24px 16px;
+  }
+  h1, h2, p, ul, li, figure { margin: 0; }
+  ul { list-style: none; padding: 0; }
+
+  .sheet {
+    width: 210mm; min-height: 297mm; max-width: 100%;
+    background: var(--sheet); border: 1px solid var(--hair);
+    padding: 20mm 20mm 16mm;
+    display: flex; flex-direction: column;
+  }
+
+  .eyebrow {
+    font-size: 7.4pt; text-transform: uppercase; letter-spacing: 0.2em;
+    color: var(--ink-faint);
+  }
+  h1 {
+    font-family: var(--display); font-weight: 300;
+    font-size: 27pt; line-height: 1.08; letter-spacing: -0.014em;
+    margin-top: 4mm; max-width: 20ch; text-wrap: balance;
+  }
+  .sub { margin-top: 3mm; font-size: 10pt; color: var(--ink-soft); max-width: 54ch; }
+  .meta {
+    margin-top: 5mm; padding-top: 3.4mm; border-top: 1px solid var(--hair);
+    font-size: 7.4pt; text-transform: uppercase; letter-spacing: 0.2em;
+    color: var(--ink-faint); display: flex; flex-wrap: wrap; gap: 1.5mm 7mm;
+  }
+  .question {
+    margin-top: 9mm;
+    font-family: var(--display); font-size: 14pt; line-height: 1.36;
+    max-width: 44ch; text-wrap: balance;
+  }
+
+  figure { margin: 9mm 0 2mm; }
+  figure svg { display: block; width: 100%; height: auto; color: var(--ink); }
+
+  .weeks { margin-top: 2mm; border-top: 1px solid var(--hair); }
+  .wk {
+    display: grid; grid-template-columns: 9mm 1fr; gap: 0 6mm;
+    padding: 4.2mm 0; border-bottom: 1px solid var(--hair-faint);
+  }
+  .wk .no {
+    font-size: 7.4pt; letter-spacing: 0.2em; color: var(--ink-faint);
+    font-variant-numeric: tabular-nums; padding-top: 1.1mm;
+  }
+  .wk h2 { font-family: var(--display); font-weight: 300; font-size: 11.5pt; line-height: 1.25; }
+  .wk p { font-size: 9.4pt; line-height: 1.5; color: var(--ink-soft); margin-top: 1.2mm; max-width: 62ch; }
+
+  .foot { margin-top: auto; padding-top: 8mm; }
+  .label {
+    font-size: 7.4pt; text-transform: uppercase; letter-spacing: 0.2em;
+    color: var(--ink-faint); margin-bottom: 2.6mm;
+  }
+  .leaves { display: grid; gap: 1px; background: var(--hair-faint); }
+  .leaves div {
+    background: var(--sheet); padding: 3.4mm 3.6mm;
+    font-family: var(--display); font-size: 10.5pt; line-height: 1.3;
+  }
+  @media (min-width: 520px) { .leaves { grid-template-columns: repeat(3, 1fr); } }
+
+  .terms { margin-top: 6mm; padding-top: 4mm; border-top: 1px solid var(--hair); }
+  .terms li {
+    font-size: 8.8pt; line-height: 1.5; padding-left: 4.4mm; position: relative; max-width: 72ch;
+  }
+  .terms li + li { margin-top: 1mm; }
+  .terms li::before { content: "—"; position: absolute; left: 0; color: var(--ink-faint); }
+
+  .close {
+    margin-top: 5mm; padding-top: 4mm; border-top: 1px solid var(--hair);
+    display: flex; flex-wrap: wrap; gap: 2mm 8mm; align-items: baseline; justify-content: space-between;
+  }
+  .close .line { font-family: var(--display); font-size: 10.5pt; line-height: 1.35; max-width: 42ch; }
+  .close .spec {
+    font-size: 7.4pt; text-transform: uppercase; letter-spacing: 0.2em;
+    color: var(--ink-faint); text-align: right;
+  }
+  .close .spec span { display: block; }
+
+  /* The one place with emphasis: a solid rule, where the sheet asks for a reply. */
+  .cta {
+    margin-top: 5mm; padding-top: 4.6mm; border-top: 1px solid var(--ink);
+    display: grid; gap: 3mm 8mm;
+  }
+  @media (min-width: 520px) { .cta { grid-template-columns: 1.4fr 1fr; } }
+  .cta .ask { font-family: var(--display); font-size: 12pt; line-height: 1.32; max-width: 34ch; }
+  .cta .req { font-size: 8.6pt; line-height: 1.5; color: var(--ink-soft); margin-top: 2.6mm; max-width: 44ch; }
+  .cta .contact { font-size: 9.6pt; line-height: 1.45; margin-top: 3.4mm; }
+  .cta .contact span { display: block; }
+  .cta .side {
+    font-size: 7.4pt; text-transform: uppercase; letter-spacing: 0.2em;
+    color: var(--ink-faint); align-self: end;
+  }
+  .cta .side span { display: block; margin-bottom: 1.6mm; }
+
+  @page { size: A4 portrait; margin: 0; }
+  @media print {
+    :root {
+      --ground: #ffffff; --sheet: #ffffff; --ink: #111317; --ink-soft: #3f4147;
+      --ink-faint: #6e7075; --hair: #b4b5b2; --hair-faint: #d2d3d0;
+      color-scheme: light;
+    }
+    body { padding: 0; display: block; background: #ffffff; }
+    .sheet {
+      width: 210mm; height: 297mm; min-height: 0;
+      border: none; background: #ffffff; padding: 18mm 20mm 15mm;
+      page-break-after: avoid;
+    }
+    .wk, .leaves, .terms, .cta { break-inside: avoid; }
+  }
+</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,300&family=IBM+Plex+Sans:wght@300&display=swap">
+<style>[hidden]{display:none!important}img{max-width:100%}</style>
+</head>
+<body>
+<div class="sheet">
+  <span class="eyebrow">Course one of three · Antifragile Communication Design</span>
+  <h1>Media as Universe</h1>
+  <p class="sub">The attention economy: how it extracts, and why a business built on extraction is fragile.</p>
+  <div class="meta">
+    <span>Four weeks</span><span>48 contact hours</span><span>Studio, in English</span><span>No prerequisites</span>
+  </div>
+
+  <p class="question">Why were we never built for this — and what breaks first in a business that depends on us not noticing?</p>
+
+  <figure>
+    <svg viewBox="0 0 620 70" role="img" aria-label="Four nodes rising along a single wandering filament, one for each week.">
+      <path d="M 40 52 Q 145 44 250 38 Q 355 32 460 18" fill="none" stroke="currentColor" stroke-width="1.2" opacity="0.9"/>
+      <path d="M 40 58 Q 190 50 320 38 Q 420 28 540 14" fill="none" stroke="currentColor" stroke-width="0.6" opacity="0.26"/>
+      <circle cx="40" cy="52" r="3" fill="currentColor" opacity="0.5"/>
+      <circle cx="180" cy="42.5" r="3.4" fill="currentColor" opacity="0.65"/>
+      <circle cx="320" cy="34.5" r="3.9" fill="currentColor" opacity="0.8"/>
+      <circle cx="460" cy="18" r="4.6" fill="currentColor"/>
+    </svg>
+  </figure>
+
+  <div class="weeks">
+    <div class="wk"><span class="no">01</span><div><h2>The mechanics</h2>
+      <p>Name every weapon operating on you, and find the four places the model that uses them is structurally weak.</p></div></div>
+    <div class="wk"><span class="no">02</span><div><h2>The person</h2>
+      <p>Stop writing to profiles. Write to the state someone is actually in when the message arrives.</p></div></div>
+    <div class="wk"><span class="no">03</span><div><h2>The claim</h2>
+      <p>Take a commercial claim apart, down to the economic, historical and cognitive roots it was built on.</p></div></div>
+    <div class="wk"><span class="no">04</span><div><h2>The proof</h2>
+      <p>Build one thing. Measure what it costs the people who receive it. Read the number out loud.</p></div></div>
+  </div>
+
+  <div class="foot">
+    <p class="label">Students leave with</p>
+    <div class="leaves">
+      <div>One finished artifact</div>
+      <div>A measured result, obtained under their own protocol</div>
+      <div>A sourced causal analysis of a real claim</div>
+    </div>
+
+    <div class="terms">
+      <ul>
+        <li>One artifact, not a portfolio. No marks for attendance or volume.</li>
+        <li>A poor result, honestly measured, scores above a good one with no method behind it.</li>
+      </ul>
+    </div>
+
+    <div class="cta">
+      <div>
+        <p class="ask">Fifteen minutes on a call will tell you whether this fits your programme.</p>
+        <p class="req">Syllabus in outcome-based format, facilitator's kit and student handbook, all on request. Adapts to your calendar and your own credit framework.</p>
+        <p class="contact">
+          <span>[Name]</span>
+          <span>[email]</span>
+          <span>[phone]</span>
+        </p>
+      </div>
+      <p class="side">
+        <span>Suits advertising, communication, brand strategy, design, business</span>
+        <span>No laboratory · no equipment · no software</span>
+        <span>Four weeks intensive, or sixteen at two hours</span>
+      </p>
+    </div>
+  </div>
+</div>
+</body>
+</html>
